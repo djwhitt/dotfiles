@@ -1,1 +1,18 @@
+#+EXPORT_FILE_NAME: index.html
 * Dotfiles
+** curlrc
+   #+begin_src conf :tangle curlrc
+     cacert=/etc/ssl/certs/ca-certificates.crt
+   #+end_src
+** npmrc
+   #+begin_src conf :tangle npmrc
+     prefix = ${NPM_PACKAGES}
+   #+end_src
+** inputrc
+   #+begin_src conf :tangle inputrc
+     set completion-ignore-case on
+   #+end_src
+** gemrc
+   #+begin_src conf :tangle gemrc
+     gem: --no-rdoc --no-ri
+   #+end_src
