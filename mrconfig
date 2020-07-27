@@ -1,0 +1,41 @@
+[DEFAULT]
+lib =
+    hostname="$(hostname)"
+    whoami="$(whoami)"
+    hours_since_update() {
+        [ "$1" != update ] || hours_since "$1" "$2"
+    }
+    on() {
+        for host in $@; do
+            if [ "${host%@*}" != "${host#*@}" ]; then
+                if [ "$whoami" != "${host%@*}" ]; then
+                  continue
+                fi
+                host="${host#*@}"
+            fi
+            if [ "$hostname" = "$host" ]; then
+                return 0
+            fi
+        done
+        return 1
+    }
+
+# Dummy target, runs fixups after update
+[Temp]
+push = :
+status = :
+update = $HOME/Scripts/fixups
+checkout =
+  mkdir -p Temp
+  $HOME/Scripts/fixups
+order = 25
+
+##
+## Dotfiles
+##
+
+[.dotfiles]
+checkout = git clone git@github.com:djwhitt/dotfiles.git .dotfiles
+
+[.dotfiles-private]
+checkout = git clone git@github.com:djwhitt/dotfiles-private.git .dotfiles-private
