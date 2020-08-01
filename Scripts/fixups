@@ -18,3 +18,6 @@ fi
 # SSH permissions
 chmod 700 $(realpath ~/.ssh)
 find -L ~/.ssh -type f -name 'id_rsa*' -exec realpath {} \; -exec chmod 600 {} \; > /dev/null
+
+# Update desktop database
+update-desktop-database ~/.local/share/applications/

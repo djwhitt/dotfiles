@@ -16,3 +16,13 @@
    #+begin_src conf :tangle gemrc
      gem: --no-rdoc --no-ri
    #+end_src
+** Org Protocol
+   #+begin_src conf :tangle tag-desktop/local/share/applications/org-protocol.desktop
+     [Desktop Entry]
+     Name=org-protocol
+     Exec=emacsclient %u
+     Type=Application
+     Terminal=false
+     Categories=System;
+     MimeType=x-scheme-handler/org-protocol;
+   #+end_src
