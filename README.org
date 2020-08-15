@@ -95,3 +95,31 @@
       Categories=System;
       MimeType=x-scheme-handler/org-protocol;
     #+end_src
+
+** Table Babel + Tangle Experiment
+   #+TBLNAME: dirs
+   | Var   | Dir       |
+   |-------+-----------|
+   | docs  | Documents |
+   | repos | Work      |
+
+   #+NAME: dir-vars
+   #+BEGIN_SRC emacs-lisp :var dir-rows=dirs :results output
+     (dolist (dir-row dir-rows)
+       (let ((v (first dir-row))
+             (d (second dir-row)))
+         (princ (concat "(setq dir-" v " \"" d  "\")\n"))))
+   #+END_SRC
+
+   #+RESULTS: dir-vars
+   : (setq dir-docs "Documents")
+   : (setq dir-repos "Work")
+
+   #+NAME: var-lookup
+   #+BEGIN_SRC emacs-lisp :var var='dir-docs :noweb yes
+     <<dir-vars()>>
+     (symbol-value var)
+   #+END_SRC
+
+   #+RESULTS: var-lookup
+   : Documents
