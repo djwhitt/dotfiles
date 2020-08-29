@@ -19,6 +19,13 @@ export BOOT_EMIT_TARGET=no
 export BOOT_JVM_OPTION="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -Xverify:none"
 
 ###############################################################################
+### Direnv
+
+if (( $+commands[direnv] )); then
+  eval "$(direnv hook zsh)"
+fi
+
+###############################################################################
 ### Nix
 
 if [[ -e "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]]; then
@@ -42,4 +49,11 @@ fi
 
 if [[ -e ~/Scripts ]]; then
     path=(~/Scripts $path)
+fi
+
+###############################################################################
+### Private
+
+if [[ -e ~/.zshenv-private ]]; then
+    source ~/.zshenv-private
 fi
