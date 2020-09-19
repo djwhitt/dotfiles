@@ -28,3 +28,8 @@ find -L ~/.ssh -type f -name 'id_rsa*' -exec realpath {} \; -exec chmod 600 {} \
 if hash update-desktop-database 2> /dev/null; then
     update-desktop-database ~/.local/share/applications/
 fi
+
+# Symlink doom
+if [[ -e ~/Lib/doom-emacs/bin/doom ]]; then
+  ln -sf ~/Lib/doom-emacs/bin/doom ~/Scripts
+fi
