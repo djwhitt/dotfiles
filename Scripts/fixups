@@ -9,6 +9,11 @@ rcup
 # Delete dead symlinks in Scripts directory
 find ~/Scripts -xtype l -delete
 
+# Switch to latest home-manager generation
+if hash home-manager 2> /dev/null; then
+    home-manager switch
+fi
+
 # GnuPG permissions
 if [[ -d ~/.gnupg ]]; then
     chmod 700 $(realpath ~/.gnupg)
