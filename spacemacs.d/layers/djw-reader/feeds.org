@@ -1,3 +1,5 @@
-* Feeds                                                              :elfeed:
-** AWS                                                                  :aws:
+* Feeds                                                                                  :elfeed:
+** AWS                                                                                      :aws:
+*** https://aws.amazon.com/blogs/aws/feed/
 *** https://aws.amazon.com/about-aws/whats-new/recent/feed/
+*** https://aws.amazon.com/blogs/security/feed/                                        :security:
