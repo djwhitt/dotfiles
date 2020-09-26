@@ -42,6 +42,16 @@
 
 (map! :n "-" 'dired-jump)
 
+;; Lastpass
+
+(use-package lastpass
+  :config
+  ;; Set lastpass user
+  (setq lastpass-user "djwhitt@gmail.com"
+        lastpass-shell "/run/current-system/sw/bin/bash")
+  ;; Enable lastpass custom auth-source
+  (lastpass-auth-source-enable))
+
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
