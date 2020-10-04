@@ -70,3 +70,4 @@
 ;; they are implemented.
 
 (load! "email.el")
+(load! "dotfiles.el")
