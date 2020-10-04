@@ -105,10 +105,10 @@ MimeType=x-scheme-handler/org-protocol;
 
 #+NAME: dir-vars
 #+BEGIN_SRC emacs-lisp :var dir-rows=dirs :results output
-(dolist (dir-row dir-rows)
-  (let ((v (first dir-row))
-        (d (second dir-row)))
-    (princ (concat "(setq dir-" v " \"" d  "\")\n"))))
+;;(dolist (dir-row dir-rows)
+;;  (let ((v (first dir-row))
+;;        (d (second dir-row)))
+;;    (princ (concat "(setq dir-" v " \"" d  "\")\n"))))
 #+END_SRC
 
 #+RESULTS: dir-vars
@@ -117,8 +117,8 @@ MimeType=x-scheme-handler/org-protocol;
 
 #+NAME: var-lookup
 #+BEGIN_SRC emacs-lisp :var var='dir-docs :noweb yes
-<<dir-vars()>>
-(symbol-value var)
+;;<<dir-vars()>>
+;;(symbol-value var)
 #+END_SRC
 
 #+RESULTS: var-lookup
