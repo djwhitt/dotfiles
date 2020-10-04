@@ -12,114 +12,114 @@
 #+END_EXPORT
 * Dotfiles
 ** curlrc
-   #+begin_src conf :tangle curlrc
-     cacert=/etc/ssl/certs/ca-certificates.crt
-   #+end_src
+#+begin_src conf :tangle curlrc
+cacert=/etc/ssl/certs/ca-certificates.crt
+#+end_src
 ** inputrc
-   #+begin_src conf :tangle inputrc
-     set completion-ignore-case on
-   #+end_src
+#+begin_src conf :tangle inputrc
+set completion-ignore-case on
+#+end_src
 ** Languages
 *** Node
 **** npmrc
-     #+begin_src conf :tangle npmrc
-       prefix = ${NPM_PACKAGES}
-     #+end_src
+#+begin_src conf :tangle npmrc
+prefix = ${NPM_PACKAGES}
+#+end_src
 **** Packages Path
-     #+NAME: zshenv-npm-packages
-     #+begin_src sh
-       export NPM_PACKAGES="$HOME/.npm-packages"
-       if [[ -e "$NPM_PACKAGES" ]]; then
-           path=($NPM_PACKAGES/bin $path)
-       fi
-     #+end_src
+#+NAME: zshenv-npm-packages
+#+begin_src sh
+export NPM_PACKAGES="$HOME/.npm-packages"
+if [[ -e "$NPM_PACKAGES" ]]; then
+    path=($NPM_PACKAGES/bin $path)
+fi
+#+end_src
 *** Ruby
 **** gemrc
-     #+begin_src conf :tangle gemrc
-       gem: --no-rdoc --no-ri
-     #+end_src
+#+begin_src conf :tangle gemrc
+gem: --no-rdoc --no-ri
+#+end_src
 ** Shell
 **** zshenv
-     #+begin_src sh :noweb yes :tangle zshenv
-       ###############################################################################
-       ### Misc
+#+begin_src sh :noweb yes :tangle zshenv
+###############################################################################
+### Misc
 
-       export EDITOR="vim"
-       export HOSTNAME="$(hostname -s)"
-       export MOSH_SERVER_NETWORK_TMOUT=259200
-       export LPASS_AGENT_TIMEOUT=64800
+export EDITOR="vim"
+export HOSTNAME="$(hostname -s)"
+export MOSH_SERVER_NETWORK_TMOUT=259200
+export LPASS_AGENT_TIMEOUT=64800
 
-       typeset -U path
+typeset -U path
 
-       ###############################################################################
-       ### Clojure
+###############################################################################
+### Clojure
 
-       # Lein
-       export LEIN_FAST_TRAMPOLINE=y
+# Lein
+export LEIN_FAST_TRAMPOLINE=y
 
-       # Boot
-       export BOOT_EMIT_TARGET=no
-       export BOOT_JVM_OPTION="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -Xverify:none"
+# Boot
+export BOOT_EMIT_TARGET=no
+export BOOT_JVM_OPTION="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -Xverify:none"
 
-       ###############################################################################
-       ### Nix
+###############################################################################
+### Nix
 
-       if [[ -e "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]]; then
-           . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
-       fi
+if [[ -e "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]]; then
+    . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
+fi
 
-       ###############################################################################
-       ### Node
+###############################################################################
+### Node
 
-       <<zshenv-npm-packages>>
+<<zshenv-npm-packages>>
 
-       ###############################################################################
-       ### Path
+###############################################################################
+### Path
 
-       if [[ -e ~/.local/bin ]]; then
-           path=(~/.local/bin $path)
-       fi
+if [[ -e ~/.local/bin ]]; then
+    path=(~/.local/bin $path)
+fi
 
-       if [[ -e ~/Scripts ]]; then
-           path=(~/Scripts $path)
-       fi
-     #+end_src
+if [[ -e ~/Scripts ]]; then
+    path=(~/Scripts $path)
+fi
+#+end_src
 ** Desktop
 *** Org Protocol
-    #+begin_src conf :tangle tag-desktop/local/share/applications/org-protocol.desktop
-      [Desktop Entry]
-      Name=org-protocol
-      Exec=emacsclient %u
-      Type=Application
-      Terminal=false
-      Categories=System;
-      MimeType=x-scheme-handler/org-protocol;
-    #+end_src
+#+begin_src conf :tangle tag-desktop/local/share/applications/org-protocol.desktop
+[Desktop Entry]
+Name=org-protocol
+Exec=emacsclient %u
+Type=Application
+Terminal=false
+Categories=System;
+MimeType=x-scheme-handler/org-protocol;
+#+end_src
 
 ** Table Babel + Tangle Experiment
-   #+TBLNAME: dirs
-   | Var   | Dir       |
-   |-------+-----------|
-   | docs  | Documents |
-   | repos | Work      |
+#+TBLNAME: dirs
+| Var   | Dir       |
+|-------+-----------|
+| docs  | Documents |
+| repos | Work      |
 
-   #+NAME: dir-vars
-   #+BEGIN_SRC emacs-lisp :var dir-rows=dirs :results output
-     (dolist (dir-row dir-rows)
-       (let ((v (first dir-row))
-             (d (second dir-row)))
-         (princ (concat "(setq dir-" v " \"" d  "\")\n"))))
-   #+END_SRC
+#+NAME: dir-vars
+#+BEGIN_SRC emacs-lisp :var dir-rows=dirs :results output
+(dolist (dir-row dir-rows)
+  (let ((v (first dir-row))
+        (d (second dir-row)))
+    (princ (concat "(setq dir-" v " \"" d  "\")\n"))))
+#+END_SRC
 
-   #+RESULTS: dir-vars
-   : (setq dir-docs "Documents")
-   : (setq dir-repos "Work")
+#+RESULTS: dir-vars
+: (setq dir-docs "Documents")
+: (setq dir-repos "Work")
 
-   #+NAME: var-lookup
-   #+BEGIN_SRC emacs-lisp :var var='dir-docs :noweb yes
-     <<dir-vars()>>
-     (symbol-value var)
-   #+END_SRC
+#+NAME: var-lookup
+#+BEGIN_SRC emacs-lisp :var var='dir-docs :noweb yes
+<<dir-vars()>>
+(symbol-value var)
+#+END_SRC
 
-   #+RESULTS: var-lookup
-   : Documents
+#+RESULTS: var-lookup
+: Documents
