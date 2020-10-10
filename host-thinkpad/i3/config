@@ -180,15 +180,16 @@ bar {
         status_command i3status
 }
 
-# Workspaces
-workspace "1:terms" output DP-1-1
-workspace "2:emacs" output DP-1-1
-workspace 3         output DP-1-1
-workspace 4         output DP-1-1
-workspace 5         output DP-1-1
+exec --no-startup-id bash -c "pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"
 
-workspace 6         output eDP-1
-workspace 7         output eDP-1
-workspace "8:www"   output eDP-1
-workspace "9:im"    output eDP-1
-workspace "10:mail" output eDP-1
+# Workspaces
+workspace "1:terms" output LVSD-1
+workspace "2:emacs" output LVSD-1
+workspace 3         output LVSD-1
+workspace 4         output LVSD-1
+workspace 5         output LVSD-1
+workspace 6         output LVSD-1
+workspace 7         output LVSD-1
+workspace "8:www"   output LVSD-1
+workspace "9:im"    output LVSD-1
+workspace "10:mail" output LVSD-1

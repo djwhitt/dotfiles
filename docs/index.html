@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-10 Sat 15:52 -->
+<!-- 2020-10-10 Sat 16:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -822,7 +822,18 @@ bar <span style="color: #51afef;">{</span>
         status_command i3status
 <span style="color: #51afef;">}</span>
 
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
+workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
+workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
+workspace <span style="color: #da8548; font-weight: bold;">4</span>         output DP-1-1
+workspace <span style="color: #da8548; font-weight: bold;">5</span>         output DP-1-1
 
+workspace <span style="color: #da8548; font-weight: bold;">6</span>         output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">7</span>         output eDP-1
+workspace <span style="color: #98be65;">"8:www"</span>   output eDP-1
+workspace <span style="color: #98be65;">"9:im"</span>    output eDP-1
+workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
 </pre>
 </div>
 </div>
@@ -1012,18 +1023,19 @@ bar <span style="color: #51afef;">{</span>
         status_command i3status
 <span style="color: #51afef;">}</span>
 
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
-workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
-workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">4</span>         output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">5</span>         output DP-1-1
+<span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
 
-workspace <span style="color: #da8548; font-weight: bold;">6</span>         output eDP-1
-workspace <span style="color: #da8548; font-weight: bold;">7</span>         output eDP-1
-workspace <span style="color: #98be65;">"8:www"</span>   output eDP-1
-workspace <span style="color: #98be65;">"9:im"</span>    output eDP-1
-workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+workspace <span style="color: #98be65;">"1:terms"</span> output LVSD-1
+workspace <span style="color: #98be65;">"2:emacs"</span> output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">3</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">4</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">5</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">6</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">7</span>         output LVSD-1
+workspace <span style="color: #98be65;">"8:www"</span>   output LVSD-1
+workspace <span style="color: #98be65;">"9:im"</span>    output LVSD-1
+workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </pre>
 </div>
 </div>
@@ -1080,7 +1092,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-10-10 Sat 15:52</p>
+<p class="date">Created: 2020-10-10 Sat 16:01</p>
 </div>
 </body>
 </html>

@@ -322,14 +322,14 @@ workspace "10:mail" output LVSD-1
 #+BEGIN_SRC conf
 <<i3-common>>
 
-<<i3-thinkpad-config>>
+<<i3-lp-dwhittin-linux>>
 #+END_SRC
 **** Thinkpad Config
 #+begin_src sh :noweb yes :tangle host-thinkpad/i3/config
 #+BEGIN_SRC conf
 <<i3-common>>
 
-<<i3-lp-dwhittin-linux>>
+<<i3-thinkpad>>
 #+END_SRC
 ** Table Babel + Tangle Experiment
 #+TBLNAME: dirs
