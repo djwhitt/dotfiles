@@ -9,16 +9,6 @@ export LPASS_AGENT_TIMEOUT=64800
 typeset -U path
 
 ###############################################################################
-### Clojure
-
-# Lein
-export LEIN_FAST_TRAMPOLINE=y
-
-# Boot
-export BOOT_EMIT_TARGET=no
-export BOOT_JVM_OPTION="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -Xverify:none"
-
-###############################################################################
 ### Direnv
 
 if (( $+commands[direnv] )); then
