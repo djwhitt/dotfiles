@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-10 Sat 14:14 -->
+<!-- 2020-10-10 Sat 15:46 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -572,7 +572,6 @@ workspace_layout tabbed
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Startup</span>
-exec --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
 exec --no-startup-id i3-msg workspace <span style="color: #98be65;">"1:terms"</span>
 exec --no-startup-id keychain --quiet --inherit any
 exec copyq
@@ -602,7 +601,7 @@ bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"<
 <li><a id="org373b46a"></a>Dell Workspaces<br />
 <div class="outline-text-5" id="text-1-5-2-2">
 <div class="org-src-container">
-<pre class="src src-conf" id="org3fe9913"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+<pre class="src src-conf" id="orgb716ebb"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
 workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
 workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
 workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
@@ -621,7 +620,32 @@ workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
 <li><a id="org13644c3"></a>Thinkpad Workspaces<br />
 <div class="outline-text-5" id="text-1-5-2-3">
 <div class="org-src-container">
-<pre class="src src-conf" id="org664b886"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+<pre class="src src-conf" id="org142037a">exec --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+workspace <span style="color: #98be65;">"1:terms"</span> output LVSD-1
+workspace <span style="color: #98be65;">"2:emacs"</span> output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">3</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">4</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">5</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">6</span>         output LVSD-1
+workspace <span style="color: #da8548; font-weight: bold;">7</span>         output LVSD-1
+workspace <span style="color: #98be65;">"8:www"</span>   output LVSD-1
+workspace <span style="color: #98be65;">"9:im"</span>    output LVSD-1
+workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org59bd221"></a>Work Laptop Config<br />
+<div class="outline-text-5" id="text-1-5-2-4">
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #5B6268;">#</span><span style="color: #5B6268;">+BEGIN_SRC conf</span>
+
+
+<span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
 workspace <span style="color: #98be65;">"1:terms"</span> output LVSD-1
 workspace <span style="color: #98be65;">"2:emacs"</span> output LVSD-1
 workspace <span style="color: #da8548; font-weight: bold;">3</span>         output LVSD-1
@@ -637,202 +661,23 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 </li>
 <li><a id="orgedbddd1"></a>Thinkpad Config<br />
-<div class="outline-text-5" id="text-1-5-2-4">
+<div class="outline-text-5" id="text-1-5-2-5">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #5B6268;">#</span><span style="color: #5B6268;">+BEGIN_SRC conf</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">i3 config file (v4)</span>
-<span style="color: #5B6268;">#</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Please see http://i3wm.org/docs/userguide.html for a complete reference!</span>
 
-<span style="color: #c678dd;">set</span> $<span style="color: #dcaeea;">mod</span> Mod4
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Font for window titles. Will also be used by the bar unless a different font</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">is used in the bar {} block below. ISO 10646 = Unicode</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The font above is very space-efficient, that is, it looks good, sharp and</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">clear in small sizes. However, if you need a lot of unicode glyphs or</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">right-to-left text rendering, you should instead use pango for rendering and</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">chose a FreeType font, such as:</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Use Mouse+$mod to drag floating windows to their wanted position</span>
-floating_modifier $<span style="color: #dcaeea;">mod</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">kill</span><span style="color: #5B6268;"> focused window</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+q <span style="color: #ECBE7B;">kill</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">start dmenu (a program launcher)</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+d exec dmenu_run
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">There also is the (new) i3-dmenu-desktop which only displays applications</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">shipping a .desktop file. It is a wrapper around dmenu, so you need that</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">installed.</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">bindsym $mod+d exec --no-startup-id i3-dmenu-desktop</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">change focus</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+h focus left
-bindsym $<span style="color: #dcaeea;">mod</span>+j focus down
-bindsym $<span style="color: #dcaeea;">mod</span>+k focus up
-bindsym $<span style="color: #dcaeea;">mod</span>+l focus right
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">alternatively, you can use the cursor keys:</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Left focus left
-bindsym $<span style="color: #dcaeea;">mod</span>+Down focus down
-bindsym $<span style="color: #dcaeea;">mod</span>+Up focus up
-bindsym $<span style="color: #dcaeea;">mod</span>+Right focus right
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">move focused window</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+h move left
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+j move down
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+k move up
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+l move right
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">alternatively, you can use the cursor keys:</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+Left move left
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+Down move down
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+Up move up
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+Right move right
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">split in horizontal orientation</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+backslash split h
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">split in vertical orientation</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+minus split v
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">enter fullscreen mode for the focused container</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+f fullscreen
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">change container layout (stacked, tabbed, toggle split)</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+s layout stacking
-bindsym $<span style="color: #dcaeea;">mod</span>+w layout tabbed
-bindsym $<span style="color: #dcaeea;">mod</span>+e layout toggle split
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">toggle tiling / floating</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+space floating toggle
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">change focus between tiling / floating windows</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+space focus mode_toggle
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">focus the parent container</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+a focus parent
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">focus the child container</span>
-<span style="color: #5B6268;">#</span><span style="color: #5B6268;">bindsym $mod+d focus child</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Tab workspace back_and_forth
-bindsym $<span style="color: #dcaeea;">mod</span>+Next workspace next_on_output
-bindsym $<span style="color: #dcaeea;">mod</span>+Prior workspace prev_on_output
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">switch to workspace</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+1 workspace <span style="color: #98be65;">"1:terms"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+2 workspace <span style="color: #98be65;">"2:emacs"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+3 workspace <span style="color: #da8548; font-weight: bold;">3</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+4 workspace <span style="color: #da8548; font-weight: bold;">4</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+5 workspace <span style="color: #da8548; font-weight: bold;">5</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+6 workspace <span style="color: #da8548; font-weight: bold;">6</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+7 workspace <span style="color: #da8548; font-weight: bold;">7</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+8 workspace <span style="color: #98be65;">"8:www"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+9 workspace <span style="color: #98be65;">"9:im"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+0 workspace <span style="color: #98be65;">"10:mail"</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">move focused container to workspace</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+1 move container to workspace <span style="color: #98be65;">"1:terms"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+2 move container to workspace <span style="color: #98be65;">"2:emacs"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+3 move container to workspace <span style="color: #da8548; font-weight: bold;">3</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+4 move container to workspace <span style="color: #da8548; font-weight: bold;">4</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+5 move container to workspace <span style="color: #da8548; font-weight: bold;">5</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+6 move container to workspace <span style="color: #da8548; font-weight: bold;">6</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+7 move container to workspace <span style="color: #da8548; font-weight: bold;">7</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+8 move container to workspace <span style="color: #98be65;">"8:www"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+9 move container to workspace <span style="color: #98be65;">"9:im"</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+0 move container to workspace <span style="color: #98be65;">"10:mail"</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">reload the configuration file</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+c reload
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">restart i3 inplace (preserves your layout/session, can be used to upgrade i3)</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+r restart
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">exit i3 (logs you out of your X session)</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+Shift+e exec <span style="color: #98be65;">"xfce4-session-logout"</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">resize window (you can also use the mouse for that)</span>
-mode <span style="color: #98be65;">"resize"</span> <span style="color: #51afef;">{</span>
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">These bindings trigger as soon as you enter the resize mode</span>
-
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Pressing left will shrink the window&#8217;s width.</span>
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Pressing right will grow the window&#8217;s width.</span>
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Pressing up will shrink the window&#8217;s height.</span>
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Pressing down will grow the window&#8217;s height.</span>
-        bindsym h resize shrink width <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-        bindsym j resize grow height <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-        bindsym k resize shrink height <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-        bindsym l resize grow width <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">same bindings, but for the arrow keys</span>
-        bindsym Left resize shrink width <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-        bindsym Down resize grow height <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-        bindsym Up resize shrink height <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-        bindsym Right resize grow width <span style="color: #da8548; font-weight: bold;">10</span> px or <span style="color: #da8548; font-weight: bold;">10</span> ppt
-
-        <span style="color: #5B6268;"># </span><span style="color: #5B6268;">back to normal: Enter or Escape</span>
-        bindsym Return mode <span style="color: #98be65;">"default"</span>
-        bindsym Escape mode <span style="color: #98be65;">"default"</span>
-<span style="color: #51afef;">}</span>
-
-bindsym $<span style="color: #dcaeea;">mod</span>+r mode <span style="color: #98be65;">"resize"</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Default borders</span>
-hide_edge_borders both
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Default workspace layout</span>
-workspace_layout tabbed
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Window commands</span>
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"SshAskpass"</span><span style="color: #51afef;">]</span> resize set <span style="color: #da8548; font-weight: bold;">398</span> px <span style="color: #da8548; font-weight: bold;">144</span> px, border pixel 1, move position center
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Terraria"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Factorio"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> floating enable
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
-font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Startup</span>
-<span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
-<span style="color: #51afef;">exec</span> --no-startup-id i3-msg workspace <span style="color: #98be65;">"1:terms"</span>
-<span style="color: #51afef;">exec</span> --no-startup-id keychain --quiet --inherit any
-<span style="color: #51afef;">exec</span> copyq
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Keyboard</span>
-bindsym XF86AudioRaiseVolume  exec <span style="color: #98be65;">"pamixer -i 5"</span>
-bindsym XF86AudioLowerVolume  exec <span style="color: #98be65;">"pamixer -d 5"</span>
-bindsym XF86AudioMute         exec pactl set-sink-mute @DEFAULT_SINK@ toggle
-bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
-bindsym XF86MonBrightnessUp   exec brightnessctl set +5%
-bindsym XF86TouchpadToggle    exec toggle-touchpad
-bindsym $<span style="color: #dcaeea;">mod</span>+Return           exec gnome-terminal
-bindsym $<span style="color: #dcaeea;">mod</span>+period           exec emacs
-bindsym $<span style="color: #dcaeea;">mod</span>+x                exec fixup-x
-bindsym Print                 exec flameshot gui
-bindsym $<span style="color: #dcaeea;">mod</span>+n                workspace <span style="color: #98be65;">"2:emacs"</span>; <span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
-bar <span style="color: #51afef;">{</span>
-        status_command i3status
-<span style="color: #51afef;">}</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
-workspace <span style="color: #98be65;">"1:terms"</span> output LVSD-1
-workspace <span style="color: #98be65;">"2:emacs"</span> output LVSD-1
-workspace <span style="color: #da8548; font-weight: bold;">3</span>         output LVSD-1
-workspace <span style="color: #da8548; font-weight: bold;">4</span>         output LVSD-1
-workspace <span style="color: #da8548; font-weight: bold;">5</span>         output LVSD-1
-workspace <span style="color: #da8548; font-weight: bold;">6</span>         output LVSD-1
-workspace <span style="color: #da8548; font-weight: bold;">7</span>         output LVSD-1
-workspace <span style="color: #98be65;">"8:www"</span>   output LVSD-1
-workspace <span style="color: #98be65;">"9:im"</span>    output LVSD-1
-workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
+workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
+workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
+workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
+workspace <span style="color: #da8548; font-weight: bold;">4</span>         output DP-1-1
+workspace <span style="color: #da8548; font-weight: bold;">5</span>         output DP-1-1
+
+workspace <span style="color: #da8548; font-weight: bold;">6</span>         output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">7</span>         output eDP-1
+workspace <span style="color: #98be65;">"8:www"</span>   output eDP-1
+workspace <span style="color: #98be65;">"9:im"</span>    output eDP-1
+workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
 </pre>
 </div>
 </div>
@@ -889,7 +734,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-10-10 Sat 14:14</p>
+<p class="date">Created: 2020-10-10 Sat 15:46</p>
 </div>
 </body>
 </html>

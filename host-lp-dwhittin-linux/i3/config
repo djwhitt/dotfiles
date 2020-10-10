@@ -1,0 +1,16 @@
+#+BEGIN_SRC conf
+
+
+exec --no-startup-id bash -c "pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"
+
+# Workspaces
+workspace "1:terms" output LVSD-1
+workspace "2:emacs" output LVSD-1
+workspace 3         output LVSD-1
+workspace 4         output LVSD-1
+workspace 5         output LVSD-1
+workspace 6         output LVSD-1
+workspace 7         output LVSD-1
+workspace "8:www"   output LVSD-1
+workspace "9:im"    output LVSD-1
+workspace "10:mail" output LVSD-1
