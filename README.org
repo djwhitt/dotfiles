@@ -285,7 +285,7 @@ bar {
 }
 #+END_SRC
 **** Dell Workspaces
-#+NAME: i3-lp-dwhittin-linux-config
+#+NAME: i3-lp-dwhittin-linux
 #+BEGIN_SRC conf
 # Workspaces
 workspace "1:terms" output DP-1-1
@@ -301,7 +301,7 @@ workspace "9:im"    output eDP-1
 workspace "10:mail" output eDP-1
 #+END_SRC
 **** Thinkpad Workspaces
-#+NAME: i3-thinkpad-config
+#+NAME: i3-thinkpad
 #+BEGIN_SRC conf
 exec --no-startup-id bash -c "pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"
 
@@ -320,16 +320,16 @@ workspace "10:mail" output LVSD-1
 **** Work Laptop Config
 #+begin_src sh :noweb yes :tangle host-lp-dwhittin-linux/i3/config
 #+BEGIN_SRC conf
-<<i3-config>>
+<<i3-common>>
 
 <<i3-thinkpad-config>>
 #+END_SRC
 **** Thinkpad Config
 #+begin_src sh :noweb yes :tangle host-thinkpad/i3/config
 #+BEGIN_SRC conf
-<<i3-config>>
+<<i3-common>>
 
-<<i3-lp-dwhittin-linux-config>>
+<<i3-lp-dwhittin-linux>>
 #+END_SRC
 ** Table Babel + Tangle Experiment
 #+TBLNAME: dirs
