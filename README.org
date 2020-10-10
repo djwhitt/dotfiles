@@ -90,6 +90,13 @@ fi
 if [[ -e ~/Scripts ]]; then
     path=(~/Scripts $path)
 fi
+
+###############################################################################
+### Private
+
+if [[ -e ~/.zshenv-private ]]; then
+    source ~/.zshenv-private
+fi
 #+end_src
 ** Desktop
 *** Org Protocol
