@@ -54,7 +54,7 @@ bindsym $mod+Shift+Right move right
 bindsym $mod+backslash split h
 
 # split in vertical orientation
-bindsym $mod+minus split v
+bindsym $mod+equal split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
@@ -75,6 +75,12 @@ bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
+
+# Make the currently focused window a scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# Show the first scratchpad window
+bindsym $mod+minus scratchpad show
 
 # workspace navigation
 bindsym $mod+Tab workspace back_and_forth
@@ -151,7 +157,7 @@ for_window [title="Factorio"] floating enable
 for_window [title="Steam"] floating enable
 for_window [title="CopyQ"] floating enable
 for_window [title="Pinboard - Save a Bookmark"] floating enable
-for_window [class="xpad"] floating enable
+for_window [class="xpad"] move scratchpad
 
 # UI
 font pango:DejaVu Sans 9

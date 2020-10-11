@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-10 Sat 16:01 -->
+<!-- 2020-10-11 Sun 12:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -469,7 +469,7 @@ bindsym $mod+Shift+Right move right
 bindsym $mod+backslash split h
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">split in vertical orientation</span>
-bindsym $mod+minus split v
+bindsym $mod+equal split v
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">enter fullscreen mode for the focused container</span>
 bindsym $mod+f fullscreen
@@ -490,6 +490,12 @@ bindsym $mod+a focus parent
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">focus the child container</span>
 <span style="color: #5B6268;">#</span><span style="color: #5B6268;">bindsym $mod+d focus child</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Make the currently focused window a scratchpad</span>
+bindsym $mod+Shift+minus move scratchpad
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show the first scratchpad window</span>
+bindsym $mod+minus scratchpad show
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
 bindsym $mod+Tab workspace back_and_forth
@@ -566,7 +572,7 @@ workspace_layout tabbed
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Steam"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"CopyQ"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span>] floating enable
-<span style="color: #dcaeea;">for_window [class</span>=<span style="color: #98be65;">"xpad"</span>] floating enable
+<span style="color: #dcaeea;">for_window [class</span>=<span style="color: #98be65;">"xpad"</span>] move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -696,7 +702,7 @@ bindsym $<span style="color: #dcaeea;">mod</span>+Shift+Right move right
 bindsym $<span style="color: #dcaeea;">mod</span>+backslash split h
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">split in vertical orientation</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+minus split v
+bindsym $<span style="color: #dcaeea;">mod</span>+equal split v
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">enter fullscreen mode for the focused container</span>
 bindsym $<span style="color: #dcaeea;">mod</span>+f fullscreen
@@ -717,6 +723,12 @@ bindsym $<span style="color: #dcaeea;">mod</span>+a focus parent
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">focus the child container</span>
 <span style="color: #5B6268;">#</span><span style="color: #5B6268;">bindsym $mod+d focus child</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Make the currently focused window a scratchpad</span>
+bindsym $<span style="color: #dcaeea;">mod</span>+Shift+minus move scratchpad
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show the first scratchpad window</span>
+bindsym $<span style="color: #dcaeea;">mod</span>+minus scratchpad show
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
 bindsym $<span style="color: #dcaeea;">mod</span>+Tab workspace back_and_forth
@@ -793,7 +805,7 @@ for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">t
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> floating enable
+for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -897,7 +909,7 @@ bindsym $<span style="color: #dcaeea;">mod</span>+Shift+Right move right
 bindsym $<span style="color: #dcaeea;">mod</span>+backslash split h
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">split in vertical orientation</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+minus split v
+bindsym $<span style="color: #dcaeea;">mod</span>+equal split v
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">enter fullscreen mode for the focused container</span>
 bindsym $<span style="color: #dcaeea;">mod</span>+f fullscreen
@@ -918,6 +930,12 @@ bindsym $<span style="color: #dcaeea;">mod</span>+a focus parent
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">focus the child container</span>
 <span style="color: #5B6268;">#</span><span style="color: #5B6268;">bindsym $mod+d focus child</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Make the currently focused window a scratchpad</span>
+bindsym $<span style="color: #dcaeea;">mod</span>+Shift+minus move scratchpad
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show the first scratchpad window</span>
+bindsym $<span style="color: #dcaeea;">mod</span>+minus scratchpad show
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
 bindsym $<span style="color: #dcaeea;">mod</span>+Tab workspace back_and_forth
@@ -994,7 +1012,7 @@ for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">t
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> floating enable
+for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -1092,7 +1110,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-10-10 Sat 16:01</p>
+<p class="date">Created: 2020-10-11 Sun 12:37</p>
 </div>
 </body>
 </html>
