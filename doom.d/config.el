@@ -34,6 +34,8 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type nil)
 
+(setq confirm-kill-emacs nil)
+
 ;; Set leader keys
 (setq doom-leader-key "SPC"
       doom-leader-alt-key "M-SPC"
