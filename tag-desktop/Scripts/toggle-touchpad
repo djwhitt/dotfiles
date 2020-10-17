@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+declare -i device_id
+device_id=`xinput list | grep -Eio '(touchpad|glidepoint)\s*id\=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}'`
+declare -i state
+state=`xinput list-props $device_id | grep 'Device Enabled'|awk '{print $4}'`
+if [[ $state -eq 1 ]]; then
+  xinput disable $device_id
+else
+  xinput enable $device_id
+fi
