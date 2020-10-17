@@ -1,0 +1,80 @@
+!! Xft
+
+Xft.dpi: 96
+Xft.autohint: 0
+Xft.lcdfilter: lcddefault
+Xft.hintstyle: hintslight
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+
+!! Cursor theme
+
+Xcursor.theme: Vanilla-DMZ
+
+!! Emacs
+
+emacs.font: DejaVu Sans Mono-11
+
+!! URxvt
+
+URxvt.scrollBar: false
+
+! do not scroll with output
+URxvt*scrollTtyOutput: false
+
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)
+URxvt*scrollWithBuffer: true
+
+! scroll back to the bottom on keypress
+URxvt*scrollTtyKeypress: true
+
+! disable scrolling in less, etc.
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
+
+! clickable URLs
+URxvt.perl-ext-common: default,matcher
+URxvt.url-launcher: /usr/bin/google-chrome
+URxvt.matcher.button: 1
+
+! URxvt font
+
+URxvt.font: xft:DejaVu Sans Mono:size=10,xft:OctoIcons:size=9,xft:Pomicons:size=9,xft:Symbola:size=9
+!URxvt.letterSpace: -2
+
+!! URxvt Colors - Tango except fg and bg
+
+URxvt*background: gray10
+URxvt*foreground: gray80
+!URxvt*background: #2e3436 - Tango
+!URxvt*foreground: #eeeeec - Tango
+!URxvt*cursorColor: #8faf9f
+! foreground color for underline
+URxvt*colorUL: #8ae234
+! line color for underline
+URxvt*underlineColor:     #92659a
+! black dark/light
+URxvt*color0: #2e3436
+URxvt*color8: #6e706b
+! red dark/light
+URxvt*color1: #cc0000
+URxvt*color9: #ef2929
+! green dark/light
+URxvt*color2: #4e9a06
+URxvt*color10: #8ae234
+! yellow dark/light
+URxvt*color3: #edd400
+URxvt*color11: #fce94f
+! blue dark/light
+URxvt*color4: #3465a4
+URxvt*color12: #729fcf
+! magenta dark/light
+URxvt*color5: #92659a
+URxvt*color13: #c19fbe
+! cyan dark/light
+URxvt*color6: #07c7ca
+URxvt*color14: #63e9e9
+! white dark/light
+URxvt*color7: #d3d7cf
+URxvt*color15: #eeeeec
