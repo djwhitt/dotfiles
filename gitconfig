@@ -1,0 +1,32 @@
+[user]
+	name = David Whittington
+	email = djwhitt@gmail.com
+
+[alias]
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	df = diff
+	lg = log -p
+
+[push]
+	default = current
+
+[credential]
+	helper = !aws codecommit credential-helper $@
+	UseHttpPath = true
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[magithub]
+	online = false
+
+[magithub "status"]
+	includeStatusHeader = false
+	includePullRequestsSection = false
+	includeIssuesSection = false
