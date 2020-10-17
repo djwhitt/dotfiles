@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-11 Sun 12:37 -->
+<!-- 2020-10-17 Sat 14:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -40,7 +40,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -194,25 +194,23 @@
   /*]]>*/-->
 </style>
 <script type="text/javascript">
-// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&amp;dn=gpl-3.0.txt GPL-v3-or-Later
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
      function CodeHighlightOn(elem, id)
      {
        var target = document.getElementById(id);
        if(null != target) {
-         elem.cacheClassElem = elem.className;
-         elem.cacheClassTarget = target.className;
-         target.className = "code-highlighted";
-         elem.className   = "code-highlighted";
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
        }
      }
      function CodeHighlightOff(elem, id)
      {
        var target = document.getElementById(id);
-       if(elem.cacheClassElem)
-         elem.className = elem.cacheClassElem;
-       if(elem.cacheClassTarget)
-         target.className = elem.cacheClassTarget;
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
      }
     /*]]>*///-->
 // @license-end
@@ -566,13 +564,11 @@ hide_edge_borders both
 workspace_layout tabbed
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Window commands</span>
-<span style="color: #dcaeea;">for_window [class</span>=<span style="color: #98be65;">"SshAskpass"</span>] resize set <span style="color: #da8548; font-weight: bold;">398</span> px <span style="color: #da8548; font-weight: bold;">144</span> px, border pixel <span style="color: #da8548; font-weight: bold;">1</span>, move position center
-<span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Terraria"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Factorio"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Steam"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"CopyQ"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span>] floating enable
-<span style="color: #dcaeea;">for_window [class</span>=<span style="color: #98be65;">"xpad"</span>] move scratchpad
+<span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Scratchpad"</span>] move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -591,9 +587,9 @@ bindsym XF86MonBrightnessUp   exec brightnessctl set +5%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec gnome-terminal
 bindsym $mod+period           exec emacs
-bindsym $mod+x                exec fixup-x
 bindsym Print                 exec flameshot gui
 bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"</span>; exec --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
+bindsym $mod+apostrophe       exec emacsclient --no-wait --create-frame --frame-parameters <span style="color: #98be65;">'(quote (name . "Scratchpad"))'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
@@ -799,13 +795,11 @@ hide_edge_borders both
 workspace_layout tabbed
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Window commands</span>
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"SshAskpass"</span><span style="color: #51afef;">]</span> resize set <span style="color: #da8548; font-weight: bold;">398</span> px <span style="color: #da8548; font-weight: bold;">144</span> px, border pixel 1, move position center
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Terraria"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Factorio"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> move scratchpad
+for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Scratchpad"</span><span style="color: #51afef;">]</span> move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -824,9 +818,9 @@ bindsym XF86MonBrightnessUp   exec brightnessctl set +5%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $<span style="color: #dcaeea;">mod</span>+Return           exec gnome-terminal
 bindsym $<span style="color: #dcaeea;">mod</span>+period           exec emacs
-bindsym $<span style="color: #dcaeea;">mod</span>+x                exec fixup-x
 bindsym Print                 exec flameshot gui
 bindsym $<span style="color: #dcaeea;">mod</span>+n                workspace <span style="color: #98be65;">"2:emacs"</span>; <span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
+bindsym $<span style="color: #dcaeea;">mod</span>+apostrophe       exec emacsclient --no-wait --create-frame --frame-parameters <span style="color: #98be65;">'(quote (name . "Scratchpad"))'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
@@ -1006,13 +1000,11 @@ hide_edge_borders both
 workspace_layout tabbed
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Window commands</span>
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"SshAskpass"</span><span style="color: #51afef;">]</span> resize set <span style="color: #da8548; font-weight: bold;">398</span> px <span style="color: #da8548; font-weight: bold;">144</span> px, border pixel 1, move position center
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Terraria"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Factorio"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">class</span>=<span style="color: #98be65;">"xpad"</span><span style="color: #51afef;">]</span> move scratchpad
+for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Scratchpad"</span><span style="color: #51afef;">]</span> move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -1031,9 +1023,9 @@ bindsym XF86MonBrightnessUp   exec brightnessctl set +5%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $<span style="color: #dcaeea;">mod</span>+Return           exec gnome-terminal
 bindsym $<span style="color: #dcaeea;">mod</span>+period           exec emacs
-bindsym $<span style="color: #dcaeea;">mod</span>+x                exec fixup-x
 bindsym Print                 exec flameshot gui
 bindsym $<span style="color: #dcaeea;">mod</span>+n                workspace <span style="color: #98be65;">"2:emacs"</span>; <span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
+bindsym $<span style="color: #dcaeea;">mod</span>+apostrophe       exec emacsclient --no-wait --create-frame --frame-parameters <span style="color: #98be65;">'(quote (name . "Scratchpad"))'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
@@ -1110,7 +1102,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-10-11 Sun 12:37</p>
+<p class="date">Created: 2020-10-17 Sat 14:15</p>
 </div>
 </body>
 </html>
