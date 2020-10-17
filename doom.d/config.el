@@ -79,3 +79,4 @@
 
 (load! "email.el")
 (load! "dotfiles.el")
+(load! "org-roam.el")
