@@ -4,8 +4,15 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  home.packages = [
-    pkgs.fortune
+  home.packages = with pkgs; [
+    # graphics
+    gimp
+    inkscape
+
+    # office
+    gnumeric
+    libreoffice
+    thunderbird
   ];
 
   # This value determines the Home Manager release that your
