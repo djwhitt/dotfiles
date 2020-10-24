@@ -24,10 +24,10 @@ lib =
 [Temp]
 push = :
 status = :
-update = $HOME/Scripts/fixups
+update = $HOME/.local/bin/fixups
 checkout =
   mkdir -p Temp
-  $HOME/Scripts/fixups
+  $HOME/.local/bin/fixups
 order = 25
 
 ##
