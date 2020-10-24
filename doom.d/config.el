@@ -84,4 +84,7 @@
 (load! "+email.el")
 (load! "+org-roam.el")
 
+(load! "+babashka.el")
+(load! "+clojure.el")
+
 (load! "+dotfiles.el")
