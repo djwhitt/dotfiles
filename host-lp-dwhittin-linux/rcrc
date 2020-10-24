@@ -1,0 +1,4 @@
+TAGS="desktop"
+DOTFILES_DIRS="/home/dwhittington/.dotfiles /home/dwhittington/.dotfiles-private"
+EXCLUDES="*:*.org"
+UNDOTTED="Scripts"
