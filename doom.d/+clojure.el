@@ -3,8 +3,15 @@
 ;; Based off of spacemac's https://github.com/syl20bnr/spacemacs/blob/develop/layers/+lang/clojure/funcs.el
 ;; commit: 3663b29a48d8a47c9920f9e9261f94630ca389d8
 (after! cider
+
+  (assoc-delete-all "^\\*cider-error*"  +popup--display-buffer-alist)
+  (assoc-delete-all "^\\*cider-repl" +popup--display-buffer-alist)
+
   (set-popup-rule! "^\\*cider-error*" :quit t :modeline t)
-  (set-popup-rule! "^\\*cider-repl" :ignore t :modeline t))
+
+  (setq cider-repl-pop-to-buffer-on-connect nil)
+
+  )
 
 ;;;###autoload
 (defun ++clojure/cider-find-var (sym-name &optional arg)
