@@ -77,6 +77,7 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(load! "email.el")
-(load! "dotfiles.el")
-(load! "org-roam.el")
+(load! "+email.el")
+(load! "+org-roam.el")
+
+(load! "+dotfiles.el")
