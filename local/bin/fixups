@@ -31,5 +31,5 @@ fi
 
 # Symlink doom
 if [[ -e ~/Lib/doom-emacs/bin/doom ]]; then
-  ln -sf ~/Lib/doom-emacs/bin/doom ~/Scripts
+  ln -sf ~/Lib/doom-emacs/bin/doom ~/.local/bin
 fi
