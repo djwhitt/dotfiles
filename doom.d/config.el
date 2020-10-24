@@ -50,6 +50,10 @@
 
 (map! :n "-" 'dired-jump)
 
+(map! :leader
+      :desc "Prodigy"
+      "o p" 'prodigy)
+
 ;; Lastpass
 
 (use-package lastpass
