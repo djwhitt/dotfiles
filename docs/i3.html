@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-31 Sat 11:51 -->
+<!-- 2020-10-31 Sat 13:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>I3 Configuration</title>
@@ -306,7 +306,7 @@ bindsym $mod+a focus parent
 bindsym $mod+Shift+minus move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show the first scratchpad window</span>
-bindsym $mod+minus scratchpad show
+bindsym $mod+minus exec <span style="color: #98be65;">"$HOME/.local/bin/scratchpad"</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
 bindsym $mod+Tab workspace back_and_forth
@@ -381,7 +381,6 @@ workspace_layout tabbed
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Steam"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"CopyQ"</span>] floating enable
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span>] floating enable
-<span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Scratchpad"</span>] move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -402,7 +401,6 @@ bindsym $mod+Return           exec gnome-terminal
 bindsym $mod+period           exec emacs
 bindsym Print                 exec flameshot gui
 bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"</span>; exec --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
-bindsym $mod+apostrophe       exec emacsclient --no-wait --create-frame --frame-parameters <span style="color: #98be65;">'(quote (name . "Scratchpad"))'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
@@ -529,7 +527,7 @@ bindsym $<span style="color: #dcaeea;">mod</span>+a focus parent
 bindsym $<span style="color: #dcaeea;">mod</span>+Shift+minus move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show the first scratchpad window</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+minus scratchpad show
+bindsym $<span style="color: #dcaeea;">mod</span>+minus exec <span style="color: #98be65;">"</span><span style="color: #a9a1e1;">$</span><span style="color: #dcaeea;">HOME</span><span style="color: #98be65;">/.local/bin/scratchpad"</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
 bindsym $<span style="color: #dcaeea;">mod</span>+Tab workspace back_and_forth
@@ -604,7 +602,6 @@ for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">t
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Scratchpad"</span><span style="color: #51afef;">]</span> move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -625,7 +622,6 @@ bindsym $<span style="color: #dcaeea;">mod</span>+Return           exec gnome-te
 bindsym $<span style="color: #dcaeea;">mod</span>+period           exec emacs
 bindsym Print                 exec flameshot gui
 bindsym $<span style="color: #dcaeea;">mod</span>+n                workspace <span style="color: #98be65;">"2:emacs"</span>; <span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+apostrophe       exec emacsclient --no-wait --create-frame --frame-parameters <span style="color: #98be65;">'(quote (name . "Scratchpad"))'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
@@ -724,7 +720,7 @@ bindsym $<span style="color: #dcaeea;">mod</span>+a focus parent
 bindsym $<span style="color: #dcaeea;">mod</span>+Shift+minus move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show the first scratchpad window</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+minus scratchpad show
+bindsym $<span style="color: #dcaeea;">mod</span>+minus exec <span style="color: #98be65;">"</span><span style="color: #a9a1e1;">$</span><span style="color: #dcaeea;">HOME</span><span style="color: #98be65;">/.local/bin/scratchpad"</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">workspace navigation</span>
 bindsym $<span style="color: #dcaeea;">mod</span>+Tab workspace back_and_forth
@@ -799,7 +795,6 @@ for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">t
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Steam"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"CopyQ"</span><span style="color: #51afef;">]</span> floating enable
 for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span><span style="color: #51afef;">]</span> floating enable
-for_window <span style="color: #51afef;">[</span><span style="color: #dcaeea;">title</span>=<span style="color: #98be65;">"Scratchpad"</span><span style="color: #51afef;">]</span> move scratchpad
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
 font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
@@ -820,7 +815,6 @@ bindsym $<span style="color: #dcaeea;">mod</span>+Return           exec gnome-te
 bindsym $<span style="color: #dcaeea;">mod</span>+period           exec emacs
 bindsym Print                 exec flameshot gui
 bindsym $<span style="color: #dcaeea;">mod</span>+n                workspace <span style="color: #98be65;">"2:emacs"</span>; <span style="color: #51afef;">exec</span> --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
-bindsym $<span style="color: #dcaeea;">mod</span>+apostrophe       exec emacsclient --no-wait --create-frame --frame-parameters <span style="color: #98be65;">'(quote (name . "Scratchpad"))'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">finds out, if available)</span>
@@ -848,7 +842,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-10-31 Sat 11:51</p>
+<p class="date">Created: 2020-10-31 Sat 13:21</p>
 </div>
 </body>
 </html>
