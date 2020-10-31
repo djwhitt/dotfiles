@@ -8,6 +8,24 @@
     # CLI utils
     bat           # cat clone with syntax highlighting and git integration
     lazygit       # terminal UI for git
+
+    # X utils
+    flameshot     # screenshot tool
+    hacksaw       # area selection tool
+    nomacs        # image viewer
+    shotgun       # screenshot tool
+    xdotool
+    xorg.xprop
+    xorg.xwininfo
+    
+    # graphics
+    gimp
+    inkscape
+    
+    # office
+    gnumeric
+    libreoffice
+    thunderbird
   ];
 
   # This value determines the Home Manager release that your

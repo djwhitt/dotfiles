@@ -1,0 +1,78 @@
+#+TITLE: Home Manager
+
+* Common Packages
+#+NAME: common-packages
+#+BEGIN_SRC nix
+# CLI utils
+bat           # cat clone with syntax highlighting and git integration
+lazygit       # terminal UI for git
+#+END_SRC
+* Desktop Packages
+#+NAME: desktop-packages
+#+BEGIN_SRC nix
+# X utils
+flameshot     # screenshot tool
+hacksaw       # area selection tool
+nomacs        # image viewer
+shotgun       # screenshot tool
+xdotool
+xorg.xprop
+xorg.xwininfo
+
+# graphics
+gimp
+inkscape
+
+# office
+gnumeric
+libreoffice
+thunderbird
+#+END_SRC
+* CLI Config
+#+BEGIN_SRC nix :noweb yes :tangle config/nixpkgs/home.nix
+{ config, pkgs, ... }:
+
+{
+  # Let Home Manager install and manage itself.
+  programs.home-manager.enable = true;
+
+  home.packages = with pkgs; [
+    <<common-packages>>
+  ];
+
+  # This value determines the Home Manager release that your
+  # configuration is compatible with. This helps avoid breakage
+  # when a new Home Manager release introduces backwards
+  # incompatible changes.
+  #
+  # You can update Home Manager without changing this value. See
+  # the Home Manager release notes for a list of state version
+  # changes in each release.
+  home.stateVersion = "20.03";
+}
+#+END_SRC
+* Desktop Config
+#+BEGIN_SRC nix :noweb yes :tangle tag-desktop/config/nixpkgs/home.nix
+{ config, pkgs, ... }:
+
+{
+  # Let Home Manager install and manage itself.
+  programs.home-manager.enable = true;
+
+  home.packages = with pkgs; [
+    <<common-packages>>
+
+    <<desktop-packages>>
+  ];
+
+  # This value determines the Home Manager release that your
+  # configuration is compatible with. This helps avoid breakage
+  # when a new Home Manager release introduces backwards
+  # incompatible changes.
+  #
+  # You can update Home Manager without changing this value. See
+  # the Home Manager release notes for a list of state version
+  # changes in each release.
+  home.stateVersion = "20.03";
+}
+#+END_SRC
