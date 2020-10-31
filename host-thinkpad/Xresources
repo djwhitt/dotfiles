@@ -12,10 +12,6 @@ Xft.rgba: rgb
 
 Xcursor.theme: Vanilla-DMZ
 
-!! Emacs
-
-emacs.font: DejaVu Sans Mono-11
-
 !! URxvt
 
 URxvt.scrollBar: false
