@@ -8,6 +8,7 @@
     # CLI utils
     bat           # cat clone with syntax highlighting and git integration
     lazygit       # terminal UI for git
+    tmuxp         # tmux workspace manager
 
     # X utils
     flameshot     # screenshot tool
