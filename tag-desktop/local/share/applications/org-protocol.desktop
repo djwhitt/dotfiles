@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=org-protocol
-Exec=emacsclient %u
+Exec=bash -c "$HOME/.local/bin/scratchpad && emacsclient %u"
 Type=Application
 Terminal=false
 Categories=System;
