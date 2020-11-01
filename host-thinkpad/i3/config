@@ -162,6 +162,7 @@ bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec gnome-terminal
 bindsym $mod+period           exec emacs
 bindsym Print                 exec flameshot gui
+bindsym $mod+Print            exec $HOME/.local/bin/org-screenshot
 bindsym $mod+n                workspace "2:emacs"; exec --no-startup-id bash -c 'emacsclient "org-protocol://capture?template=j"'
 
 # Start i3bar to display a workspace bar (plus the system information i3status

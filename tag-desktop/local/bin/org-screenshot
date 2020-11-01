@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -ex
+
+geometry=$(hacksaw)
+prefix="$HOME/Org/roam/"
+screenshot="screenshots/$(date -Iseconds).png"
+shotgun --geometry "${geometry}" "${prefix}${screenshot}"
+
+cat << EOF >> $HOME/Org/roam/inbox.org
+* [$(date +"%Y-%m-%d %T")] Screenshot
+[[./${screenshot}]]
+EOF
