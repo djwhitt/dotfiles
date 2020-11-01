@@ -57,9 +57,7 @@
 
 ;; Lastpass
 
-(use-package lastpass
-  :config
-  ;; Set lastpass user
+(after! lastpass
   (setq lastpass-user "djwhitt@gmail.com"
         lastpass-shell "/run/current-system/sw/bin/bash")
   ;; Enable lastpass custom auth-source
