@@ -23,6 +23,10 @@
     gimp
     inkscape
     
+    # misc
+    calibre
+    wine
+    
     # office
     gnumeric
     libreoffice
