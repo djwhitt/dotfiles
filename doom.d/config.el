@@ -56,7 +56,7 @@
       "o p" 'prodigy)
 
 (map! :leader
-      "Switch to last buffer"
+      :desc "Switch to last buffer"
       "TAB" 'evil-switch-to-windows-last-buffer)
 
 ;; Lastpass
