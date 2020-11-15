@@ -15,6 +15,7 @@ tmuxp         # tmux workspace manager
 flameshot     # screenshot tool
 hacksaw       # area selection tool
 nomacs        # image viewer
+rofi
 shotgun       # screenshot tool
 xdotool
 xorg.xprop
@@ -26,6 +27,7 @@ inkscape
 
 # misc
 calibre
+qutebrowser
 wine
 
 # office

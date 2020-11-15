@@ -14,6 +14,7 @@
     flameshot     # screenshot tool
     hacksaw       # area selection tool
     nomacs        # image viewer
+    rofi
     shotgun       # screenshot tool
     xdotool
     xorg.xprop
@@ -25,6 +26,7 @@
     
     # misc
     calibre
+    qutebrowser
     wine
     
     # office
