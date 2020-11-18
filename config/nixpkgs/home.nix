@@ -7,6 +7,7 @@
   home.packages = with pkgs; [
     # CLI utils
     bat           # cat clone with syntax highlighting and git integration
+    fd            # alternative to find
     lazygit       # terminal UI for git
     tmuxp         # tmux workspace manager
   ];
