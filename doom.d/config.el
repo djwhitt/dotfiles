@@ -96,6 +96,9 @@
                                 ("S" "Protocol Selection" entry (file ,(concat org-directory "roam/inbox.org"))
                                  "* %^{Title}\nSource: %u, [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"))))
 
+(setq +emacs-lisp-disable-flycheck-in-dirs
+ (list doom-emacs-dir doom-private-dir "~/.dotfiles/doom.d"))
+
 (load! "+email.el")
 (load! "+org-roam.el")
 
