@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-11-17 Tue 21:05 -->
+<!-- 2020-11-20 Fri 21:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Manager</title>
@@ -238,7 +238,11 @@
 <pre class="src src-nix" id="org00280fc"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
 bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
 fd            <span style="color: #5B6268;"># alternative to find</span>
+jq
 lazygit       <span style="color: #5B6268;"># terminal UI for git</span>
+nixfmt
+ripgrep
+shellcheck
 tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
 </pre>
 </div>
@@ -265,6 +269,7 @@ inkscape
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">misc</span>
 calibre
 qutebrowser
+spotify
 wine
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">office</span>
@@ -282,6 +287,8 @@ thunderbird
 <pre class="src src-nix">{ config, pkgs, ... }:
 
 {
+  <span style="color: #dcaeea;">nixpkgs.config.allowUnfree</span> = <span style="color: #c678dd;">true</span>;
+
   <span style="color: #5B6268;"># Let Home Manager install and manage itself.</span>
   <span style="color: #dcaeea;">programs.home-manager.enable</span> = <span style="color: #c678dd;">true</span>;
 
@@ -289,7 +296,11 @@ thunderbird
     <span style="color: #5B6268;"># CLI utils</span>
     bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
     fd            <span style="color: #5B6268;"># alternative to find</span>
+    jq
     lazygit       <span style="color: #5B6268;"># terminal UI for git</span>
+    nixfmt
+    ripgrep
+    shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
   ];
 
@@ -314,6 +325,8 @@ thunderbird
 <pre class="src src-nix">{ config, pkgs, ... }:
 
 {
+  <span style="color: #dcaeea;">nixpkgs.config.allowUnfree</span> = <span style="color: #c678dd;">true</span>;
+
   <span style="color: #5B6268;"># Let Home Manager install and manage itself.</span>
   <span style="color: #dcaeea;">programs.home-manager.enable</span> = <span style="color: #c678dd;">true</span>;
 
@@ -321,7 +334,11 @@ thunderbird
     <span style="color: #5B6268;"># CLI utils</span>
     bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
     fd            <span style="color: #5B6268;"># alternative to find</span>
+    jq
     lazygit       <span style="color: #5B6268;"># terminal UI for git</span>
+    nixfmt
+    ripgrep
+    shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
 
     <span style="color: #5B6268;"># X utils</span>
@@ -341,6 +358,7 @@ thunderbird
     <span style="color: #5B6268;"># misc</span>
     calibre
     qutebrowser
+    spotify
     wine
     
     <span style="color: #5B6268;"># office</span>
@@ -366,7 +384,7 @@ thunderbird
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-11-17 Tue 21:05</p>
+<p class="date">Created: 2020-11-20 Fri 21:15</p>
 </div>
 </body>
 </html>

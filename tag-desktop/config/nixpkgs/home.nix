@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  nixpkgs.config.allowUnfree = true;
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -8,7 +10,11 @@
     # CLI utils
     bat           # cat clone with syntax highlighting and git integration
     fd            # alternative to find
+    jq
     lazygit       # terminal UI for git
+    nixfmt
+    ripgrep
+    shellcheck
     tmuxp         # tmux workspace manager
 
     # X utils
@@ -28,6 +34,7 @@
     # misc
     calibre
     qutebrowser
+    spotify
     wine
     
     # office
