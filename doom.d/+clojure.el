@@ -1,4 +1,4 @@
-;;; modules/+clojure.el -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t -*-
 
 ;; Based off of spacemac's https://github.com/syl20bnr/spacemacs/blob/develop/layers/+lang/clojure/funcs.el
 ;; commit: 3663b29a48d8a47c9920f9e9261f94630ca389d8
@@ -12,6 +12,63 @@
   (setq cider-repl-pop-to-buffer-on-connect nil)
 
   )
+
+;;;###autoload
+(defun babashka-quit ()
+  (interactive)
+  (setq sesman-links-alist
+        (a-dissoc sesman-links-alist '(CIDER . "babashka")))
+  (when (get-buffer "*babashka-nrepl-server*")
+    (kill-buffer "*babashka-nrepl-server*"))
+  (when (get-buffer "*babashka-repl*")
+    (kill-buffer "*babashka-repl*")))
+
+;;;###autoload
+(defun babashka-jack-in (&optional connected-callback)
+  (interactive)
+  (babashka-quit)
+  (let* ((cmd "bb --nrepl-server 32985") ;; TODO switch to port 0 when Babasha 0.2.4 comes out
+         (serv-buf (get-buffer-create "*babashka-nrepl-server*"))
+         (host "127.0.0.1")
+         (repl-builder (lambda (port)
+                         (lambda (_)
+                           (let ((repl-buf (get-buffer-create "*babashka-repl*")))
+                             (with-current-buffer repl-buf
+                               (cider-repl-create (list :repl-buffer repl-buf
+                                                        :repl-type 'clj
+                                                        :host host
+                                                        :port port
+                                                        :project-dir "~"
+                                                        :session-name "babashka"
+                                                        :repl-init-function (lambda ()
+                                                                              (setq-local cljr-suppress-no-project-warning t
+                                                                                          cljr-suppress-middleware-warnings t)
+                                                                              (rename-buffer "*babashka-repl*")))))))))
+         (port-filter (lambda (serv-buf)
+                        (lambda (process output)
+                          (when (buffer-live-p serv-buf)
+                            (with-current-buffer serv-buf
+                              (insert output)
+                              (when (string-match "Started nREPL server at 127.0.0.1:\\([0-9]+\\)" output)
+                                (let ((port (string-to-number (match-string 1 output))))
+                                  (setq nrepl-endpoint (list :host host :port port))
+                                  (let ((client-proc (nrepl-start-client-process
+                                                      host
+                                                      port
+                                                      process
+                                                      (funcall repl-builder port))))
+                                    (set-process-query-on-exit-flag client-proc nil)
+                                    (when connected-callback
+                                      (funcall connected-callback client-proc)))))))))))
+    (with-current-buffer serv-buf
+      (setq nrepl-is-server t
+            nrepl-server-command cmd))
+    (let ((serv-proc (start-file-process-shell-command "babashka-nrepl-server" serv-buf cmd)))
+      (set-process-query-on-exit-flag serv-proc nil)
+      (set-process-filter serv-proc (funcall port-filter serv-buf))
+      (set-process-sentinel serv-proc 'nrepl-server-sentinel)
+      (set-process-coding-system serv-proc 'utf-8-unix 'utf-8-unix)))
+  nil)
 
 ;;;###autoload
 (defun ++clojure/cider-find-var (sym-name &optional arg)
