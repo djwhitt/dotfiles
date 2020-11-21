@@ -29,7 +29,6 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Org/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -84,25 +83,12 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(after! org
-
-  (defun transform-square-brackets-to-round-ones(string-to-transform)
-    "Transforms [ into ( and ] into ), other chars left unchanged."
-    (concat
-     (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform)))
-
-  (setq org-capture-templates `(("L" "Protocol Link" entry (file ,(concat org-directory "roam/inbox.org"))
-                                 "* %?[[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
-                                ("S" "Protocol Selection" entry (file ,(concat org-directory "roam/inbox.org"))
-                                 "* %^{Title}\nSource: %u, [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"))))
-
 (setq +emacs-lisp-disable-flycheck-in-dirs
  (list doom-emacs-dir doom-private-dir "~/.dotfiles/doom.d"))
 
 (load! "+email.el")
-(load! "+org-roam.el")
+(load! "+org.el")
 
-(load! "+babashka.el")
 (load! "+clojure.el")
 
 (load! "+dotfiles.el")
