@@ -103,6 +103,6 @@
 (load! "+org-roam.el")
 
 (load! "+babashka.el")
-;;(load! "+clojure.el")
+(load! "+clojure.el")
 
 (load! "+dotfiles.el")
