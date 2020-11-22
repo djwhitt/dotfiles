@@ -13,6 +13,19 @@
 
   )
 
+;; Derived from https://github.com/plexus/corgi/blob/43832042f4e5dc77f38e3602c0f4e916544a6f44/corgi-user-config.arne.el
+
+;;;###autoload
+(defun babashka-scratch ()
+  (interactive)
+  (let* ((buf (get-buffer-create "*babashka-scratch*")))
+    (with-current-buffer buf
+      (clojure-mode)
+      (babashka-jack-in
+       (lambda (_)
+         (sesman-link-session 'CIDER '("babashka") 'buffer buf))))
+    (switch-to-buffer buf)))
+
 ;;;###autoload
 (defun babashka-quit ()
   (interactive)
