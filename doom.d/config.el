@@ -50,9 +50,9 @@
 
 (map! :n "-" 'dired-jump)
 
-(map! :leader
-      :desc "Prodigy"
-      "o p" 'prodigy)
+;; (map! :leader
+;;       :desc "Prodigy"
+;;       "o p" 'prodigy)
 
 (map! :leader
       :desc "Switch to last buffer"
