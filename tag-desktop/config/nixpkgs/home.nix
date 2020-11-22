@@ -13,6 +13,7 @@
     jq
     lazygit       # terminal UI for git
     nixfmt
+    python3
     ripgrep
     shellcheck
     tmuxp         # tmux workspace manager
