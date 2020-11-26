@@ -3,11 +3,20 @@
 set -ex
 
 geometry=$(hacksaw)
-prefix="$HOME/Org/roam/"
-screenshot="screenshots/$(date -Iseconds).png"
-shotgun --geometry "${geometry}" "${prefix}${screenshot}"
+media_dir="$HOME/Org/roam/media"
+screenshot="screenshot-$(date -Iseconds).png"
+shotgun --geometry "${geometry}" "${media_dir}/${screenshot}"
 
-cat << EOF >> $HOME/Org/roam/inbox.org
+daily_date="$(date +'%Y-%m-%d')"
+daily_file="$HOME/Org/roam/daily/${daily_date}.org"
+
+if ! [ -e "${daily_file}" ]; then
+    cat << EOF >> "${daily_file}"
+#+title: ${daily_date}
+EOF
+fi
+
+cat << EOF >> "${daily_file}"
 * [$(date +"%Y-%m-%d %T")] Screenshot
-[[./${screenshot}]]
+[[../media/${screenshot}]]
 EOF
