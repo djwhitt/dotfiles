@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-11-15 Sun 11:23 -->
+<!-- 2020-11-26 Thu 18:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>I3 Configuration</title>
@@ -400,7 +400,7 @@ bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec gnome-terminal
 bindsym $mod+period           exec emacs
 bindsym Print                 exec flameshot gui
-bindsym $mod+Print            exec $HOME/.local/bin/org-screenshot
+bindsym Mod1+Sys_Req          exec $HOME/.local/bin/org-screenshot
 bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"</span>; exec --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
@@ -621,7 +621,7 @@ bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec gnome-terminal
 bindsym $mod+period           exec emacs
 bindsym Print                 exec flameshot gui
-bindsym $mod+Print            exec $HOME/.local/bin/org-screenshot
+bindsym Mod1+Sys_Req          exec $HOME/.local/bin/org-screenshot
 bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"</span>; exec --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
@@ -814,7 +814,7 @@ bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec gnome-terminal
 bindsym $mod+period           exec emacs
 bindsym Print                 exec flameshot gui
-bindsym $mod+Print            exec $HOME/.local/bin/org-screenshot
+bindsym Mod1+Sys_Req          exec $HOME/.local/bin/org-screenshot
 bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"</span>; exec --no-startup-id bash -c <span style="color: #98be65;">'emacsclient "org-protocol://capture?template=j"'</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Start i3bar to display a workspace bar (plus the system information i3status</span>
@@ -843,7 +843,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-11-15 Sun 11:23</p>
+<p class="date">Created: 2020-11-26 Thu 18:05</p>
 </div>
 </body>
 </html>
