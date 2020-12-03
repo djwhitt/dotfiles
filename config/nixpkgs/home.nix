@@ -8,7 +8,11 @@
 
   home.packages = with pkgs; [
     # CLI utils
+    (aspellWithDicts (d: [d.en]))
+    (hunspellWithDicts (with hunspellDicts; [en-us]))
     bat           # cat clone with syntax highlighting and git integration
+    clojure
+    coursier      # pure scala artifact fetcher
     fd            # alternative to find
     jq
     lazygit       # terminal UI for git

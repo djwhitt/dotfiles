@@ -4,7 +4,11 @@
 #+NAME: common-packages
 #+BEGIN_SRC nix
 # CLI utils
+(aspellWithDicts (d: [d.en]))
+(hunspellWithDicts (with hunspellDicts; [en-us]))
 bat           # cat clone with syntax highlighting and git integration
+clojure
+coursier      # pure scala artifact fetcher
 fd            # alternative to find
 jq
 lazygit       # terminal UI for git
@@ -27,6 +31,9 @@ xdotool
 xorg.xprop
 xorg.xwininfo
 
+# Gnome utils
+gnome3.dconf-editor
+
 # graphics
 gimp
 inkscape
@@ -36,11 +43,15 @@ calibre
 qutebrowser
 spotify
 wine
+youtube-dl
+
+# pim
+khal
+vdirsyncer
 
 # office
 gnumeric
 libreoffice
-thunderbird
 #+END_SRC
 * CLI Config
 #+BEGIN_SRC nix :noweb yes :tangle config/nixpkgs/home.nix

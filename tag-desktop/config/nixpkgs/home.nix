@@ -8,7 +8,11 @@
 
   home.packages = with pkgs; [
     # CLI utils
+    (aspellWithDicts (d: [d.en]))
+    (hunspellWithDicts (with hunspellDicts; [en-us]))
     bat           # cat clone with syntax highlighting and git integration
+    clojure
+    coursier      # pure scala artifact fetcher
     fd            # alternative to find
     jq
     lazygit       # terminal UI for git
@@ -28,6 +32,9 @@
     xorg.xprop
     xorg.xwininfo
     
+    # Gnome utils
+    gnome3.dconf-editor
+    
     # graphics
     gimp
     inkscape
@@ -37,11 +44,15 @@
     qutebrowser
     spotify
     wine
+    youtube-dl
+    
+    # pim
+    khal
+    vdirsyncer
     
     # office
     gnumeric
     libreoffice
-    thunderbird
   ];
 
   # This value determines the Home Manager release that your
