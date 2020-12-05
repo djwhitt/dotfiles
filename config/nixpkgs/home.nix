@@ -18,6 +18,7 @@
     lazygit       # terminal UI for git
     nixfmt
     python3
+    ranger
     ripgrep
     shellcheck
     tmuxp         # tmux workspace manager
