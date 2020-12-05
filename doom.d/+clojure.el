@@ -13,6 +13,34 @@
 
   )
 
+(after! clojure-mode
+
+  (define-clojure-indent
+    (DELETE 2)
+    (GET 2)
+    (POST 2)
+    (PUT 2)
+    (assoc 0)
+    (async nil)
+    (at 1)
+    (await 1)
+    (case-of 2)
+    (catch-pg-key-error 1)
+    (context 2)
+    (defplugin '(1 :form (1)))
+    (element 2)
+    (ex-info 0)
+    (filter-routes 1)
+    (fn-traced 1)
+    (handle-pg-key-error 2)
+    (js/React.createElement 2)
+    (match 1)
+    (promise 1)
+    (prop/for-all 1)
+    (s/fdef 1))
+
+  )
+
 ;; Derived from https://github.com/plexus/corgi/blob/43832042f4e5dc77f38e3602c0f4e916544a6f44/corgi-user-config.arne.el
 
 ;;;###autoload
