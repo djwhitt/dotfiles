@@ -91,4 +91,8 @@
 
 (load! "+clojure.el")
 
+
 (load! "+dotfiles.el")
+
+(when (file-exists-p "+org-jira.el")
+  (load! "+org-jira.el"))
