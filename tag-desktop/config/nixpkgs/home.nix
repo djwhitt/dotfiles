@@ -17,11 +17,16 @@
     jq
     lazygit       # terminal UI for git
     nixfmt
+    odt2txt
+    poppler_utils
     python3
+    python38Packages.pdftotext
     ranger
     ripgrep
+    sc-im
     shellcheck
     tmuxp         # tmux workspace manager
+    w3m
 
     # X utils
     flameshot     # screenshot tool
@@ -42,7 +47,10 @@
     
     # misc
     calibre
-    qutebrowser
+    exiftool           # cli app for reading, writing and editing meta information
+    ffmpegthumbnailer  # video thumbnailer
+    mediainfo          # unified display of technical and tag data for video and audio files
+    qutebrowser        # keyboard driven web browser
     spotify
     wine
     youtube-dl

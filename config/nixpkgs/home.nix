@@ -17,11 +17,16 @@
     jq
     lazygit       # terminal UI for git
     nixfmt
+    odt2txt
+    poppler_utils
     python3
+    python38Packages.pdftotext
     ranger
     ripgrep
+    sc-im
     shellcheck
     tmuxp         # tmux workspace manager
+    w3m
   ];
 
   # This value determines the Home Manager release that your
