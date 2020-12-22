@@ -15,9 +15,11 @@
     coursier      # pure scala artifact fetcher
     fd            # alternative to find
     jq
+    jsonnet
     lazygit       # terminal UI for git
     nixfmt
     odt2txt
+    openjdk
     poppler_utils
     python3
     python38Packages.pdftotext

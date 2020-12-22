@@ -15,9 +15,11 @@
     coursier      # pure scala artifact fetcher
     fd            # alternative to find
     jq
+    jsonnet
     lazygit       # terminal UI for git
     nixfmt
     odt2txt
+    openjdk
     poppler_utils
     python3
     python38Packages.pdftotext
@@ -46,12 +48,13 @@
     inkscape
     
     # misc
-    calibre
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
     mediainfo          # unified display of technical and tag data for video and audio files
     qutebrowser        # keyboard driven web browser
     spotify
+    staruml
+    steam-run
     wine
     youtube-dl
     
