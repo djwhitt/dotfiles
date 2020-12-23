@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-12-19 Sat 19:55 -->
+<!-- 2020-12-23 Wed 10:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Manager</title>
@@ -223,24 +223,25 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org431aa7b">1. Common Packages</a></li>
-<li><a href="#org7cf8b06">2. Desktop Packages</a></li>
-<li><a href="#org8a4b15e">3. CLI Config</a></li>
-<li><a href="#orgebeeaa5">4. Desktop Config</a></li>
+<li><a href="#orgc2d279d">1. Common Packages</a></li>
+<li><a href="#org9d9f57c">2. Desktop Packages</a></li>
+<li><a href="#orgd803d4f">3. CLI Config</a></li>
+<li><a href="#orgcf4b098">4. Desktop Config</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org431aa7b" class="outline-2">
-<h2 id="org431aa7b"><span class="section-number-2">1</span> Common Packages</h2>
+<div id="outline-container-orgc2d279d" class="outline-2">
+<h2 id="orgc2d279d"><span class="section-number-2">1</span> Common Packages</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="org00280fc"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
+<pre class="src src-nix" id="org385c1a0"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
 (aspellWithDicts (d: [d.en]))
 (hunspellWithDicts (<span style="color: #51afef;">with</span> hunspellDicts; [en-us]))
 bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
 clojure
 coursier      <span style="color: #5B6268;"># pure scala artifact fetcher</span>
+docker-compose
 fd            <span style="color: #5B6268;"># alternative to find</span>
 jq
 jsonnet
@@ -261,11 +262,11 @@ w3m
 </div>
 </div>
 </div>
-<div id="outline-container-org7cf8b06" class="outline-2">
-<h2 id="org7cf8b06"><span class="section-number-2">2</span> Desktop Packages</h2>
+<div id="outline-container-org9d9f57c" class="outline-2">
+<h2 id="org9d9f57c"><span class="section-number-2">2</span> Desktop Packages</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-nix" id="orgd63b09d"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
+<pre class="src src-nix" id="org0a3881a"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
 flameshot     <span style="color: #5B6268;"># screenshot tool</span>
 hacksaw       <span style="color: #5B6268;"># area selection tool</span>
 nomacs        <span style="color: #5B6268;"># image viewer</span>
@@ -288,8 +289,8 @@ ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
 mediainfo          <span style="color: #5B6268;"># unified display of technical and tag data for video and audio files</span>
 qutebrowser        <span style="color: #5B6268;"># keyboard driven web browser</span>
 spotify
-staruml
 steam-run
+treesheets
 wine
 youtube-dl
 
@@ -304,8 +305,8 @@ libreoffice
 </div>
 </div>
 </div>
-<div id="outline-container-org8a4b15e" class="outline-2">
-<h2 id="org8a4b15e"><span class="section-number-2">3</span> CLI Config</h2>
+<div id="outline-container-orgd803d4f" class="outline-2">
+<h2 id="orgd803d4f"><span class="section-number-2">3</span> CLI Config</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -323,6 +324,7 @@ libreoffice
     bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
     clojure
     coursier      <span style="color: #5B6268;"># pure scala artifact fetcher</span>
+    docker-compose
     fd            <span style="color: #5B6268;"># alternative to find</span>
     jq
     jsonnet
@@ -355,8 +357,8 @@ libreoffice
 </div>
 </div>
 </div>
-<div id="outline-container-orgebeeaa5" class="outline-2">
-<h2 id="orgebeeaa5"><span class="section-number-2">4</span> Desktop Config</h2>
+<div id="outline-container-orgcf4b098" class="outline-2">
+<h2 id="orgcf4b098"><span class="section-number-2">4</span> Desktop Config</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -374,6 +376,7 @@ libreoffice
     bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
     clojure
     coursier      <span style="color: #5B6268;"># pure scala artifact fetcher</span>
+    docker-compose
     fd            <span style="color: #5B6268;"># alternative to find</span>
     jq
     jsonnet
@@ -414,8 +417,8 @@ libreoffice
     mediainfo          <span style="color: #5B6268;"># unified display of technical and tag data for video and audio files</span>
     qutebrowser        <span style="color: #5B6268;"># keyboard driven web browser</span>
     spotify
-    staruml
     steam-run
+    treesheets
     wine
     youtube-dl
     
@@ -445,7 +448,7 @@ libreoffice
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2020-12-19 Sat 19:55</p>
+<p class="date">Created: 2020-12-23 Wed 10:34</p>
 </div>
 </body>
 </html>

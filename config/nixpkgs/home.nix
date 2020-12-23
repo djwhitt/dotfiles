@@ -13,6 +13,7 @@
     bat           # cat clone with syntax highlighting and git integration
     clojure
     coursier      # pure scala artifact fetcher
+    docker-compose
     fd            # alternative to find
     jq
     jsonnet

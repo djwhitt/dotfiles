@@ -13,6 +13,7 @@
     bat           # cat clone with syntax highlighting and git integration
     clojure
     coursier      # pure scala artifact fetcher
+    docker-compose
     fd            # alternative to find
     jq
     jsonnet
@@ -53,8 +54,8 @@
     mediainfo          # unified display of technical and tag data for video and audio files
     qutebrowser        # keyboard driven web browser
     spotify
-    staruml
     steam-run
+    treesheets
     wine
     youtube-dl
     
