@@ -54,17 +54,22 @@ mediainfo          # unified display of technical and tag data for video and aud
 qutebrowser        # keyboard driven web browser
 spotify
 steam-run
-treesheets
 wine
 youtube-dl
 
 # pim
 khal
 vdirsyncer
-
-# office
+#+END_SRC
+** Tools for Thought
+#+NAME: desktop-thinking-tools
+#+BEGIN_SRC nix
+# tools for thought
+drawio
 gnumeric
 libreoffice
+treesheets
+yed
 #+END_SRC
 * CLI Config
 #+BEGIN_SRC nix :noweb yes :tangle config/nixpkgs/home.nix
@@ -105,6 +110,8 @@ libreoffice
     <<common-packages>>
 
     <<desktop-packages>>
+
+    <<desktop-thinking-tools>>
   ];
 
   # This value determines the Home Manager release that your

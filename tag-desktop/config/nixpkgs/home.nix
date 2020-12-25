@@ -55,17 +55,19 @@
     qutebrowser        # keyboard driven web browser
     spotify
     steam-run
-    treesheets
     wine
     youtube-dl
     
     # pim
     khal
     vdirsyncer
-    
-    # office
+
+    # tools for thought
+    drawio
     gnumeric
     libreoffice
+    treesheets
+    yed
   ];
 
   # This value determines the Home Manager release that your
