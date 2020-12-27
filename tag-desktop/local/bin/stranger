@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-export EDITOR="emacsclient -a vim --no-wait"
-
-exec gnome-terminal --title ranger -- ranger

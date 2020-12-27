@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -e
+
+ranger="$HOME/.nix-profile/bin/ranger"
+
+if [ -t 1 ]; then
+  exec $ranger $@
+else
+  export EDITOR="emacsclient -a vim --no-wait"
+  exec gnome-terminal --title ranger -- $ranger
+fi
