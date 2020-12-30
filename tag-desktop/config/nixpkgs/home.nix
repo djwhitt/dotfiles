@@ -6,6 +6,8 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
+  fonts.fontconfig.enable = true;
+
   home.packages = with pkgs; [
     # CLI utils
     (aspellWithDicts (d: [d.en]))
@@ -40,6 +42,9 @@
     xdotool
     xorg.xprop
     xorg.xwininfo
+    
+    # Fonts
+    carlito
     
     # Gnome utils
     gnome3.dconf-editor
