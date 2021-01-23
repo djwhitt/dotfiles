@@ -12,6 +12,7 @@
     # CLI utils
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (with hunspellDicts; [en-us]))
+    awscli
     bat           # cat clone with syntax highlighting and git integration
     clojure
     coursier      # pure scala artifact fetcher
@@ -54,6 +55,7 @@
     inkscape
     
     # misc
+    brave
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
     mediainfo          # unified display of technical and tag data for video and audio files
