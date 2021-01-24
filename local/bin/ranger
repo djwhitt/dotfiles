@@ -8,5 +8,5 @@ if [ -t 1 ]; then
   exec $ranger $@
 else
   export EDITOR="emacsclient -a vim --no-wait"
-  exec gnome-terminal --title ranger -- $ranger
+  exec kitty --title ranger -- $ranger
 fi
