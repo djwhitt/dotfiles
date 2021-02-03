@@ -58,6 +58,7 @@
     brave
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
+    kitty
     mediainfo          # unified display of technical and tag data for video and audio files
     qutebrowser        # keyboard driven web browser
     spotify
