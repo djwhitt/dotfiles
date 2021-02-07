@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+_JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true' steam-run $HOME/Lib/flying_logic_pro/Flying\ Logic\ Pro
