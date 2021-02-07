@@ -56,6 +56,7 @@
     
     # misc
     brave
+    evolution
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
     kitty
