@@ -44,6 +44,10 @@
     xorg.xprop
     xorg.xwininfo
     
+    # Communication
+    discord
+    slack
+    
     # Fonts
     carlito
     
@@ -56,7 +60,6 @@
     
     # misc
     brave
-    evolution
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
     kitty
@@ -68,6 +71,7 @@
     youtube-dl
     
     # pim
+    evolutionWithPlugins
     khal
     vdirsyncer
 
