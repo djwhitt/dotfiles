@@ -18,6 +18,7 @@
     coursier      # pure scala artifact fetcher
     docker-compose
     fd            # alternative to find
+    fzf
     jq
     jsonnet
     lazygit       # terminal UI for git
@@ -46,6 +47,7 @@
     
     # Communication
     discord
+    signal-desktop
     slack
     
     # Fonts
@@ -80,7 +82,7 @@
     gnumeric
     libreoffice
     treesheets
-    yed
+    #yed
   ];
 
   # This value determines the Home Manager release that your

@@ -16,6 +16,7 @@
     coursier      # pure scala artifact fetcher
     docker-compose
     fd            # alternative to find
+    fzf
     jq
     jsonnet
     lazygit       # terminal UI for git
