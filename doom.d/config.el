@@ -66,6 +66,11 @@
   ;; Enable lastpass custom auth-source
   (lastpass-auth-source-enable))
 
+;; PlantUML
+
+(after! plantuml-mode
+  (setq plantuml-output-type "png"))
+
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
@@ -84,13 +89,12 @@
 ;; they are implemented.
 
 (setq +emacs-lisp-disable-flycheck-in-dirs
- (list doom-emacs-dir doom-private-dir "~/.dotfiles/doom.d"))
+      (list doom-emacs-dir doom-private-dir "~/.dotfiles/doom.d"))
 
 (load! "+email.el")
 (load! "+org.el")
 
 (load! "+clojure.el")
-
 
 (load! "+dotfiles.el")
 
