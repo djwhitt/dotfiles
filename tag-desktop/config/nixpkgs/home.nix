@@ -19,17 +19,23 @@
     docker-compose
     fd            # alternative to find
     fzf
+    gitAndTools.git-annex
+    graphviz
+    hugo
     jq
     jsonnet
     lazygit       # terminal UI for git
     nixfmt
+    nmap
     odt2txt
     openjdk
+    plantuml
     poppler_utils
     python3
     python38Packages.pdftotext
     ranger
     ripgrep
+    rmapi
     sc-im
     shellcheck
     tmuxp         # tmux workspace manager
@@ -62,12 +68,14 @@
     
     # misc
     brave
+    emacs
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
     kitty
     mediainfo          # unified display of technical and tag data for video and audio files
     qutebrowser        # keyboard driven web browser
     spotify
+    standardnotes
     steam-run
     wine
     youtube-dl

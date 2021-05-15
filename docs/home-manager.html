@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-03-14 Sun 11:22 -->
+<!-- 2021-05-15 Sat 18:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Manager</title>
-<meta name="generator" content="Org mode" />
 <meta name="author" content="David Whittington" />
+<meta name="generator" content="Org Mode" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -223,23 +223,23 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org431aa7b">1. Common Packages</a></li>
-<li><a href="#org7cf8b06">2. Desktop Packages</a>
+<li><a href="#orgadac071">1. Common Packages</a></li>
+<li><a href="#org3f3f80b">2. Desktop Packages</a>
 <ul>
-<li><a href="#org721ca61">2.1. Tools for Thought</a></li>
+<li><a href="#org055854c">2.1. Tools for Thought</a></li>
 </ul>
 </li>
-<li><a href="#org8a4b15e">3. CLI Config</a></li>
-<li><a href="#orgebeeaa5">4. Desktop Config</a></li>
+<li><a href="#orgac004de">3. CLI Config</a></li>
+<li><a href="#orgdc9fb61">4. Desktop Config</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org431aa7b" class="outline-2">
-<h2 id="org431aa7b"><span class="section-number-2">1</span> Common Packages</h2>
+<div id="outline-container-orgadac071" class="outline-2">
+<h2 id="orgadac071"><span class="section-number-2">1</span> Common Packages</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="org00280fc"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
+<pre class="src src-nix" id="org25cf9eb"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
 (aspellWithDicts (d: [d.en]))
 (hunspellWithDicts (<span style="color: #51afef;">with</span> hunspellDicts; [en-us]))
 awscli
@@ -249,17 +249,23 @@ coursier      <span style="color: #5B6268;"># pure scala artifact fetcher</span>
 docker-compose
 fd            <span style="color: #5B6268;"># alternative to find</span>
 fzf
+gitAndTools.git-annex
+graphviz
+hugo
 jq
 jsonnet
 lazygit       <span style="color: #5B6268;"># terminal UI for git</span>
 nixfmt
+nmap
 odt2txt
 openjdk
+plantuml
 poppler_utils
 python3
 python38Packages.pdftotext
 ranger
 ripgrep
+rmapi
 sc-im
 shellcheck
 tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
@@ -268,11 +274,11 @@ w3m
 </div>
 </div>
 </div>
-<div id="outline-container-org7cf8b06" class="outline-2">
-<h2 id="org7cf8b06"><span class="section-number-2">2</span> Desktop Packages</h2>
+<div id="outline-container-org3f3f80b" class="outline-2">
+<h2 id="org3f3f80b"><span class="section-number-2">2</span> Desktop Packages</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-nix" id="orgd63b09d"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
+<pre class="src src-nix" id="org7bf8249"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
 flameshot     <span style="color: #5B6268;"># screenshot tool</span>
 hacksaw       <span style="color: #5B6268;"># area selection tool</span>
 nomacs        <span style="color: #5B6268;"># image viewer</span>
@@ -299,12 +305,14 @@ inkscape
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">misc</span>
 brave
+emacs
 exiftool           <span style="color: #5B6268;"># cli app for reading, writing and editing meta information</span>
 ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
 kitty
 mediainfo          <span style="color: #5B6268;"># unified display of technical and tag data for video and audio files</span>
 qutebrowser        <span style="color: #5B6268;"># keyboard driven web browser</span>
 spotify
+standardnotes
 steam-run
 wine
 youtube-dl
@@ -316,11 +324,11 @@ vdirsyncer
 </pre>
 </div>
 </div>
-<div id="outline-container-org721ca61" class="outline-3">
-<h3 id="org721ca61"><span class="section-number-3">2.1</span> Tools for Thought</h3>
+<div id="outline-container-org055854c" class="outline-3">
+<h3 id="org055854c"><span class="section-number-3">2.1</span> Tools for Thought</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="orgb476b6f"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">tools for thought</span>
+<pre class="src src-nix" id="org373cc97"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">tools for thought</span>
 drawio
 gnumeric
 libreoffice
@@ -331,8 +339,8 @@ treesheets
 </div>
 </div>
 </div>
-<div id="outline-container-org8a4b15e" class="outline-2">
-<h2 id="org8a4b15e"><span class="section-number-2">3</span> CLI Config</h2>
+<div id="outline-container-orgac004de" class="outline-2">
+<h2 id="orgac004de"><span class="section-number-2">3</span> CLI Config</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -354,17 +362,23 @@ treesheets
     docker-compose
     fd            <span style="color: #5B6268;"># alternative to find</span>
     fzf
+    gitAndTools.git-annex
+    graphviz
+    hugo
     jq
     jsonnet
     lazygit       <span style="color: #5B6268;"># terminal UI for git</span>
     nixfmt
+    nmap
     odt2txt
     openjdk
+    plantuml
     poppler_utils
     python3
     python38Packages.pdftotext
     ranger
     ripgrep
+    rmapi
     sc-im
     shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
@@ -385,8 +399,8 @@ treesheets
 </div>
 </div>
 </div>
-<div id="outline-container-orgebeeaa5" class="outline-2">
-<h2 id="orgebeeaa5"><span class="section-number-2">4</span> Desktop Config</h2>
+<div id="outline-container-orgdc9fb61" class="outline-2">
+<h2 id="orgdc9fb61"><span class="section-number-2">4</span> Desktop Config</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -410,17 +424,23 @@ treesheets
     docker-compose
     fd            <span style="color: #5B6268;"># alternative to find</span>
     fzf
+    gitAndTools.git-annex
+    graphviz
+    hugo
     jq
     jsonnet
     lazygit       <span style="color: #5B6268;"># terminal UI for git</span>
     nixfmt
+    nmap
     odt2txt
     openjdk
+    plantuml
     poppler_utils
     python3
     python38Packages.pdftotext
     ranger
     ripgrep
+    rmapi
     sc-im
     shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
@@ -453,12 +473,14 @@ treesheets
     
     <span style="color: #5B6268;"># misc</span>
     brave
+    emacs
     exiftool           <span style="color: #5B6268;"># cli app for reading, writing and editing meta information</span>
     ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
     kitty
     mediainfo          <span style="color: #5B6268;"># unified display of technical and tag data for video and audio files</span>
     qutebrowser        <span style="color: #5B6268;"># keyboard driven web browser</span>
     spotify
+    standardnotes
     steam-run
     wine
     youtube-dl
@@ -493,7 +515,7 @@ treesheets
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2021-03-14 Sun 11:22</p>
+<p class="date">Created: 2021-05-15 Sat 18:20</p>
 </div>
 </body>
 </html>
