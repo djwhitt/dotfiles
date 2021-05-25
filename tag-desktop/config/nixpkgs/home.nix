@@ -75,6 +75,7 @@
     spotify
     standardnotes
     steam-run
+    vscode
     wine
     youtube-dl
     
