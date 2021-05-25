@@ -15,7 +15,6 @@
     awscli
     bat           # cat clone with syntax highlighting and git integration
     clojure
-    coursier      # pure scala artifact fetcher
     docker-compose
     fd            # alternative to find
     fzf
@@ -27,16 +26,15 @@
     lazygit       # terminal UI for git
     nixfmt
     nmap
-    odt2txt
+    odt2txt       # for opendocument previews
     openjdk
     plantuml
-    poppler_utils
+    poppler_utils # for pdf previews
     python3
     python38Packages.pdftotext
     ranger
     ripgrep
     rmapi
-    sc-im
     shellcheck
     tmuxp         # tmux workspace manager
     w3m
@@ -82,8 +80,6 @@
     
     # pim
     evolutionWithPlugins
-    khal
-    vdirsyncer
 
     # tools for thought
     drawio
