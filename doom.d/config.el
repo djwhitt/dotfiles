@@ -30,17 +30,18 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type nil)
-
-(setq confirm-kill-emacs nil)
+(setq confirm-kill-emacs nil            ; Don't prompt when closing Emacs
+      display-line-numbers-type nil)    ; Disable line numbers
 
 ;; Set leader keys
 (setq doom-leader-key "SPC"
       doom-leader-alt-key "M-SPC"
       doom-localleader-key ","
       doom-localleader-alt-key "M-,")
+
+;; Don't flycheck Doom configs in ~/.dotfiles
+(setq +emacs-lisp-disable-flycheck-in-dirs
+      (list doom-emacs-dir doom-private-dir "~/.dotfiles/doom.d"))
 
 ;; Dired bindings
 
@@ -50,21 +51,25 @@
 
 (map! :n "-" 'dired-jump)
 
-;; (map! :leader
-;;       :desc "Prodigy"
-;;       "o p" 'prodigy)
+;; Spacemacs like buffer toggling
 
 (map! :leader
       :desc "Switch to last buffer"
       "TAB" 'evil-switch-to-windows-last-buffer)
 
+;; Prodigy
+
+;; (map! :leader
+;;       :desc "Prodigy"
+;;       "o y" 'prodigy)
+
 ;; Lastpass
 
-(after! lastpass
-  (setq lastpass-user "djwhitt@gmail.com"
-        lastpass-shell "/run/current-system/sw/bin/bash")
-  ;; Enable lastpass custom auth-source
-  (lastpass-auth-source-enable))
+;; (after! lastpass
+;;   (setq lastpass-user "djwhitt@gmail.com"
+;;         lastpass-shell "/run/current-system/sw/bin/bash")
+;;   ;; Enable lastpass custom auth-source
+;;   (lastpass-auth-source-enable))
 
 ;; PlantUML
 
@@ -88,12 +93,12 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(setq +emacs-lisp-disable-flycheck-in-dirs
-      (list doom-emacs-dir doom-private-dir "~/.dotfiles/doom.d"))
-
+;; PIM
 (load! "+email.el")
 (load! "+org.el")
 
+;; Languages
 (load! "+clojure.el")
 
+;; Org projects
 (load! "+dotfiles.el")
