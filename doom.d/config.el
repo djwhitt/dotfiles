@@ -71,11 +71,6 @@
 ;;   ;; Enable lastpass custom auth-source
 ;;   (lastpass-auth-source-enable))
 
-;; PlantUML
-
-(after! plantuml-mode
-  (setq plantuml-output-type "png"))
-
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
@@ -99,6 +94,7 @@
 
 ;; Languages
 (load! "+clojure.el")
+(load! "+plantuml.el")
 
 ;; Org projects
 (load! "+dotfiles.el")
