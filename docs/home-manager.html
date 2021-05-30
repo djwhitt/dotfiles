@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-05-25 Tue 09:23 -->
+<!-- 2021-05-30 Sun 14:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Manager</title>
@@ -223,23 +223,23 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgadac071">1. Common Packages</a></li>
-<li><a href="#org3f3f80b">2. Desktop Packages</a>
+<li><a href="#org598e96c">1. Common Packages</a></li>
+<li><a href="#orgbb23960">2. Desktop Packages</a>
 <ul>
-<li><a href="#org055854c">2.1. Tools for Thought</a></li>
+<li><a href="#org95dc0a8">2.1. Tools for Thought</a></li>
 </ul>
 </li>
-<li><a href="#orgac004de">3. CLI Config</a></li>
-<li><a href="#orgdc9fb61">4. Desktop Config</a></li>
+<li><a href="#orgb30f3d4">3. CLI Config</a></li>
+<li><a href="#org7968991">4. Desktop Config</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgadac071" class="outline-2">
-<h2 id="orgadac071"><span class="section-number-2">1</span> Common Packages</h2>
+<div id="outline-container-org598e96c" class="outline-2">
+<h2 id="org598e96c"><span class="section-number-2">1</span> Common Packages</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="org25cf9eb"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
+<pre class="src src-nix" id="org29488d3"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
 (aspellWithDicts (d: [d.en]))
 (hunspellWithDicts (<span style="color: #51afef;">with</span> hunspellDicts; [en-us]))
 awscli
@@ -250,6 +250,7 @@ fd            <span style="color: #5B6268;"># alternative to find</span>
 fzf
 gitAndTools.git-annex
 graphviz
+httpie
 hugo
 jq
 jsonnet
@@ -272,11 +273,11 @@ w3m
 </div>
 </div>
 </div>
-<div id="outline-container-org3f3f80b" class="outline-2">
-<h2 id="org3f3f80b"><span class="section-number-2">2</span> Desktop Packages</h2>
+<div id="outline-container-orgbb23960" class="outline-2">
+<h2 id="orgbb23960"><span class="section-number-2">2</span> Desktop Packages</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-nix" id="org7bf8249"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
+<pre class="src src-nix" id="org088601b"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
 flameshot     <span style="color: #5B6268;"># screenshot tool</span>
 hacksaw       <span style="color: #5B6268;"># area selection tool</span>
 nomacs        <span style="color: #5B6268;"># image viewer</span>
@@ -321,11 +322,11 @@ evolutionWithPlugins
 </pre>
 </div>
 </div>
-<div id="outline-container-org055854c" class="outline-3">
-<h3 id="org055854c"><span class="section-number-3">2.1</span> Tools for Thought</h3>
+<div id="outline-container-org95dc0a8" class="outline-3">
+<h3 id="org95dc0a8"><span class="section-number-3">2.1</span> Tools for Thought</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="org373cc97"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">tools for thought</span>
+<pre class="src src-nix" id="org6cc9578"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">tools for thought</span>
 drawio
 gnumeric
 libreoffice
@@ -336,8 +337,8 @@ treesheets
 </div>
 </div>
 </div>
-<div id="outline-container-orgac004de" class="outline-2">
-<h2 id="orgac004de"><span class="section-number-2">3</span> CLI Config</h2>
+<div id="outline-container-orgb30f3d4" class="outline-2">
+<h2 id="orgb30f3d4"><span class="section-number-2">3</span> CLI Config</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -360,6 +361,7 @@ treesheets
     fzf
     gitAndTools.git-annex
     graphviz
+    httpie
     hugo
     jq
     jsonnet
@@ -394,8 +396,8 @@ treesheets
 </div>
 </div>
 </div>
-<div id="outline-container-orgdc9fb61" class="outline-2">
-<h2 id="orgdc9fb61"><span class="section-number-2">4</span> Desktop Config</h2>
+<div id="outline-container-org7968991" class="outline-2">
+<h2 id="org7968991"><span class="section-number-2">4</span> Desktop Config</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -420,6 +422,7 @@ treesheets
     fzf
     gitAndTools.git-annex
     graphviz
+    httpie
     hugo
     jq
     jsonnet
@@ -507,7 +510,7 @@ treesheets
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2021-05-25 Tue 09:23</p>
+<p class="date">Created: 2021-05-30 Sun 14:56</p>
 </div>
 </body>
 </html>

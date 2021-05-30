@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-04-19 Mon 21:03 -->
+<!-- 2021-05-30 Sun 14:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>I3 Configuration</title>
@@ -223,20 +223,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org80cb62f">1. Common</a></li>
-<li><a href="#orgf1b0b90">2. Dell Laptop</a></li>
-<li><a href="#org3c222c9">3. Thinkpad</a></li>
-<li><a href="#orgdcfa121">4. Dell Laptop Config</a></li>
-<li><a href="#orgce28a55">5. Thinkpad Config</a></li>
+<li><a href="#org8ead12d">1. Common</a></li>
+<li><a href="#org28ec7d9">2. Dell Laptop</a></li>
+<li><a href="#orgb6936af">3. Thinkpad</a></li>
+<li><a href="#org1efc08b">4. Dell Laptop Config</a></li>
+<li><a href="#orgf1e6a1a">5. Thinkpad Config</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org80cb62f" class="outline-2">
-<h2 id="org80cb62f"><span class="section-number-2">1</span> Common</h2>
+<div id="outline-container-org8ead12d" class="outline-2">
+<h2 id="org8ead12d"><span class="section-number-2">1</span> Common</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-conf" id="org6d0bb12"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">i3 config file (v4)</span>
+<pre class="src src-conf" id="orgde6a389"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">i3 config file (v4)</span>
 <span style="color: #5B6268;">#</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Please see http://i3wm.org/docs/userguide.html for a complete reference!</span>
 
@@ -412,11 +412,11 @@ bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"<
 </div>
 </div>
 </div>
-<div id="outline-container-orgf1b0b90" class="outline-2">
-<h2 id="orgf1b0b90"><span class="section-number-2">2</span> Dell Laptop</h2>
+<div id="outline-container-org28ec7d9" class="outline-2">
+<h2 id="org28ec7d9"><span class="section-number-2">2</span> Dell Laptop</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-conf" id="org956d928"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+<pre class="src src-conf" id="org230c067"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
 workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
 workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
 workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
@@ -432,11 +432,11 @@ workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
 </div>
 </div>
 </div>
-<div id="outline-container-org3c222c9" class="outline-2">
-<h2 id="org3c222c9"><span class="section-number-2">3</span> Thinkpad</h2>
+<div id="outline-container-orgb6936af" class="outline-2">
+<h2 id="orgb6936af"><span class="section-number-2">3</span> Thinkpad</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
-<pre class="src src-conf" id="orgdd2b61e">exec --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
+<pre class="src src-conf" id="orgaea8884">exec --no-startup-id bash -c <span style="color: #98be65;">"pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out"</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
 workspace <span style="color: #98be65;">"1:terms"</span> output LVSD-1
@@ -453,8 +453,8 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 </div>
 </div>
-<div id="outline-container-orgdcfa121" class="outline-2">
-<h2 id="orgdcfa121"><span class="section-number-2">4</span> Dell Laptop Config</h2>
+<div id="outline-container-org1efc08b" class="outline-2">
+<h2 id="org1efc08b"><span class="section-number-2">4</span> Dell Laptop Config</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-conf"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">i3 config file (v4)</span>
@@ -646,8 +646,8 @@ workspace <span style="color: #98be65;">"10:mail"</span> output eDP-1
 </div>
 </div>
 </div>
-<div id="outline-container-orgce28a55" class="outline-2">
-<h2 id="orgce28a55"><span class="section-number-2">5</span> Thinkpad Config</h2>
+<div id="outline-container-orgf1e6a1a" class="outline-2">
+<h2 id="orgf1e6a1a"><span class="section-number-2">5</span> Thinkpad Config</h2>
 <div class="outline-text-2" id="text-5">
 <div class="org-src-container">
 <pre class="src src-conf"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">i3 config file (v4)</span>
@@ -843,7 +843,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2021-04-19 Mon 21:03</p>
+<p class="date">Created: 2021-05-30 Sun 14:56</p>
 </div>
 </body>
 </html>

@@ -18,6 +18,7 @@
     fzf
     gitAndTools.git-annex
     graphviz
+    httpie
     hugo
     jq
     jsonnet
