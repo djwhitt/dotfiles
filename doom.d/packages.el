@@ -48,5 +48,6 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
+(package! adoc-mode)
 (package! graphviz-dot-mode)
 (package! lastpass)
