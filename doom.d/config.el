@@ -95,6 +95,7 @@
 ;; Languages
 (load! "+clojure.el")
 (load! "+plantuml.el")
+(load! "+prolog.el")
 
 ;; Org projects
 (load! "+dotfiles.el")
