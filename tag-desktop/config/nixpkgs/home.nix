@@ -67,6 +67,7 @@
     
     # misc
     brave
+    clojure-lsp
     emacs
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
