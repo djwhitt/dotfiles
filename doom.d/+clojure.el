@@ -1,7 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-(add-to-list 'interpreter-mode-alist
-             '("bb" . clojure-mode))
+(add-to-list 'interpreter-mode-alist '("bb" . clojure-mode))
 
 ;; Based off of spacemac's https://github.com/syl20bnr/spacemacs/blob/develop/layers/+lang/clojure/funcs.el
 ;; commit: 3663b29a48d8a47c9920f9e9261f94630ca389d8
