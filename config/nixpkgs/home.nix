@@ -7,7 +7,8 @@
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
-    # CLI utils
+    ## CLI
+    
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (with hunspellDicts; [en-us]))
     awscli
@@ -15,20 +16,18 @@
     bat           # cat clone with syntax highlighting and git integration
     clojure
     docker-compose
+    exiftool      # cli app for reading, writing and editing meta information
     fd            # alternative to find
-    fzf
+    fzf           # cli fuzzy finder
     gitAndTools.git-annex
-    graphviz
     httpie
-    hugo
     jq
-    jsonnet
     lazygit       # terminal UI for git
-    nixfmt
+    mediainfo     # unified display of technical and tag data for video and audio files
+    nixfmt        # Nix code formatter
     nmap
     odt2txt       # for opendocument previews
     openjdk
-    plantuml
     poppler_utils # for pdf previews
     python3
     python38Packages.pdftotext
@@ -48,5 +47,5 @@
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "20.03";
+  home.stateVersion = "20.09";
 }
