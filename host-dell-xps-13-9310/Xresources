@@ -14,6 +14,7 @@ Xft.rgba: rgb
 !! Cursor theme
 
 Xcursor.theme: Vanilla-DMZ
+Xcursor.size: 64
 
 !! URxvt
 
