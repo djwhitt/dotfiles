@@ -19,11 +19,14 @@
     awscli
     babashka
     bat           # cat clone with syntax highlighting and git integration
+    bitwarden-cli
     clojure
     docker-compose
     exiftool      # cli app for reading, writing and editing meta information
     fd            # alternative to find
     fzf           # cli fuzzy finder
+    git
+    git-lfs
     gitAndTools.git-annex
     httpie
     jq
@@ -51,7 +54,10 @@
     nomacs        # image viewer
     rofi
     shotgun       # screenshot tool
+    wmctrl
     xdotool
+    xdotool
+    xorg.xev
     xorg.xprop
     xorg.xwininfo
     
@@ -71,6 +77,7 @@
     inkscape
     
     # misc
+    bitwarden
     brave
     clojure-lsp
     emacs
