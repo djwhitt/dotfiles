@@ -11,6 +11,7 @@
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (with hunspellDicts; [en-us]))
     awscli
+    babashka
     bat           # cat clone with syntax highlighting and git integration
     clojure
     docker-compose
@@ -33,7 +34,7 @@
     python38Packages.pdftotext
     ranger
     ripgrep
-    rmapi
+    rmapi         # cli tool for interacting with reMarkable cloud
     shellcheck
     tmuxp         # tmux workspace manager
     w3m

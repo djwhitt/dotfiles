@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-05-31 Mon 09:14 -->
+<!-- 2021-06-04 Fri 21:14 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Manager</title>
@@ -223,26 +223,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org598e96c">1. Common Packages</a></li>
-<li><a href="#orgbb23960">2. Desktop Packages</a>
+<li><a href="#org5bdcc54">1. Common Packages</a></li>
+<li><a href="#orga243d12">2. Desktop Packages</a>
 <ul>
-<li><a href="#org95dc0a8">2.1. Tools for Thought</a></li>
+<li><a href="#orgb1099c1">2.1. Tools for Thought</a></li>
 </ul>
 </li>
-<li><a href="#orgb30f3d4">3. CLI Config</a></li>
-<li><a href="#org7968991">4. Desktop Config</a></li>
+<li><a href="#org3f18fb3">3. CLI Config</a></li>
+<li><a href="#orgc4b265f">4. Desktop Config</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org598e96c" class="outline-2">
-<h2 id="org598e96c"><span class="section-number-2">1</span> Common Packages</h2>
+<div id="outline-container-org5bdcc54" class="outline-2">
+<h2 id="org5bdcc54"><span class="section-number-2">1</span> Common Packages</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="org29488d3"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
+<pre class="src src-nix" id="orge1c35f1"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">CLI utils</span>
 (aspellWithDicts (d: [d.en]))
 (hunspellWithDicts (<span style="color: #51afef;">with</span> hunspellDicts; [en-us]))
 awscli
+babashka
 bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
 clojure
 docker-compose
@@ -265,7 +266,7 @@ python3
 python38Packages.pdftotext
 ranger
 ripgrep
-rmapi
+rmapi         <span style="color: #5B6268;"># cli tool for interacting with reMarkable cloud</span>
 shellcheck
 tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
 w3m
@@ -273,11 +274,11 @@ w3m
 </div>
 </div>
 </div>
-<div id="outline-container-orgbb23960" class="outline-2">
-<h2 id="orgbb23960"><span class="section-number-2">2</span> Desktop Packages</h2>
+<div id="outline-container-orga243d12" class="outline-2">
+<h2 id="orga243d12"><span class="section-number-2">2</span> Desktop Packages</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-nix" id="org088601b"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
+<pre class="src src-nix" id="org1bad159"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">X utils</span>
 flameshot     <span style="color: #5B6268;"># screenshot tool</span>
 hacksaw       <span style="color: #5B6268;"># area selection tool</span>
 nomacs        <span style="color: #5B6268;"># image viewer</span>
@@ -308,26 +309,21 @@ clojure-lsp
 emacs
 exiftool           <span style="color: #5B6268;"># cli app for reading, writing and editing meta information</span>
 ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
-kitty
 mediainfo          <span style="color: #5B6268;"># unified display of technical and tag data for video and audio files</span>
-qutebrowser        <span style="color: #5B6268;"># keyboard driven web browser</span>
 spotify
 standardnotes
 steam-run
 vscode
 wine
 youtube-dl
-
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">pim</span>
-evolutionWithPlugins
 </pre>
 </div>
 </div>
-<div id="outline-container-org95dc0a8" class="outline-3">
-<h3 id="org95dc0a8"><span class="section-number-3">2.1</span> Tools for Thought</h3>
+<div id="outline-container-orgb1099c1" class="outline-3">
+<h3 id="orgb1099c1"><span class="section-number-3">2.1</span> Tools for Thought</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-nix" id="org6cc9578"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">tools for thought</span>
+<pre class="src src-nix" id="org12b0d31"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">tools for thought</span>
 drawio
 gnumeric
 libreoffice
@@ -338,8 +334,8 @@ treesheets
 </div>
 </div>
 </div>
-<div id="outline-container-orgb30f3d4" class="outline-2">
-<h2 id="orgb30f3d4"><span class="section-number-2">3</span> CLI Config</h2>
+<div id="outline-container-org3f18fb3" class="outline-2">
+<h2 id="org3f18fb3"><span class="section-number-2">3</span> CLI Config</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -355,6 +351,7 @@ treesheets
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (<span style="color: #51afef;">with</span> hunspellDicts; [en-us]))
     awscli
+    babashka
     bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
     clojure
     docker-compose
@@ -377,7 +374,7 @@ treesheets
     python38Packages.pdftotext
     ranger
     ripgrep
-    rmapi
+    rmapi         <span style="color: #5B6268;"># cli tool for interacting with reMarkable cloud</span>
     shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
     w3m
@@ -397,8 +394,8 @@ treesheets
 </div>
 </div>
 </div>
-<div id="outline-container-org7968991" class="outline-2">
-<h2 id="org7968991"><span class="section-number-2">4</span> Desktop Config</h2>
+<div id="outline-container-orgc4b265f" class="outline-2">
+<h2 id="orgc4b265f"><span class="section-number-2">4</span> Desktop Config</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
@@ -416,6 +413,7 @@ treesheets
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (<span style="color: #51afef;">with</span> hunspellDicts; [en-us]))
     awscli
+    babashka
     bat           <span style="color: #5B6268;"># cat clone with syntax highlighting and git integration</span>
     clojure
     docker-compose
@@ -438,7 +436,7 @@ treesheets
     python38Packages.pdftotext
     ranger
     ripgrep
-    rmapi
+    rmapi         <span style="color: #5B6268;"># cli tool for interacting with reMarkable cloud</span>
     shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
     w3m
@@ -474,18 +472,13 @@ treesheets
     emacs
     exiftool           <span style="color: #5B6268;"># cli app for reading, writing and editing meta information</span>
     ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
-    kitty
     mediainfo          <span style="color: #5B6268;"># unified display of technical and tag data for video and audio files</span>
-    qutebrowser        <span style="color: #5B6268;"># keyboard driven web browser</span>
     spotify
     standardnotes
     steam-run
     vscode
     wine
     youtube-dl
-    
-    <span style="color: #5B6268;"># pim</span>
-    evolutionWithPlugins
 
     <span style="color: #5B6268;"># tools for thought</span>
     drawio
@@ -512,7 +505,7 @@ treesheets
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2021-05-31 Mon 09:14</p>
+<p class="date">Created: 2021-06-04 Fri 21:14</p>
 </div>
 </body>
 </html>

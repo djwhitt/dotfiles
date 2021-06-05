@@ -13,6 +13,7 @@
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (with hunspellDicts; [en-us]))
     awscli
+    babashka
     bat           # cat clone with syntax highlighting and git integration
     clojure
     docker-compose
@@ -35,7 +36,7 @@
     python38Packages.pdftotext
     ranger
     ripgrep
-    rmapi
+    rmapi         # cli tool for interacting with reMarkable cloud
     shellcheck
     tmuxp         # tmux workspace manager
     w3m
@@ -71,18 +72,13 @@
     emacs
     exiftool           # cli app for reading, writing and editing meta information
     ffmpegthumbnailer  # video thumbnailer
-    kitty
     mediainfo          # unified display of technical and tag data for video and audio files
-    qutebrowser        # keyboard driven web browser
     spotify
     standardnotes
     steam-run
     vscode
     wine
     youtube-dl
-    
-    # pim
-    evolutionWithPlugins
 
     # tools for thought
     drawio
