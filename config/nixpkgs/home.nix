@@ -29,6 +29,7 @@
     mediainfo     # unified display of technical and tag data for video and audio files
     nixfmt        # Nix code formatter
     nmap
+    nodejs
     odt2txt       # for opendocument previews
     openjdk
     poppler_utils # for pdf previews

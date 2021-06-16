@@ -34,6 +34,7 @@
     mediainfo     # unified display of technical and tag data for video and audio files
     nixfmt        # Nix code formatter
     nmap
+    nodejs
     odt2txt       # for opendocument previews
     openjdk
     poppler_utils # for pdf previews
@@ -77,16 +78,20 @@
     inkscape
     
     # misc
+    appimage-run
     bitwarden
     brave
+    clj-kondo
     clojure-lsp
     emacs
     ffmpegthumbnailer  # video thumbnailer
+    leafpad
     spotify
     standardnotes
     steam-run
     wine
     youtube-dl
+    zoom-us
 
     # tools for thought
     drawio

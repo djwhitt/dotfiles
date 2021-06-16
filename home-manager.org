@@ -25,6 +25,7 @@ lazygit       # terminal UI for git
 mediainfo     # unified display of technical and tag data for video and audio files
 nixfmt        # Nix code formatter
 nmap
+nodejs
 odt2txt       # for opendocument previews
 openjdk
 poppler_utils # for pdf previews
@@ -71,16 +72,20 @@ gimp
 inkscape
 
 # misc
+appimage-run
 bitwarden
 brave
+clj-kondo
 clojure-lsp
 emacs
 ffmpegthumbnailer  # video thumbnailer
+leafpad
 spotify
 standardnotes
 steam-run
 wine
 youtube-dl
+zoom-us
 #+END_SRC
 ** Tools for Thought
 #+NAME: desktop-thinking-tools
