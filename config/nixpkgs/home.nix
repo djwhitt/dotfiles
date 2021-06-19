@@ -41,6 +41,7 @@
     shellcheck
     tmuxp         # tmux workspace manager
     w3m
+    yamllint
   ];
 
   # This value determines the Home Manager release that your

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-06-16 Wed 11:01 -->
+<!-- 2021-06-18 Fri 21:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Manager</title>
@@ -229,8 +229,9 @@
 <li><a href="#orgb1099c1">2.1. Tools for Thought</a></li>
 </ul>
 </li>
-<li><a href="#org3f18fb3">3. CLI Config</a></li>
-<li><a href="#orgc4b265f">4. Desktop Config</a></li>
+<li><a href="#org96a7af7">3. Dunst Config</a></li>
+<li><a href="#org3f18fb3">4. CLI Config</a></li>
+<li><a href="#orgc4b265f">5. Desktop Config</a></li>
 </ul>
 </div>
 </div>
@@ -273,6 +274,7 @@ rmapi         <span style="color: #5B6268;"># cli tool for interacting with reMa
 shellcheck
 tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
 w3m
+yamllint
 </pre>
 </div>
 </div>
@@ -320,6 +322,7 @@ clojure-lsp
 emacs
 ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
 leafpad
+libnotify
 spotify
 standardnotes
 steam-run
@@ -342,9 +345,819 @@ libreoffice
 </div>
 </div>
 </div>
-<div id="outline-container-org3f18fb3" class="outline-2">
-<h2 id="org3f18fb3"><span class="section-number-2">3</span> CLI Config</h2>
+<div id="outline-container-org96a7af7" class="outline-2">
+<h2 id="org96a7af7"><span class="section-number-2">3</span> Dunst Config</h2>
 <div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+<pre class="src src-conf" id="org4627704">
+<span style="color: #dcaeea;">font</span> = Iosevka Term <span style="color: #da8548; font-weight: bold;">11</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Allow a small subset of html markup:</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">&lt;b&gt;bold&lt;/b&gt;</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">&lt;i&gt;italic&lt;/i&gt;</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">&lt;s&gt;strikethrough&lt;/s&gt;</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">&lt;u&gt;underline&lt;/u&gt;</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">For a complete reference see</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">&lt;http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"># </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">If markup is not allowed, those tags will be stripped out of the</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"># </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">message.</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #dcaeea;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">markup</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"> = yes
+</a><span style="color: #dcaeea;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">plain_text</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"> = no
+
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"># </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">The format of the message.  Possible variables are:</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">#   </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">%a  appname</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">#   </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">%s  summary</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">#   </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">%b  body</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">#   </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">%i  iconname (including its path)</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">#   </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">%I  iconname (without its path)</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">#   </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">%p  progress value if set ([  0%] to [100%]) or nothing</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"># </a></span><span style="color: #5B6268;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">Markup is allowed</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">
+</a><span style="color: #dcaeea;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">format</a></span><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b"> = </a><span style="color: #98be65;"><a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.
+# If markup is not allowed, those tags will be stripped out of the
+# message.
+markup = yes
+plain_text = no
+
+# The format of the message.  Possible variables are:
+#   %a  appname
+#   %s  summary
+#   %b  body
+#   %i  iconname (including its path)
+#   %I  iconname (without its path)
+#   %p  progress value if set ([  0%] to [100%]) or nothing
+# Markup is allowed
+format = &quot;&lt;b&gt;%s&lt;/b">"&lt;b&gt;%s&lt;/b&gt;</a>\n%b"</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Sort messages by urgency.</span>
+<span style="color: #dcaeea;">sort</span> = no
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show how many messages are currently hidden (because of geometry).</span>
+<span style="color: #dcaeea;">indicate_hidden</span> = yes
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Alignment of message text.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Possible values are "left", "center" and "right".</span>
+<span style="color: #dcaeea;">alignment</span> = center
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The frequency with wich text that is longer than the notification</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">window allows bounces back and forth.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">This option conflicts with "word_wrap".</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Set to 0 to disable.</span>
+<span style="color: #dcaeea;">bounce_freq</span> = <span style="color: #da8548; font-weight: bold;">0</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Show age of message if message is older than show_age_threshold</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">seconds.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Set to -1 to disable.</span>
+<span style="color: #dcaeea;">show_age_threshold</span> = -1
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Split notifications into multiple lines if they don't fit into</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">geometry.</span>
+<span style="color: #dcaeea;">word_wrap</span> = yes
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Ignore newlines '\n' in notifications.</span>
+<span style="color: #dcaeea;">ignore_newline</span> = no
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Hide duplicate's count and stack them</span>
+<span style="color: #dcaeea;">stack_duplicates</span> = yes
+<span style="color: #dcaeea;">hide_duplicate_count</span> = yes
+
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The geometry of the window:</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">[{width}]x{height}[+/-{x}+/-{y}]</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The geometry of the message window.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The height is measured in number of notifications everything else</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">in pixels.  If the width is omitted but the height is given</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">("-geometry x2"), the message window expands over the whole screen</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">(dmenu-like).  If width is 0, the window expands to the longest</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">message displayed.  A positive x is measured from the left, a</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">negative from the right side of the screen.  Y is measured from</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">the top and down respectevly.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The width can be negative.  In this case the actual width is the</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">screen width minus the width defined in within the geometry option.</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">geometry = "250x50-40+40"</span>
+<span style="color: #dcaeea;">geometry</span> = <span style="color: #98be65;">"300x50-15+49"</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Shrink window if it's smaller than the width.  Will be ignored if</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">width is 0.</span>
+<span style="color: #dcaeea;">shrink</span> = no
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The transparency of the window.  Range: [0; 100].</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">This option will only work if a compositing windowmanager is</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">present (e.g. xcompmgr, compiz, etc.).</span>
+<span style="color: #dcaeea;">transparency</span> = <span style="color: #da8548; font-weight: bold;">5</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Don't remove messages, if the user is idle (no mouse or keyboard input)</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">for longer than idle_threshold seconds.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Set to 0 to disable.</span>
+<span style="color: #dcaeea;">idle_threshold</span> = <span style="color: #da8548; font-weight: bold;">0</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Which monitor should the notifications be displayed on.</span>
+<span style="color: #dcaeea;">monitor</span> = <span style="color: #da8548; font-weight: bold;">0</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Display notification on focused monitor.  Possible modes are:</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">mouse: follow mouse pointer</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">keyboard: follow window with keyboard focus</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">none: don't follow anything</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">"keyboard" needs a windowmanager that exports the</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">_NET_ACTIVE_WINDOW property.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">This should be the case for almost all modern windowmanagers.</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">If this option is set to mouse or keyboard, the monitor option</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">will be ignored.</span>
+<span style="color: #dcaeea;">follow</span> = none
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Should a notification popped up from history be sticky or timeout</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">as if it would normally do.</span>
+<span style="color: #dcaeea;">sticky_history</span> = yes
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Maximum amount of notifications kept in history</span>
+<span style="color: #dcaeea;">history_length</span> = <span style="color: #da8548; font-weight: bold;">15</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Display indicators for URLs (U) and actions (A).</span>
+<span style="color: #dcaeea;">show_indicators</span> = no
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The height of a single line.  If the height is smaller than the</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">font height, it will get raised to the font height.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">This adds empty space above and under the text.</span>
+<span style="color: #dcaeea;">line_height</span> = <span style="color: #da8548; font-weight: bold;">3</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Draw a line of "separatpr_height" pixel height between two</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">notifications.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Set to 0 to disable.</span>
+<span style="color: #dcaeea;">separator_height</span> = <span style="color: #da8548; font-weight: bold;">2</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Padding between text and separator.</span>
+<span style="color: #dcaeea;">padding</span> = <span style="color: #da8548; font-weight: bold;">6</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Horizontal padding.</span>
+<span style="color: #dcaeea;">horizontal_padding</span> = <span style="color: #da8548; font-weight: bold;">6</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Define a color for the separator.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">possible values are:</span>
+<span style="color: #5B6268;">#  </span><span style="color: #5B6268;">* auto: dunst tries to find a color fitting to the background;</span>
+<span style="color: #5B6268;">#  </span><span style="color: #5B6268;">* foreground: use the same color as the foreground;</span>
+<span style="color: #5B6268;">#  </span><span style="color: #5B6268;">* frame: use the same color as the frame;</span>
+<span style="color: #5B6268;">#  </span><span style="color: #5B6268;">* anything else will be interpreted as a X color.</span>
+<span style="color: #dcaeea;">separator_color</span> = frame
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Print a notification on startup.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">This is mainly for error detection, since dbus (re-)starts dunst</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">automatically after a crash.</span>
+<span style="color: #dcaeea;">startup_notification</span> = false
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">dmenu path.</span>
+<span style="color: #dcaeea;">dmenu</span> = /usr/bin/dmenu -p dunst:
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Browser for opening urls in context menu.</span>
+<span style="color: #dcaeea;">browser</span> = /usr/bin/firefox -new-tab
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Align icons left/right/off</span>
+<span style="color: #dcaeea;">icon_position</span> = off
+<span style="color: #dcaeea;">max_icon_size</span> = <span style="color: #da8548; font-weight: bold;">80</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Paths to default icons.</span>
+<span style="color: #dcaeea;">icon_path</span> = /usr/share/icons/Paper/16x16/mimetypes/:/usr/share/icons/Paper/48x48/status/:/usr/share/icons/Paper/16x16/devices/:/usr/share/icons/Paper/48x48/notifications/:/usr/share/icons/Paper/48x48/emblems/
+
+<span style="color: #dcaeea;">frame_width</span> = <span style="color: #da8548; font-weight: bold;">3</span>
+<span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#8EC07C"</span>
+
+[<span style="color: #ECBE7B;">shortcuts</span>]
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Shortcuts are specified as [modifier+][modifier+]...key</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Available modifiers are "ctrl", "mod1" (the alt-key), "mod2",</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">"mod3" and "mod4" (windows-key).</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Xev might be helpful to find names for keys.</span>
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Close notification.</span>
+<span style="color: #dcaeea;">close</span> = ctrl+space
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Close all notifications.</span>
+<span style="color: #dcaeea;">close_all</span> = ctrl+shift+space
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Redisplay last message(s).</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">On the US keyboard layout "grave" is normally above TAB and left</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">of "1".</span>
+<span style="color: #dcaeea;">history</span> = ctrl+grave
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Context menu.</span>
+<span style="color: #dcaeea;">context</span> = ctrl+shift+period
+
+[<span style="color: #ECBE7B;">urgency_low</span>]
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">IMPORTANT: colors have to be defined in quotation marks.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Otherwise the "#" and following would be interpreted as a comment.</span>
+<span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#3B7C87"</span>
+<span style="color: #dcaeea;">foreground</span> = <span style="color: #98be65;">"#3B7C87"</span>
+<span style="color: #dcaeea;">background</span> = <span style="color: #98be65;">"#191311"</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">background = "#2B313C"</span>
+<span style="color: #dcaeea;">timeout</span> = <span style="color: #da8548; font-weight: bold;">4</span>
+
+[<span style="color: #ECBE7B;">urgency_normal</span>]
+<span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#5B8234"</span>
+<span style="color: #dcaeea;">foreground</span> = <span style="color: #98be65;">"#5B8234"</span>
+<span style="color: #dcaeea;">background</span> = <span style="color: #98be65;">"#191311"</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">background = "#2B313C"</span>
+<span style="color: #dcaeea;">timeout</span> = <span style="color: #da8548; font-weight: bold;">6</span>
+
+[<span style="color: #ECBE7B;">urgency_critical</span>]
+<span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#B7472A"</span>
+<span style="color: #dcaeea;">foreground</span> = <span style="color: #98be65;">"#B7472A"</span>
+<span style="color: #dcaeea;">background</span> = <span style="color: #98be65;">"#191311"</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">background = "#2B313C"</span>
+<span style="color: #dcaeea;">timeout</span> = <span style="color: #da8548; font-weight: bold;">8</span>
+
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Every section that isn't one of the above is interpreted as a rules to</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">override settings for certain messages.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Messages can be matched by "appname", "summary", "body", "icon", "category",</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">"msg_urgency" and you can override the "timeout", "urgency", "foreground",</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">"background", "new_icon" and "format".</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Shell-like globbing will get expanded.</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">SCRIPTING</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">You can specify a script that gets run when the rule matches by</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">setting the "script" option.</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">The script will be called as follows:</span>
+<span style="color: #5B6268;">#   </span><span style="color: #5B6268;">script appname summary body icon urgency</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">where urgency can be "LOW", "NORMAL" or "CRITICAL".</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">NOTE: if you don't want a notification to be displayed, set the format</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">to "".</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">NOTE: It might be helpful to run dunst -print in a terminal in order</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">to find fitting options for rules.</span>
+
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[espeak]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = "*"</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">script = dunst_espeak.sh</span>
+
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[script-test]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = "*script*"</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">script = dunst_test.sh</span>
+
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[ignore]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;"># This notification will not be displayed</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = "foobar"</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">format = ""</span>
+
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[signed_on]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">appname = Pidgin</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = "*signed on*"</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">urgency = low</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[signed_off]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">appname = Pidgin</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = *signed off*</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">urgency = low</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[says]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">appname = Pidgin</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = *says*</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">urgency = critical</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">[twitter]</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">appname = Pidgin</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">summary = *twitter.com*</span>
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">urgency = normal</span>
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3f18fb3" class="outline-2">
+<h2 id="org3f18fb3"><span class="section-number-2">4</span> CLI Config</h2>
+<div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
 
@@ -389,6 +1202,7 @@ libreoffice
     shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
     w3m
+    yamllint
   ];
 
   <span style="color: #5B6268;"># This value determines the Home Manager release that your</span>
@@ -406,8 +1220,8 @@ libreoffice
 </div>
 </div>
 <div id="outline-container-orgc4b265f" class="outline-2">
-<h2 id="orgc4b265f"><span class="section-number-2">4</span> Desktop Config</h2>
-<div class="outline-text-2" id="text-4">
+<h2 id="orgc4b265f"><span class="section-number-2">5</span> Desktop Config</h2>
+<div class="outline-text-2" id="text-5">
 <div class="org-src-container">
 <pre class="src src-nix">{ config, pkgs, ... }:
 
@@ -457,6 +1271,7 @@ libreoffice
     shellcheck
     tmuxp         <span style="color: #5B6268;"># tmux workspace manager</span>
     w3m
+    yamllint
 
     <span style="color: #5B6268;">## Desktop</span>
     
@@ -497,6 +1312,7 @@ libreoffice
     emacs
     ffmpegthumbnailer  <span style="color: #5B6268;"># video thumbnailer</span>
     leafpad
+    libnotify
     spotify
     standardnotes
     steam-run
@@ -510,12 +1326,179 @@ libreoffice
     <span style="color: #5B6268;">#yed</span>
   ];
 
+  <span style="color: #dcaeea;">services.dunst</span> ={
+    <span style="color: #dcaeea;">enable</span> = <span style="color: #c678dd;">true</span>;
+    <span style="color: #dcaeea;">settings</span> = {
+      <span style="color: #dcaeea;">global</span> = {
+        <span style="color: #dcaeea;">font</span> = <span style="color: #98be65;">"DejaVu Sans 11"</span>;
+
+        <span style="color: #dcaeea;">markup</span> = <span style="color: #98be65;">"yes"</span>;
+        <span style="color: #dcaeea;">plain_text</span> = <span style="color: #98be65;">"no"</span>;
+
+        <span style="color: #5B6268;"># The format of the message.  Possible variables are:</span>
+        <span style="color: #5B6268;">#   %a  appname</span>
+        <span style="color: #5B6268;">#   %s  summary</span>
+        <span style="color: #5B6268;">#   %b  body</span>
+        <span style="color: #5B6268;">#   %i  iconname (including its path)</span>
+        <span style="color: #5B6268;">#   %I  iconname (without its path)</span>
+        <span style="color: #5B6268;">#   %p  progress value if set ([  0%] to [100%]) or nothing</span>
+        <span style="color: #5B6268;"># Markup is allowed</span>
+        <span style="color: #dcaeea;">format</span> = <span style="color: #98be65;">"&lt;b&gt;%s&lt;/b&gt;\n%b"</span>;
+
+        <span style="color: #5B6268;"># Sort messages by urgency.</span>
+        <span style="color: #dcaeea;">sort</span> = <span style="color: #98be65;">"no"</span>;
+
+        <span style="color: #5B6268;"># Show how many messages are currently hidden (because of geometry).</span>
+        <span style="color: #dcaeea;">indicate_hidden</span> = <span style="color: #98be65;">"yes"</span>;
+
+        <span style="color: #5B6268;"># Alignment of message text.</span>
+        <span style="color: #5B6268;"># Possible values are "left", "center" and "right".</span>
+        <span style="color: #dcaeea;">alignment</span> =  <span style="color: #98be65;">"center"</span>;
+
+        <span style="color: #5B6268;"># The frequency with wich text that is longer than the notification</span>
+        <span style="color: #5B6268;"># window allows bounces back and forth.</span>
+        <span style="color: #5B6268;"># This option conflicts with "word_wrap".</span>
+        <span style="color: #5B6268;"># Set to 0 to disable.</span>
+        <span style="color: #dcaeea;">bounce_freq</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
+
+        <span style="color: #5B6268;"># Show age of message if message is older than show_age_threshold</span>
+        <span style="color: #5B6268;"># seconds.</span>
+        <span style="color: #5B6268;"># Set to -1 to disable.</span>
+        <span style="color: #dcaeea;">show_age_threshold</span> = -1;
+
+        <span style="color: #5B6268;"># Split notifications into multiple lines if they don't fit into</span>
+        <span style="color: #5B6268;"># geometry.</span>
+        <span style="color: #dcaeea;">word_wrap</span> = <span style="color: #98be65;">"yes"</span>;
+
+        <span style="color: #5B6268;"># Ignore newlines '\n' in notifications.</span>
+        <span style="color: #dcaeea;">ignore_newline</span> = <span style="color: #98be65;">"no"</span>;
+
+        <span style="color: #5B6268;"># Hide duplicate's count and stack them</span>
+        <span style="color: #dcaeea;">stack_duplicates</span> = <span style="color: #98be65;">"yes"</span>;
+        <span style="color: #dcaeea;">hide_duplicate_count</span> = <span style="color: #98be65;">"yes"</span>;
+
+        <span style="color: #5B6268;"># The geometry of the window:</span>
+        <span style="color: #5B6268;">#   [{width}]x{height}[+/-{x}+/-{y}]</span>
+        <span style="color: #5B6268;"># The geometry of the message window.</span>
+        <span style="color: #5B6268;"># The height is measured in number of notifications everything else</span>
+        <span style="color: #5B6268;"># in pixels.  If the width is omitted but the height is given</span>
+        <span style="color: #5B6268;"># ("-geometry x2"), the message window expands over the whole screen</span>
+        <span style="color: #5B6268;"># (dmenu-like).  If width is 0, the window expands to the longest</span>
+        <span style="color: #5B6268;"># message displayed.  A positive x is measured from the left, a</span>
+        <span style="color: #5B6268;"># negative from the right side of the screen.  Y is measured from</span>
+        <span style="color: #5B6268;"># the top and down respectevly.</span>
+        <span style="color: #5B6268;"># The width can be negative.  In this case the actual width is the</span>
+        <span style="color: #5B6268;"># screen width minus the width defined in within the geometry option.</span>
+        <span style="color: #5B6268;">#geometry = "250x50-40+40"</span>
+        <span style="color: #dcaeea;">geometry</span> = <span style="color: #98be65;">"800x200-20+60"</span>;
+
+        <span style="color: #5B6268;"># Shrink window if it's smaller than the width.  Will be ignored if</span>
+        <span style="color: #5B6268;"># width is 0.</span>
+        <span style="color: #dcaeea;">shrink</span> = <span style="color: #98be65;">"no"</span>;
+
+        <span style="color: #5B6268;"># The transparency of the window.  Range: [0; 100].</span>
+        <span style="color: #5B6268;"># This option will only work if a compositing windowmanager is</span>
+        <span style="color: #5B6268;"># present (e.g. xcompmgr, compiz, etc.).</span>
+        <span style="color: #5B6268;">#transparency = 5;</span>
+
+        <span style="color: #5B6268;"># Don't remove messages, if the user is idle (no mouse or keyboard input)</span>
+        <span style="color: #5B6268;"># for longer than idle_threshold seconds.</span>
+        <span style="color: #5B6268;"># Set to 0 to disable.</span>
+        <span style="color: #dcaeea;">idle_threshold</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
+
+        <span style="color: #5B6268;"># Which monitor should the notifications be displayed on.</span>
+        <span style="color: #dcaeea;">monitor</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
+
+        <span style="color: #5B6268;"># Display notification on focused monitor.  Possible modes are:</span>
+        <span style="color: #5B6268;">#   mouse: follow mouse pointer</span>
+        <span style="color: #5B6268;">#   keyboard: follow window with keyboard focus</span>
+        <span style="color: #5B6268;">#   none: don't follow anything</span>
+        <span style="color: #5B6268;">#</span>
+        <span style="color: #5B6268;"># "keyboard" needs a windowmanager that exports the</span>
+        <span style="color: #5B6268;"># _NET_ACTIVE_WINDOW property.</span>
+        <span style="color: #5B6268;"># This should be the case for almost all modern windowmanagers.</span>
+        <span style="color: #5B6268;">#</span>
+        <span style="color: #5B6268;"># If this option is set to mouse or keyboard, the monitor option</span>
+        <span style="color: #5B6268;"># will be ignored.</span>
+        <span style="color: #dcaeea;">follow</span> = <span style="color: #98be65;">"none"</span>;
+
+        <span style="color: #5B6268;"># Should a notification popped up from history be sticky or timeout</span>
+        <span style="color: #5B6268;"># as if it would normally do.</span>
+        <span style="color: #dcaeea;">sticky_history</span> = <span style="color: #98be65;">"yes"</span>;
+
+        <span style="color: #5B6268;"># Maximum amount of notifications kept in history</span>
+        <span style="color: #dcaeea;">history_length</span> = <span style="color: #da8548; font-weight: bold;">15</span>;
+
+        <span style="color: #5B6268;"># Display indicators for URLs (U) and actions (A).</span>
+        <span style="color: #dcaeea;">show_indicators</span> = <span style="color: #98be65;">"no"</span>;
+
+        <span style="color: #5B6268;"># The height of a single line.  If the height is smaller than the</span>
+        <span style="color: #5B6268;"># font height, it will get raised to the font height.</span>
+        <span style="color: #5B6268;"># This adds empty space above and under the text.</span>
+        <span style="color: #dcaeea;">line_height</span> = <span style="color: #da8548; font-weight: bold;">3</span>;
+
+        <span style="color: #5B6268;"># Draw a line of "separatpr_height" pixel height between two</span>
+        <span style="color: #5B6268;"># notifications.</span>
+        <span style="color: #5B6268;"># Set to 0 to disable.</span>
+        <span style="color: #dcaeea;">separator_height</span> = <span style="color: #da8548; font-weight: bold;">2</span>;
+
+        <span style="color: #5B6268;"># Padding between text and separator.</span>
+        <span style="color: #dcaeea;">padding</span> = <span style="color: #da8548; font-weight: bold;">6</span>;
+
+        <span style="color: #5B6268;"># Horizontal padding.</span>
+        <span style="color: #dcaeea;">horizontal_padding</span> = <span style="color: #da8548; font-weight: bold;">6</span>;
+
+        <span style="color: #5B6268;"># Define a color for the separator.</span>
+        <span style="color: #5B6268;"># possible values are:</span>
+        <span style="color: #5B6268;">#  * auto: dunst tries to find a color fitting to the background;</span>
+        <span style="color: #5B6268;">#  * foreground: use the same color as the foreground;</span>
+        <span style="color: #5B6268;">#  * frame: use the same color as the frame;</span>
+        <span style="color: #5B6268;">#  * anything else will be interpreted as a X color.</span>
+        <span style="color: #dcaeea;">separator_color</span> = <span style="color: #98be65;">"frame"</span>;
+
+        <span style="color: #5B6268;"># Print a notification on startup.</span>
+        <span style="color: #5B6268;"># This is mainly for error detection, since dbus (re-)starts dunst</span>
+        <span style="color: #5B6268;"># automatically after a crash.</span>
+        <span style="color: #dcaeea;">startup_notification</span> = <span style="color: #c678dd;">false</span>;
+
+        <span style="color: #5B6268;"># dmenu path.</span>
+        <span style="color: #dcaeea;">dmenu</span> = <span style="color: #98be65;">"/run/current-system/sw/bin/dmenu -p dunst:"</span>;
+
+        <span style="color: #5B6268;"># Browser for opening urls in context menu.</span>
+        <span style="color: #dcaeea;">browser</span> = <span style="color: #98be65;">"/home/djwhitt/.nix-profile/bin/brave"</span>;
+
+        <span style="color: #dcaeea;">frame_width</span> = <span style="color: #da8548; font-weight: bold;">3</span>;
+        <span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#8EC07C"</span>;
+      };
+
+      <span style="color: #dcaeea;">urgency_low</span> = {
+        <span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#3B7C87"</span>;
+        <span style="color: #dcaeea;">foreground</span> = <span style="color: #98be65;">"#3B7C87"</span>;
+        <span style="color: #dcaeea;">background</span> = <span style="color: #98be65;">"#191311"</span>;
+        <span style="color: #dcaeea;">timeout</span> = <span style="color: #da8548; font-weight: bold;">4</span>;
+      };
+
+      <span style="color: #dcaeea;">urgency_normal</span> = {
+        <span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#5B8234"</span>;
+        <span style="color: #dcaeea;">foreground</span> = <span style="color: #98be65;">"#5B8234"</span>;
+        <span style="color: #dcaeea;">background</span> = <span style="color: #98be65;">"#191311"</span>;
+        <span style="color: #dcaeea;">timeout</span> = <span style="color: #da8548; font-weight: bold;">6</span>;
+      };
+
+      <span style="color: #dcaeea;">urgency_critical</span> = {
+        <span style="color: #dcaeea;">frame_color</span> = <span style="color: #98be65;">"#B7472A"</span>;
+        <span style="color: #dcaeea;">foreground</span> = <span style="color: #98be65;">"#B7472A"</span>;
+        <span style="color: #dcaeea;">background</span> = <span style="color: #98be65;">"#191311"</span>;
+        <span style="color: #dcaeea;">timeout</span> = <span style="color: #da8548; font-weight: bold;">8</span>;
+      };
+    };
+  };
   <span style="color: #5B6268;"># This value determines the Home Manager release that your</span>
   <span style="color: #5B6268;"># configuration is compatible with. This helps avoid breakage</span>
   <span style="color: #5B6268;"># when a new Home Manager release introduces backwards</span>
   <span style="color: #5B6268;"># incompatible changes.</span>
   <span style="color: #5B6268;">#</span>
-  <span style="color: #5B6268;"># You can update Home Manager without changing this value. See</span>
+
   <span style="color: #5B6268;"># the Home Manager release notes for a list of state version</span>
   <span style="color: #5B6268;"># changes in each release.</span>
   <span style="color: #dcaeea;">home.stateVersion</span> = <span style="color: #98be65;">"20.09"</span>;
@@ -527,7 +1510,7 @@ libreoffice
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2021-06-16 Wed 11:01</p>
+<p class="date">Created: 2021-06-18 Fri 21:03</p>
 </div>
 </body>
 </html>
