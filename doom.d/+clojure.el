@@ -39,7 +39,11 @@
     (match 1)
     (promise 1)
     (prop/for-all 1)
-    (s/fdef 1))
+    (s/fdef 1)
+    (Given 2)
+    (When 2)
+    (And 2)
+    (Then 2))
 
   )
 
