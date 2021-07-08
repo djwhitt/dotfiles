@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-06-04 Fri 13:02 -->
+<!-- 2021-07-08 Thu 10:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>I3 Configuration</title>
@@ -249,7 +249,7 @@ set $mod Mod4
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">clear in small sizes. However, if you need a lot of unicode glyphs or</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">right-to-left text rendering, you should instead use pango for rendering and</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">chose a FreeType font, such as:</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Use Mouse+$mod to drag floating windows to their wanted position</span>
 floating_modifier $mod
@@ -383,7 +383,7 @@ workspace_layout tabbed
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span>] floating enable
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
-font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
+font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">10</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Startup</span>
 exec --no-startup-id i3-msg workspace <span style="color: #98be65;">"1:terms"</span>
@@ -416,12 +416,12 @@ bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"<
 <h2 id="orgcfd7bac"><span class="section-number-2">2</span> Dell Laptop</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-conf" id="org41a19ff"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
-workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
-workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">4</span>         output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">5</span>         output DP-1-1
+<pre class="src src-conf" id="orgecd3ab8"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
+workspace <span style="color: #98be65;">"1:terms"</span> output eDP-1
+workspace <span style="color: #98be65;">"2:emacs"</span> output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">3</span>         output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">4</span>         output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">5</span>         output eDP-1
 
 workspace <span style="color: #da8548; font-weight: bold;">6</span>         output eDP-1
 workspace <span style="color: #da8548; font-weight: bold;">7</span>         output eDP-1
@@ -470,7 +470,7 @@ set $mod Mod4
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">clear in small sizes. However, if you need a lot of unicode glyphs or</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">right-to-left text rendering, you should instead use pango for rendering and</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">chose a FreeType font, such as:</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Use Mouse+$mod to drag floating windows to their wanted position</span>
 floating_modifier $mod
@@ -604,7 +604,7 @@ workspace_layout tabbed
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span>] floating enable
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
-font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
+font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">10</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Startup</span>
 exec --no-startup-id i3-msg workspace <span style="color: #98be65;">"1:terms"</span>
@@ -631,11 +631,11 @@ bindsym $mod+n                workspace <span style="color: #98be65;">"2:emacs"<
 }
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Workspaces</span>
-workspace <span style="color: #98be65;">"1:terms"</span> output DP-1-1
-workspace <span style="color: #98be65;">"2:emacs"</span> output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">3</span>         output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">4</span>         output DP-1-1
-workspace <span style="color: #da8548; font-weight: bold;">5</span>         output DP-1-1
+workspace <span style="color: #98be65;">"1:terms"</span> output eDP-1
+workspace <span style="color: #98be65;">"2:emacs"</span> output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">3</span>         output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">4</span>         output eDP-1
+workspace <span style="color: #da8548; font-weight: bold;">5</span>         output eDP-1
 
 workspace <span style="color: #da8548; font-weight: bold;">6</span>         output eDP-1
 workspace <span style="color: #da8548; font-weight: bold;">7</span>         output eDP-1
@@ -663,7 +663,7 @@ set $mod Mod4
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">clear in small sizes. However, if you need a lot of unicode glyphs or</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">right-to-left text rendering, you should instead use pango for rendering and</span>
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">chose a FreeType font, such as:</span>
-<span style="color: #5B6268;"># </span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
+<span style="color: #5B6268;">#</span><span style="color: #5B6268;">font pango:DejaVu Sans Mono 10</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Use Mouse+$mod to drag floating windows to their wanted position</span>
 floating_modifier $mod
@@ -797,7 +797,7 @@ workspace_layout tabbed
 <span style="color: #dcaeea;">for_window [title</span>=<span style="color: #98be65;">"Pinboard - Save a Bookmark"</span>] floating enable
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">UI</span>
-font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">9</span>
+font pango:DejaVu Sans <span style="color: #da8548; font-weight: bold;">10</span>
 
 <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Startup</span>
 exec --no-startup-id i3-msg workspace <span style="color: #98be65;">"1:terms"</span>
@@ -843,7 +843,7 @@ workspace <span style="color: #98be65;">"10:mail"</span> output LVSD-1
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: David Whittington</p>
-<p class="date">Created: 2021-06-04 Fri 13:02</p>
+<p class="date">Created: 2021-07-08 Thu 10:24</p>
 </div>
 </body>
 </html>
