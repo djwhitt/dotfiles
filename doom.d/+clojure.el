@@ -40,6 +40,8 @@
     (promise 1)
     (prop/for-all 1)
     (s/fdef 1)
+    (Before 1)
+    (After 1)
     (Given 2)
     (When 2)
     (And 2)
