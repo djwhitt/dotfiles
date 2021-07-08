@@ -86,6 +86,7 @@
     clojure-lsp
     emacs
     ffmpegthumbnailer  # video thumbnailer
+    kitty
     leafpad
     libnotify
     spotify
