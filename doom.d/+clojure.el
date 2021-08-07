@@ -45,7 +45,8 @@
     (Given 2)
     (When 2)
     (And 2)
-    (Then 2))
+    (Then 2)
+    (tests '(:defn)))
 
   )
 
