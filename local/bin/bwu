@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+BW_SESSION=$(cat ~/.cache/bw/cli-session-id)
+export BW_SESSION
+
+bw "$@"

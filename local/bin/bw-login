@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+mkdir -p ~/.cache/bw/
+bw login --raw >> ~/.cache/bw/cli-session-id
