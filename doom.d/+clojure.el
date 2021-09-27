@@ -46,7 +46,8 @@
     (When 2)
     (And 2)
     (Then 2)
-    (tests '(:defn)))
+    (tests '(:defn))
+    (do! 0))
 
   )
 
