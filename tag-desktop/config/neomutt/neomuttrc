@@ -25,3 +25,7 @@ color sidebar_new  yellow default
 # Notmuch
 set nm_default_url = "notmuch:///home/djwhitt/.mail"
 virtual-mailboxes "Today" "notmuch://?query=date:today"
+
+# Trash
+folder-hook . 'macro index d "<save-message>=gmail/trash<enter>"'
+folder-hook =gmail/trash 'macro index d <delete-message>'
