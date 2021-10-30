@@ -8,3 +8,20 @@ set tmpdir            = ~/.mutt/temp           # where to keep temp files
 set signature         = ~/.mutt/sig            # my signature file
 
 set spoolfile = "+gmail/all"
+
+source ~/.config/neomutt/themes/colors-gruvbox-shuber.muttrc
+#source ~/.config/neomutt/themes/colors-gruvbox-shuber-extended.muttrc
+
+# Index Key Bindings
+bind index g   noop
+bind index gg  first-entry
+bind index G   last-entry
+
+# Sidebar
+set sidebar_visible = yes
+set sidebar_width   = 30
+color sidebar_new  yellow default
+
+# Notmuch
+set nm_default_url = "notmuch:///home/djwhitt/.mail"
+virtual-mailboxes "Today" "notmuch://?query=date:today"
