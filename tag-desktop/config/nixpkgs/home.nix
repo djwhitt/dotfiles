@@ -13,7 +13,7 @@
 
   home.packages = with pkgs; [
     ## CLI
-    
+
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (with hunspellDicts; [en-us]))
     awscli
@@ -21,22 +21,32 @@
     bat           # cat clone with syntax highlighting and git integration
     bitwarden-cli
     clojure
+    coursier      # jvm artifact fetcher + runner
+    ditaa
     docker-compose
+    duply
     exiftool      # cli app for reading, writing and editing meta information
     fd            # alternative to find
+    file
     fzf           # cli fuzzy finder
     git
     git-lfs
     gitAndTools.git-annex
+    graphviz
+    httperf
     httpie
     jq
     lazygit       # terminal UI for git
+    leiningen
     mediainfo     # unified display of technical and tag data for video and audio files
+    neovim
     nixfmt        # Nix code formatter
     nmap
     nodejs
     odt2txt       # for opendocument previews
+    offlineimap
     openjdk
+    plantuml
     poppler_utils # for pdf previews
     python3
     python38Packages.pdftotext
@@ -49,11 +59,13 @@
     yamllint
 
     ## Desktop
-    
+
     # X utils
     flameshot     # screenshot tool
+    glxinfo
     hacksaw       # area selection tool
-    nomacs        # image viewer
+    libnotify
+    gnome.eog     # image viewer
     rofi
     shotgun       # screenshot tool
     wmctrl
@@ -62,44 +74,51 @@
     xorg.xev
     xorg.xprop
     xorg.xwininfo
-    
+
     # Communication
     discord
+    neomutt
+    notmuch       # mail indexer
     signal-desktop
     slack
-    
+
     # Fonts
     carlito
-    
+
     # Gnome utils
     gnome3.dconf-editor
-    
+
     # Graphics
+    drawio
     gimp
     inkscape
-    
+
     # misc
+    anki
     appimage-run
     bitwarden
     brave
     clj-kondo
     clojure-lsp
+    dbeaver
     emacs
+    evince
     ffmpegthumbnailer  # video thumbnailer
     kitty
     leafpad
-    libnotify
+    mplayer
+    obs-studio
+    pasystray
+    playonlinux
     spotify
     standardnotes
+    steam
     steam-run
+    trezor-suite
     wine
     youtube-dl
     zoom-us
-
-    # tools for thought
-    drawio
     libreoffice
-    #yed
   ];
 
   services.dunst ={
