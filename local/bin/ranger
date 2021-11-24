@@ -7,6 +7,5 @@ ranger="$HOME/.nix-profile/bin/ranger"
 if [ -t 1 ]; then
   exec $ranger $@
 else
-  export EDITOR="emacsclient -a vim --no-wait"
   exec kitty --title ranger -- $ranger
 fi
