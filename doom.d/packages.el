@@ -51,3 +51,4 @@
 (package! ediprolog)
 (package! graphviz-dot-mode)
 (package! lastpass)
+(package! wakatime-mode)

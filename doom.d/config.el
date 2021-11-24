@@ -31,7 +31,8 @@
 ;; change `org-directory'. It must be set before org loads!
 
 (setq confirm-kill-emacs nil            ; Don't prompt when closing Emacs
-      display-line-numbers-type nil)    ; Disable line numbers
+      display-line-numbers-type nil     ; Disable line numbers
+      org-directory "~/Notes")
 
 ;; Set leader keys
 (setq doom-leader-key "SPC"
@@ -57,20 +58,6 @@
       :desc "Switch to last buffer"
       "TAB" 'evil-switch-to-windows-last-buffer)
 
-;; Prodigy
-
-;; (map! :leader
-;;       :desc "Prodigy"
-;;       "o y" 'prodigy)
-
-;; Lastpass
-
-;; (after! lastpass
-;;   (setq lastpass-user "djwhitt@gmail.com"
-;;         lastpass-shell "/run/current-system/sw/bin/bash")
-;;   ;; Enable lastpass custom auth-source
-;;   (lastpass-auth-source-enable))
-
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
@@ -87,15 +74,3 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-
-;; PIM
-(load! "+email.el")
-(load! "+org.el")
-
-;; Languages
-(load! "+clojure.el")
-(load! "+plantuml.el")
-(load! "+prolog.el")
-
-;; Org projects
-(load! "+dotfiles.el")
