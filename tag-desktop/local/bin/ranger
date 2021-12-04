@@ -2,10 +2,12 @@
 
 set -e
 
+export EDITOR=nvim
+
 ranger="$HOME/.nix-profile/bin/ranger"
 
 if [ -t 1 ]; then
-  exec $ranger $@
+  exec $ranger "$@"
 else
   exec kitty --title ranger -- $ranger
 fi
