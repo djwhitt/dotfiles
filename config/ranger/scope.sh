@@ -240,11 +240,20 @@ handle_image() {
         #     ;;
     esac
 
+    ditaa_image() {
+        TMPDIR="$(mktemp -d)"
+        mkdir -p "$TMPDIR"
+        TMPPNG="${TMPDIR}/$(basename -s .ditaa ${1}).png"
+        ditaa -s 2 "${1}" "${TMPPNG}"
+        mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
+        rmdir "${TMPDIR}"
+    }
+
     dot_image() {
         TMPDIR="$(mktemp -d)"
         mkdir -p "$TMPDIR"
-        TMPSVG="${TMPDIR}/$(basename -s .plantuml ${1}).svg"
-        TMPPNG="${TMPDIR}/$(basename -s .plantuml ${1}).png"
+        TMPSVG="${TMPDIR}/$(basename -s .dot ${1}).svg"
+        TMPPNG="${TMPDIR}/$(basename -s .dot ${1}).png"
         dot -Tsvg -o "${TMPSVG}" "${1}"
         convert -resize 200% "${TMPSVG}" "${TMPPNG}"
         rm "${TMPSVG}"
@@ -265,6 +274,9 @@ handle_image() {
     }
 
     case "${FILE_EXTENSION_LOWER}" in
+        ditaa)
+            ditaa_image "${FILE_PATH}" && exit 6
+            ;;
         dot)
             dot_image "${FILE_PATH}" && exit 6
             ;;
