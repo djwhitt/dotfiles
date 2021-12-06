@@ -143,6 +143,7 @@ for_window [title="Factorio"] floating enable
 for_window [title="Steam"] floating enable
 for_window [title="CopyQ"] floating enable
 for_window [title="Pinboard - Save a Bookmark"] floating enable
+for_window [title="Xscratch"] move scratchpad
 
 # UI
 font pango:DejaVu Sans 10
