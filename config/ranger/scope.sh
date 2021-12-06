@@ -261,7 +261,30 @@ handle_image() {
         rmdir "${TMPDIR}"
     }
 
+    freeplane_image() {
+        Xephyr -title Xscratch :9 &
+        TMPJPG="/tmp/$(basename -s .mm ${1}).jpg"
+        DISPLAY=:9 freeplane -SXExport_jpg_on_selected_node "${1}"
+        kill %1
+        mv "${TMPJPG}" "${IMAGE_CACHE_PATH}"
+    }
+
+    gnumeric_image() {
+        TMPDIR="$(mktemp -d)"
+        TMPPNG="${TMPDIR}/$(basename -s .gnumeric ${1}).png"
+        TMPPNG0="${TMPPNG}.0"
+        ssconvert --export-graphs "${1}" "${TMPPNG}"
+        if [ -f "${TMPPNG0}" ]; then
+          mv "${TMPPNG0}" "${IMAGE_CACHE_PATH}"
+          rm "${TMPDIR}/*"
+          rmdir "${TMPDIR}"
+        else
+          return 1
+        fi
+    }
+
     plantuml_image() {
+        touch /tmp/foo
         TMPDIR="$(mktemp -d)"
         mkdir -p "$TMPDIR"
         TMPSVG="${TMPDIR}/$(basename -s .plantuml ${1}).svg"
@@ -280,11 +303,16 @@ handle_image() {
         dot)
             dot_image "${FILE_PATH}" && exit 6
             ;;
+        gnumeric)
+            gnumeric_image "${FILE_PATH}" && exit 6
+            ;;
+        mm)
+            freeplane_image "${FILE_PATH}" && exit 6
+            ;;
         plantuml)
             plantuml_image "${FILE_PATH}" && exit 6
             ;;
     esac
-
 
     # openscad_image() {
     #     TMPPNG="$(mktemp -t XXXXXX.png)"
