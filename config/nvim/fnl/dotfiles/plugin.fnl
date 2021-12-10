@@ -37,6 +37,7 @@
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
   :airblade/vim-gitgutter {}
+  :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {}
   :clojure-vim/vim-jack-in {}
   ; :dag/vim-fish {}
@@ -53,6 +54,7 @@
   ; :liuchengxu/vim-better-default {:mod :better-default}
   :marko-cerovac/material.nvim {:mod :material}
   ; :maxmellon/vim-jsx-pretty {}
+  :mhinz/vim-startify {}
   ; :mbbill/undotree {:mod :undotree}
   :neovim/nvim-lspconfig {:mod :lspconfig}
   ; :norcalli/nvim-colorizer.lua {:mod :colorizer}
