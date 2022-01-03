@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+exec wine "${HOME}/Lib/winbox/winbox.exe"
