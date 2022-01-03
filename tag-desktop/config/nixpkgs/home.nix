@@ -8,6 +8,14 @@
 
   fonts.fontconfig.enable = true;
 
+  programs.vscode = {
+    enable = true;
+    extensions = with pkgs.vscode-extensions; [
+      github.copilot
+      vscodevim.vim
+    ];
+  };
+
   home.homeDirectory = "/home/djwhitt";
   home.username = "djwhitt";
 
@@ -19,6 +27,7 @@
     awscli
     babashka
     bat           # cat clone with syntax highlighting and git integration
+    bind
     bitwarden-cli
     clojure
     coursier      # jvm artifact fetcher + runner
@@ -32,6 +41,7 @@
     git
     git-lfs
     gitAndTools.git-annex
+    gnuplot
     graphviz
     httperf
     httpie
@@ -42,7 +52,7 @@
     neovim
     nixfmt        # Nix code formatter
     nmap
-    nodejs
+    nodejs-16_x
     odt2txt       # for opendocument previews
     offlineimap
     openjdk
@@ -81,6 +91,7 @@
     notmuch       # mail indexer
     signal-desktop
     slack
+    teams
 
     # Fonts
     carlito
@@ -103,9 +114,15 @@
     dbeaver
     emacs
     evince
+    feh
     ffmpegthumbnailer  # video thumbnailer
+    firefox
+    freeplane
+    gnumeric
     kitty
     leafpad
+    ledger-live-desktop
+    libreoffice
     mplayer
     obs-studio
     pasystray
@@ -114,11 +131,11 @@
     standardnotes
     steam
     steam-run
+    treesheets
     trezor-suite
     wine
     youtube-dl
     zoom-us
-    libreoffice
   ];
 
   services.dunst ={
