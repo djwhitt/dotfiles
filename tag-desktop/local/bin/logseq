@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-exec appimage-run $HOME/Lib/logseq/logseq-linux-x64-*.AppImage
+exec appimage-run $HOME/Lib/logseq/Logseq-linux-x64-*.AppImage
