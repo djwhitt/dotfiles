@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+pamixer --source $(pamixer --list-sources | grep "alsa_input.usb-Blue_Microphones_Yeti" | awk '{ print $1 }') -t
