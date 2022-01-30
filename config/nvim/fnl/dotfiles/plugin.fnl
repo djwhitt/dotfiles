@@ -43,6 +43,7 @@
   :clojure-vim/vim-jack-in {}
   ; :dag/vim-fish {}
   ; :easymotion/vim-easymotion {:mod :easymotion}
+  :github/copilot.vim {}
   :guns/vim-sexp {:mod :sexp}
   ; :hashivim/vim-terraform {}
   ; :hoob3rt/lualine.nvim {:mod :lualine}
