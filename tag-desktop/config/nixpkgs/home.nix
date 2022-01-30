@@ -71,6 +71,7 @@
     ## Desktop
 
     # X utils
+    copyq         # clipboard manager
     flameshot     # screenshot tool
     glxinfo
     hacksaw       # area selection tool

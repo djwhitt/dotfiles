@@ -152,7 +152,7 @@ font pango:DejaVu Sans 10
 exec --no-startup-id i3-msg workspace "1:terms"
 exec --no-startup-id keychain --quiet --inherit any
 exec --no-startup-id cd ~/Annex && git annex assistant
-exec copyq
+exec --no-startup-id copyq
 
 # Keyboard
 bindsym XF86AudioRaiseVolume  exec "pamixer -i 5"
