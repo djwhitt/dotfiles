@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+appimage=$(ls $HOME/Lib/remnote/RemNote-*.AppImage)
+export HOME="$HOME/.local/share/remnote-home"
+appimage-run "${appimage}"
