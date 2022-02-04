@@ -128,6 +128,7 @@
     obs-studio
     pasystray
     playonlinux
+    python310Packages.py3status
     spotify
     standardnotes
     steam
