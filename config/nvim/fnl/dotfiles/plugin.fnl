@@ -39,10 +39,10 @@
   :airblade/vim-gitgutter {}
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {}
-  :kchmck/vim-coffee-script {}
   :clojure-vim/vim-jack-in {}
   ; :dag/vim-fish {}
   ; :easymotion/vim-easymotion {:mod :easymotion}
+  :editorconfig/editorconfig-vim {}
   :github/copilot.vim {}
   :guns/vim-sexp {:mod :sexp}
   ; :hashivim/vim-terraform {}
