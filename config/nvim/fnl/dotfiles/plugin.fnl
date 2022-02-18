@@ -66,6 +66,7 @@
   :pangloss/vim-javascript {}
   :prettier/vim-prettier {:ft :javascript}
   :radenling/vim-dispatch-neovim {}
+  :ray-x/go.nvim {}
   :tami5/compe-conjure {}
   ; :tpope/vim-abolish {}
   ; :tpope/vim-commentary {}
