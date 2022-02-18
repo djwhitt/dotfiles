@@ -52,6 +52,7 @@
   ; :janet-lang/janet.vim {}
   ; :jiangmiao/auto-pairs {:mod :auto-pairs}
   ; :kyazdani42/nvim-tree.lua {:mod :nvimtree}
+  :kchmck/vim-coffee-script {}
   ; :lambdalisue/suda.vim {}
   ; :liuchengxu/vim-better-default {:mod :better-default}
   :marko-cerovac/material.nvim {:mod :material}
