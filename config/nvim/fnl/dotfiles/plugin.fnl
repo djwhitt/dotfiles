@@ -42,7 +42,7 @@
   :clojure-vim/vim-jack-in {}
   ; :dag/vim-fish {}
   ; :easymotion/vim-easymotion {:mod :easymotion}
-  :editorconfig/editorconfig-vim {}
+  :editorconfig/editorconfig-vim {:mod :editorconfig}
   :github/copilot.vim {}
   :guns/vim-sexp {:mod :sexp}
   ; :hashivim/vim-terraform {}
