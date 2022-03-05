@@ -48,8 +48,6 @@
   ; :hashivim/vim-terraform {}
   ; :hoob3rt/lualine.nvim {:mod :lualine}
   :hrsh7th/nvim-compe {:mod :compe}
-  ; :hylang/vim-hy {}
-  ; :janet-lang/janet.vim {}
   ; :jiangmiao/auto-pairs {:mod :auto-pairs}
   ; :kyazdani42/nvim-tree.lua {:mod :nvimtree}
   :kchmck/vim-coffee-script {}
