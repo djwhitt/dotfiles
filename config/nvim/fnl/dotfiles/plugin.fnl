@@ -67,7 +67,7 @@
   :ray-x/go.nvim {}
   :tami5/compe-conjure {}
   ; :tpope/vim-abolish {}
-  ; :tpope/vim-commentary {}
+  :tpope/vim-commentary {}
   ; :tpope/vim-dadbod {}
   :tpope/vim-dispatch {}
   ; :tpope/vim-eunuch {}
