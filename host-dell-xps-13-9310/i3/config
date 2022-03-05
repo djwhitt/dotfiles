@@ -163,8 +163,8 @@ bindsym XF86MonBrightnessDown exec brightnessctl set 2%-
 bindsym XF86MonBrightnessUp   exec brightnessctl set +2%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec kitty
-bindsym $mod+period           exec $HOME/.local/bin/ranger
-bindsym $mod+comma            exec rofi-copyq
+bindsym $mod+period           exec rofi-copyq
+bindsym $mod+comma            exec $HOME/.local/bin/ranger
 bindsym Print                 exec flameshot gui
 
 # Start i3bar to display a workspace bar (plus the system information i3status
