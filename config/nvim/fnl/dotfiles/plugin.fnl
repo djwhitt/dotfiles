@@ -59,7 +59,11 @@
   ; :mbbill/undotree {:mod :undotree}
   :neovim/nvim-lspconfig {:mod :lspconfig}
   ; :norcalli/nvim-colorizer.lua {:mod :colorizer}
-  :nvim-telescope/telescope.nvim {:requires [[:nvim-lua/popup.nvim] [:nvim-lua/plenary.nvim] [:nvim-telescope/telescope-project.nvim]] :mod :telescope}
+  :nvim-telescope/telescope.nvim {:requires
+                                  [[:nvim-lua/popup.nvim]
+                                   [:nvim-lua/plenary.nvim]
+                                   [:nvim-telescope/telescope-project.nvim]]
+                                  :mod :telescope}
   ; :nvim-treesitter/nvim-treesitter {:run ":TSUpdate" :mod :treesitter}
   :pangloss/vim-javascript {}
   :prettier/vim-prettier {:ft :javascript}
