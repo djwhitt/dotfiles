@@ -5,12 +5,12 @@ while true; do
   if [ -n "$source" ]; then
     status=$(pamixer --source "${source}" --get-mute 2> /dev/null)
     if [ "${status}" = "true" ]; then
+      echo "#FFFF00"
+      echo "MUTED"
+    else
       volume=$(pamixer --source "${source}" --get-volume 2> /dev/null)
       echo "#FFFFFF"
       echo "MIC ${volume}"
-    else
-      echo "#FFFF00"
-      echo "MUTED"
     fi
   else
     echo
