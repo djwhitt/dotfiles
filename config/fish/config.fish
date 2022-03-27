@@ -1,1 +1,2 @@
-alias nv=nvim
+alias tl="tmuxp load"
+alias e="nvr"
