@@ -139,10 +139,10 @@ hide_edge_borders both
 workspace_layout tabbed
 
 # Window commands
-for_window [title="Factorio"] floating enable
-for_window [title="Steam"] floating enable
 for_window [title="CopyQ"] floating enable
+for_window [title="Factorio"] floating enable
 for_window [title="Pinboard - Save a Bookmark"] floating enable
+for_window [title="Steam"] floating enable
 for_window [title="Xscratch"] move scratchpad
 
 # UI
@@ -163,8 +163,9 @@ bindsym XF86MonBrightnessDown exec brightnessctl set 2%-
 bindsym XF86MonBrightnessUp   exec brightnessctl set +2%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec kitty
-bindsym $mod+period           exec rofi-copyq
+bindsym $mod+period           exec kitty fish -c "nvim --listen /tmp/nvimsocket"
 bindsym $mod+comma            exec $HOME/.local/bin/ranger
+bindsym $mod+apostrophe       exec rofi-copyq
 bindsym Print                 exec flameshot gui
 
 # Start i3bar to display a workspace bar (plus the system information i3status
