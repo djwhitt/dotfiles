@@ -40,7 +40,7 @@
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {}
   :clojure-vim/vim-jack-in {}
-  ; :dag/vim-fish {}
+  :dag/vim-fish {}
   ; :easymotion/vim-easymotion {:mod :easymotion}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
   :github/copilot.vim {}
