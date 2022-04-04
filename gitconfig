@@ -23,10 +23,5 @@
 	process = git-lfs filter-process
 	required = true
 
-[magithub]
-	online = false
-
-[magithub "status"]
-	includeStatusHeader = false
-	includePullRequestsSection = false
-	includeIssuesSection = false
+[diff]
+	external = difft

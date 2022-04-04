@@ -31,6 +31,7 @@
     bitwarden-cli
     clojure
     coursier      # jvm artifact fetcher + runner
+    difftastic
     ditaa
     docker-compose
     duply
