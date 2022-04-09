@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+if ! wmctrl -x -a neovide; then 
+  neovide -- --listen $XDG_RUNTIME_DIR/nvimsocket
+  while ! wmctrl -x -a neovide; do sleep 0.1; done
+fi
