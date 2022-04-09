@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 
+ensure-neovide
+
+export NVIM_LISTEN_ADDRESS="$XDG_RUNTIME_DIR/nvimsocket"
+
+# Wait for NVIM_LIST_ADDRESS to exist
+while [ ! -e "$NVIM_LISTEN_ADDRESS" ]; do
+  sleep 0.1
+done
+
 nvr --nostart "$@"
-i3-msg 'workspace "2:edit"' > /dev/null
