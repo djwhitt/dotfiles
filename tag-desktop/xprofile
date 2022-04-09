@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-export PATH="$HOME/.local/bin:$PATH"
+# Add NPM packages bin directory to the path if it's missing
+npm_bin="$HOME/.npm-packages/bin"
+if [ -d "$npm_bin" ] && [[ ":$PATH:" != *":$npm_bin:"* ]]; then
+  export PATH="$npm_bin${PATH:+":$PATH"}"
+fi
 
-npm_packages="$HOME/.npm-packages"
-if [ -d "$npm_packages" ] && [[ "$:PATH:" != *":$PATH:"* ]]; then
-  export PATH="$npm_packages/bin:$PATH"
+# Add personal bin directory to the path if it's missing
+local_bin="$HOME/.local/bin"
+if [ -d "$local_bin" ] && [[ ":$PATH:" != *":$local_bin:"* ]]; then
+  export PATH="$local_bin${PATH:+":$PATH"}"
 fi
