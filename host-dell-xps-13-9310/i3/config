@@ -144,6 +144,7 @@ for_window [title="Factorio"] floating enable
 for_window [title="Pinboard - Save a Bookmark"] floating enable
 for_window [title="Steam"] floating enable
 for_window [title="Xscratch"] move scratchpad
+for_window [class="neovide"] move workspace "2:edit"
 
 # UI
 font pango:DejaVu Sans 10
@@ -163,7 +164,7 @@ bindsym XF86MonBrightnessDown exec brightnessctl set 2%-
 bindsym XF86MonBrightnessUp   exec brightnessctl set +2%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec kitty
-bindsym $mod+period           exec kitty fish -c "nvim --listen /tmp/nvimsocket"
+bindsym $mod+period           exec ensure-neovide
 bindsym $mod+comma            exec $HOME/.local/bin/ranger
 bindsym $mod+apostrophe       exec rofi-copyq
 bindsym Print                 exec flameshot gui
