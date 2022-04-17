@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ensure-neovide
+ensure-kitty-nvim
 
 export NVIM_LISTEN_ADDRESS="$XDG_RUNTIME_DIR/nvimsocket"
 

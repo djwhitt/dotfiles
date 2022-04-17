@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+window_class="kitty-nvim"
+if ! wmctrl -x -a $window_class; then 
+  kitty --class $window_class --detach nvim --listen $XDG_RUNTIME_DIR/nvimsocket
+  while ! wmctrl -x -a $window_class; do sleep 0.1; done
+fi
