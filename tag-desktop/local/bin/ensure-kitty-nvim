@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 window_class="kitty-nvim"
+nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 if ! wmctrl -x -a $window_class; then 
-  kitty --class $window_class --detach nvim --listen $XDG_RUNTIME_DIR/nvimsocket
+  pgrep nvim > /dev/null || rm "${nvimsocket}"
+  kitty --class $window_class --detach nvim --listen "${nvimsocket}"
   while ! wmctrl -x -a $window_class; do sleep 0.1; done
 fi
