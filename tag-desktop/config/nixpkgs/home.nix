@@ -120,6 +120,7 @@
     ffmpegthumbnailer  # video thumbnailer
     firefox
     freeplane
+    fira-code
     gnumeric
     kitty
     leafpad
