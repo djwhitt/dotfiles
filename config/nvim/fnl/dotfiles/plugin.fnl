@@ -45,16 +45,17 @@
   :editorconfig/editorconfig-vim {:mod :editorconfig}
   :github/copilot.vim {}
   :guns/vim-sexp {:mod :sexp}
-  ; :hashivim/vim-terraform {}
+  :hashivim/vim-terraform {}
   ; :hoob3rt/lualine.nvim {:mod :lualine}
   :hrsh7th/nvim-compe {:mod :compe}
+  :jose-elias-alvarez/null-ls.nvim {:mod :null-ls}
+  :jose-elias-alvarez/nvim-lsp-ts-utils {}
   ; :jiangmiao/auto-pairs {:mod :auto-pairs}
   ; :kyazdani42/nvim-tree.lua {:mod :nvimtree}
   :kchmck/vim-coffee-script {}
   ; :lambdalisue/suda.vim {}
-  :liuchengxu/vim-better-default {:mod :better-default}
+  ; :liuchengxu/vim-better-default {:mod :better-default}
   :marko-cerovac/material.nvim {:mod :material}
-  ; :maxmellon/vim-jsx-pretty {}
   :mhinz/vim-startify {}
   ; :mbbill/undotree {:mod :undotree}
   :neovim/nvim-lspconfig {:mod :lspconfig}
@@ -84,7 +85,7 @@
   ; :tpope/vim-unimpaired {}
   :tpope/vim-vinegar {}
   ; :tweekmonster/startuptime.vim {}
-  :w0rp/ale {:mod :ale}
+  ; :w0rp/ale {:mod :ale}
   :wakatime/vim-wakatime {}
   :wbthomason/packer.nvim {}
   ; :wlangstroth/vim-racket {}
