@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export KITTY_NVIM=true
+
 window_class="kitty-nvim"
 nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 if ! wmctrl -x -a $window_class; then 

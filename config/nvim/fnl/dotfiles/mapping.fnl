@@ -7,6 +7,10 @@
   "Sets a mapping with {:noremap true}."
   (nvim.set_keymap mode from to {:noremap true}))
 
+;; Disable CTRL-Z in dedicated terminal
+(when (= nvim.env.KITTY_NVIM "true")
+  (noremap :n "<c-z>" "<nop>"))
+
 ;; Generic mapping configuration
 (nvim.set_keymap :n :<space> :<nop> {:noremap true})
 (set nvim.g.mapleader " ")
