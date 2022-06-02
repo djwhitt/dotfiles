@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
+export VISUAL="$HOME/.local/bin/e"
+
+export NPM_PACKAGES="$HOME/.npm-packages"
+
 # Add NPM packages bin directory to the path if it's missing
-npm_bin="$HOME/.npm-packages/bin"
+npm_bin="$NPM_PACKAGES/bin"
 if [ -d "$npm_bin" ] && [[ ":$PATH:" != *":$npm_bin:"* ]]; then
   export PATH="$npm_bin${PATH:+":$PATH"}"
 fi

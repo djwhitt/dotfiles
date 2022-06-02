@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+ranger="$HOME/.nix-profile/bin/ranger"
+
+window_class="kitty-ranger"
+if ! wmctrl -x -a $window_class; then 
+  pgrep ranger
+  kitty --class $window_class --title ranger --detach $ranger
+  while ! wmctrl -x -a $window_class; do sleep 0.1; done
+fi

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [ -e node_modules/.bin/nbb ]; then
+  exec npx nbb "$@"
+else
+  exec $NPM_PACKAGES/bin/nbb "$@"
+fi
