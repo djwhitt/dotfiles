@@ -51,6 +51,7 @@
   :jose-elias-alvarez/null-ls.nvim {:mod :null-ls}
   :jose-elias-alvarez/nvim-lsp-ts-utils {}
   ; :jiangmiao/auto-pairs {:mod :auto-pairs}
+  :jparise/vim-graphql {}
   ; :kyazdani42/nvim-tree.lua {:mod :nvimtree}
   :kchmck/vim-coffee-script {}
   ; :lambdalisue/suda.vim {}
