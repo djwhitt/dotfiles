@@ -44,6 +44,7 @@
   ; :easymotion/vim-easymotion {:mod :easymotion}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
   :github/copilot.vim {}
+  :google/vim-jsonnet {}
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
   ; :hoob3rt/lualine.nvim {:mod :lualine}
