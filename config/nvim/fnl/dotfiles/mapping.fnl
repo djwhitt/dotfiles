@@ -52,7 +52,7 @@
 (noremap :n :<leader>bt ":%s/\\s\\+$//e<cr>")
 
 ;; Dispatch
-(noremap :n :<localleader><localleader> ":Dispatch<cr>")
+(noremap :n :<leader><leader> ":Dispatch<cr>")
 
 (nu.fn-bridge
   :DeleteHiddenBuffers
