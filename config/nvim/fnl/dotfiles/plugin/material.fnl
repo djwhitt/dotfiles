@@ -3,7 +3,7 @@
              material material}})
 
 (material.setup
-  {:custom_highlights {:FloatBorder "#1A1A1A"}
+  {:custom_highlights {:FloatBorder {:fg "#1A1A1A"}}
    :borders true
    :text_contrast {:darker true}})
 
