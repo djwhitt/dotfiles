@@ -40,6 +40,7 @@
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {}
   :clojure-vim/vim-jack-in {}
+  :PaterJason/cmp-conjure {}
   :dag/vim-fish {}
   ; :easymotion/vim-easymotion {:mod :easymotion}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
@@ -48,7 +49,11 @@
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
   ; :hoob3rt/lualine.nvim {:mod :lualine}
-  :hrsh7th/nvim-compe {:mod :compe}
+  :hrsh7th/cmp-buffer {}
+  :hrsh7th/cmp-cmdline {}
+  :hrsh7th/cmp-nvim-lsp {}
+  :hrsh7th/cmp-path {}
+  :hrsh7th/nvim-cmp {:mod :cmp}
   :jose-elias-alvarez/null-ls.nvim {:mod :null-ls}
   :jose-elias-alvarez/nvim-lsp-ts-utils {}
   ; :jiangmiao/auto-pairs {:mod :auto-pairs}
