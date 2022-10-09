@@ -8,6 +8,7 @@
 (set nvim.o.timeoutlen 500)
 (set nvim.o.sessionoptions "blank,curdir,folds,help,tabpages,winsize")
 (set nvim.o.inccommand :split)
+(set nvim.o.shada "!,'1000,<50,s10,h") ;; 1000 oldfiles
 
 ;(nvim.ex.set :spell)
 (nvim.ex.set :list)
