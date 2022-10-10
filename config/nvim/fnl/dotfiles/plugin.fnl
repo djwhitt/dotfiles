@@ -48,7 +48,7 @@
   :google/vim-jsonnet {}
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
-  ; :hoob3rt/lualine.nvim {:mod :lualine}
+  :hoob3rt/lualine.nvim {:mod :lualine}
   :hrsh7th/cmp-buffer {}
   :hrsh7th/cmp-cmdline {}
   :hrsh7th/cmp-nvim-lsp {}
