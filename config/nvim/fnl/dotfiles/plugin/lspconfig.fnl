@@ -25,11 +25,11 @@
          (on-attach client bufnr))})
 
     ;; https://www.chrisatmachine.com/Neovim/27-native-lsp/
-    (map :gd "lua vim.lsp.buf.definition()")
+    ;;(map :gd "lua vim.lsp.buf.definition()")
     (map :gD "lua vim.lsp.buf.declaration()")
-    (map :gr "lua vim.lsp.buf.references()")
+    ;;(map :gr "lua vim.lsp.buf.references()")
     (map :gi "lua vim.lsp.buf.implementation()")
-    (map :K "lua vim.lsp.buf.hover()")
+    ;;(map :K "lua vim.lsp.buf.hover()")
     (map :<c-k> "lua vim.lsp.buf.signature_help()")
     (map :<c-n> "lua vim.diagnostic.goto_prev()")
     (map :<c-p> "lua vim.diagnostic.goto_next()")

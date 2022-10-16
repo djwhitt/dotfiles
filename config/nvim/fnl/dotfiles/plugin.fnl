@@ -45,6 +45,7 @@
   ; :easymotion/vim-easymotion {:mod :easymotion}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
   :github/copilot.vim {}
+  :glepnir/lspsaga.nvim {:mod :lspsaga}
   :google/vim-jsonnet {}
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
