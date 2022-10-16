@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
+# Used by conditionals in Neovim config
 export KITTY_NVIM=true
 
 window_class="kitty-nvim"
-nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
+
+# KDE version (useful in Wayland)
+#nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
+#ww -f "${window_class}" -c "kitty --class $window_class --detach nvim --listen ${nvimsocket}"
+
+# X11 version
 if ! wmctrl -x -a $window_class; then 
   pgrep nvim > /dev/null || rm "${nvimsocket}"
   kitty --class $window_class --detach nvim --listen "${nvimsocket}"
-  while ! wmctrl -x -a $window_class; do sleep 0.1; done
+  while ! wmctrl -x -a $window_class; do sleep 0.05; done
 fi
