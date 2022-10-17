@@ -7,15 +7,14 @@
 
 (let [(ok? saga) (pcall require :lspsaga)]
   (when ok?
-    (saga.init_lsp_saga)
+    (saga.init_lsp_saga
+      {:finder_action_keys
+       {:open "<CR>"}})
 
-    ;;(map :<C-j> "Lspsaga diagnostic_jump_next")
     (map :K  "Lspsaga hover_doc")
     (map :gd "Lspsaga lsp_finder")
-    ;; TODO need to map this in insert mode
-    ;;(map :<C-k> "Lspsaga signature_help")
     (map :gp "Lspsaga peek_definition")
-    (map :<leader>lr "Lspsaga rename")
+    ;;(map :<leader>lr "Lspsaga rename")
     ;; TODO do this in visual mode too
     (map :<leader>la "Lspsaga code_action")
     ))
