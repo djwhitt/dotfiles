@@ -36,11 +36,11 @@
   ; :Olical/nvim-local-fennel {}
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
+  :PaterJason/cmp-conjure {}
   :airblade/vim-gitgutter {}
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {}
   :clojure-vim/vim-jack-in {}
-  :PaterJason/cmp-conjure {}
   :dag/vim-fish {}
   ; :easymotion/vim-easymotion {:mod :easymotion}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
@@ -78,7 +78,6 @@
   :prettier/vim-prettier {:ft :javascript}
   :radenling/vim-dispatch-neovim {}
   :ray-x/go.nvim {}
-  :tami5/compe-conjure {}
   ; :tpope/vim-abolish {}
   :tpope/vim-commentary {}
   ; :tpope/vim-dadbod {}
@@ -93,9 +92,7 @@
   ; :tpope/vim-unimpaired {}
   :tpope/vim-vinegar {}
   ; :tweekmonster/startuptime.vim {}
-  ; :w0rp/ale {:mod :ale}
   :wakatime/vim-wakatime {}
   :wbthomason/packer.nvim {}
-  ; :wlangstroth/vim-racket {}
   )
 
