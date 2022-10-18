@@ -4,9 +4,9 @@
 export KITTY_NVIM=true
 
 window_class="kitty-nvim"
+nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 
 # KDE version (useful in Wayland)
-#nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 #ww -f "${window_class}" -c "kitty --class $window_class --detach nvim --listen ${nvimsocket}"
 
 # X11 version
