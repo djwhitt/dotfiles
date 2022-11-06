@@ -42,9 +42,8 @@
   :clojure-vim/clojure.vim {}
   :clojure-vim/vim-jack-in {}
   :dag/vim-fish {}
-  ; :easymotion/vim-easymotion {:mod :easymotion}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
-  :ggandor/leap.nvim {:mod :leap} ;; TODO try lightspeed instead
+  :ggandor/leap.nvim {:mod :leap}
   :github/copilot.vim {}
   :glepnir/lspsaga.nvim {:mod :lspsaga}
   :google/vim-jsonnet {}
