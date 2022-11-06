@@ -3,9 +3,9 @@
              material material}})
 
 (material.setup
-  {:custom_highlights {:FloatBorder {:fg "#1A1A1A"}}
-   :borders true
-   :text_contrast {:darker true}})
+  {:borders true
+   :text_contrast {:darker true}
+   :plugin ["lspsaga" "nvim-cmp" "telescope"]})
 
 (set nvim.g.material_style :darker)
 (nvim.ex.colorscheme :material)

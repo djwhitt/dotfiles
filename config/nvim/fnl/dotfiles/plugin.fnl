@@ -63,7 +63,7 @@
   :kchmck/vim-coffee-script {}
   ; :lambdalisue/suda.vim {}
   ; :liuchengxu/vim-better-default {:mod :better-default}
-  :marko-cerovac/material.nvim {:mod :material}
+  :marko-cerovac/material.nvim {:mod :material :commit "901dae9cc3a0afafb6b86fabd2a10235d5865f2f"}
   :mhinz/vim-startify {}
   ; :mbbill/undotree {:mod :undotree}
   :neovim/nvim-lspconfig {:mod :lspconfig}
