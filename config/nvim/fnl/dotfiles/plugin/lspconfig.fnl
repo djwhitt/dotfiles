@@ -16,8 +16,8 @@
     (lsp.tsserver.setup 
       {:on_attach
        (fn [client bufnr]
-         (set client.resolved_capabilities.document_formatting false)
-         (set client.resolved_capabilities.document_range_formatting false)
+         (set client.server_capabilities.document_formatting false)
+         (set client.server_capabilities.document_range_formatting false)
 
          (let [ts-utils (require :nvim-lsp-ts-utils)]
            (ts-utils.setup {})
