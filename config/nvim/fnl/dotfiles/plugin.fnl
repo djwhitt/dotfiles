@@ -71,7 +71,8 @@
   :nvim-telescope/telescope.nvim {:requires
                                   [[:nvim-lua/popup.nvim]
                                    [:nvim-lua/plenary.nvim]
-                                   [:nvim-telescope/telescope-project.nvim]]
+                                   [:nvim-telescope/telescope-project.nvim]
+                                   [:nvim-telescope/telescope-file-browser.nvim]]
                                   :mod :telescope}
   ; :nvim-treesitter/nvim-treesitter {:run ":TSUpdate" :mod :treesitter}
   :pangloss/vim-javascript {}
