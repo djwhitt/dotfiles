@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-export AWS_PROFILE=${AWS_PROFILE:-personal}
-
 if [ -e node_modules/.bin/nbb ]; then
   exec npx nbb "$@"
 else

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+export AWS_PROFILE=${AWS_PROFILE:-personal}
+
+if [ -e node_modules/.bin/nbb ]; then
+  exec ./node_modules/.bin/nbb nrepl-server :port 8794 
+else
+  exec bb nrepl-server localhost:8794
+fi
