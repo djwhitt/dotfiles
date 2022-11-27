@@ -1,0 +1,47 @@
+#!/usr/bin/env bb
+#_:clj-kondo/ignore
+(ns gpt
+  (:require [cheshire.core :as json]
+            [clojure.string :as str]
+            [org.httpkit.client :as http]))
+
+;; OpenAI API URLs
+(def base-url "https://api.openai.com/v1")
+(def completions-url (str base-url "/completions"))
+
+;; TODO get API key from Bitwarden
+
+;; Read API key
+(def api-key (->> "/.config/openai/apikey"
+                  (str (System/getenv "HOME"))
+                  slurp
+                  str/trim))
+
+(defn completions [prompt]
+  (-> @(http/post completions-url
+                  {:headers {"Content-Type" "application/json"
+                             "Authorization" (str "Bearer " api-key)}
+                   :body (json/generate-string {:model "text-davinci-002"
+                                                :prompt prompt
+                                                :max_tokens 6
+                                                :temperature 0})})
+      :body
+      (json/parse-string true)))
+
+(defn -main [& args]
+  (-> (completions (str/join " " args))
+      :choices
+      first
+      :text
+      println))
+
+(when (= *file* (System/getProperty "babashka.file"))
+  (apply -main *command-line-args*))
+
+(comment
+
+  (-main "What is the square root of 4?")
+
+  )
+
+; vim: set ft=clojure:
