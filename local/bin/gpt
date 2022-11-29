@@ -3,19 +3,32 @@
 (ns gpt
   (:require [cheshire.core :as json]
             [clojure.string :as str]
-            [org.httpkit.client :as http]))
+            [clojure.tools.cli :refer [parse-opts]]
+            [org.httpkit.client :as http]
+            [selmer.parser :as parser]))
 
 ;; OpenAI API URLs
 (def base-url "https://api.openai.com/v1")
 (def completions-url (str base-url "/completions"))
 
+
+(def config-dir (str (System/getenv "HOME")
+                     "/.config/openai"))
+
+(defn config-path [path]
+  (str config-dir "/" path))
+
 ;; TODO get API key from Bitwarden
 
 ;; Read API key
-(def api-key (->> "/.config/openai/apikey"
-                  (str (System/getenv "HOME"))
-                  slurp
-                  str/trim))
+(def api-key (-> "apikey" config-path slurp str/trim))
+
+;; TODO investigate https://github.com/semiosis/prompts
+
+(selmer.parser/set-resource-path! (config-path "prompts"))
+
+(defn render-prompt [template prompt]
+  (parser/render-file template prompt))
 
 (defn completions [prompt]
   (-> @(http/post completions-url
@@ -23,22 +36,34 @@
                              "Authorization" (str "Bearer " api-key)}
                    :body (json/generate-string {:model "text-davinci-002"
                                                 :prompt prompt
-                                                :max_tokens 6
+                                                :max_tokens 100
                                                 :temperature 0})})
       :body
       (json/parse-string true)))
 
+(def cli-options
+  [["-p" "--prompt TEMPLATE" "Prompt template to use"
+    :default "default"]])
+
 (defn -main [& args]
-  (-> (completions (str/join " " args))
-      :choices
-      first
-      :text
-      println))
+  (let [{:keys [options arguments]} (parse-opts args cli-options)
+        {template :prompt} options
+        prompt (-> template
+                   (render-prompt {:prompt (str/join  " " arguments)})
+                   str/trim)]
+    (-> (completions prompt)
+        :choices
+        first
+        :text
+        str/trim
+        println)))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (apply -main *command-line-args*))
 
 (comment
+
+  (parse-opts ["-p" "a" "b"] cli-options)
 
   (-main "What is the square root of 4?")
 
