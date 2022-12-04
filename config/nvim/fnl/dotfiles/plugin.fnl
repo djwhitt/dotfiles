@@ -37,7 +37,7 @@
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
   :PaterJason/cmp-conjure {}
-  :airblade/vim-gitgutter {}
+  ;:airblade/vim-gitgutter {}
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {}
   :clojure-vim/vim-jack-in {}
@@ -62,6 +62,7 @@
   ; :kyazdani42/nvim-tree.lua {:mod :nvimtree}
   :kchmck/vim-coffee-script {}
   ; :lambdalisue/suda.vim {}
+  :lewis6991/gitsigns.nvim {:mod :gitsigns}
   ; :liuchengxu/vim-better-default {:mod :better-default}
   :marko-cerovac/material.nvim {:mod :material :commit "901dae9cc3a0afafb6b86fabd2a10235d5865f2f"}
   :mhinz/vim-startify {}
