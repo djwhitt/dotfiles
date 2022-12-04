@@ -47,6 +47,7 @@
   :github/copilot.vim {}
   :glepnir/lspsaga.nvim {:mod :lspsaga}
   :google/vim-jsonnet {}
+  :gpanders/nvim-parinfer {}
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
   :hoob3rt/lualine.nvim {:mod :lualine}
@@ -95,6 +96,4 @@
   :tpope/vim-vinegar {}
   ; :tweekmonster/startuptime.vim {}
   :wakatime/vim-wakatime {}
-  :wbthomason/packer.nvim {}
-  )
-
+  :wbthomason/packer.nvim {})
