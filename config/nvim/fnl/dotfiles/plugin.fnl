@@ -39,7 +39,7 @@
   :PaterJason/cmp-conjure {}
   ;:airblade/vim-gitgutter {}
   :airblade/vim-rooter {}
-  :clojure-vim/clojure.vim {}
+  :clojure-vim/clojure.vim {:mod :clojure}
   :clojure-vim/vim-jack-in {}
   :dag/vim-fish {}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
