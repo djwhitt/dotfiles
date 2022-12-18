@@ -3,4 +3,4 @@
 
 ;; Match cljfmt defaults
 (set nvim.g.clojure_align_subforms 1)
-(set nvim.g.clojure_fuzzy_indent_patterns ["^with" "^def" "^let" "^do"])
+(set nvim.g.clojure_fuzzy_indent_patterns ["^with" "^def" "^let" "^do" "^comment$"])
