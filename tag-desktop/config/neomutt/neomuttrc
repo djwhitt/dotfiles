@@ -7,15 +7,16 @@ set mailcap_path      = ~/.mutt/mailcap        # entries for filetypes
 set tmpdir            = ~/.mutt/temp           # where to keep temp files
 set signature         = ~/.mutt/sig            # my signature file
 
-set spoolfile = "+gmail/all"
+set virtual_spoolfile = yes
 
 source ~/.config/neomutt/themes/colors-gruvbox-shuber.muttrc
 #source ~/.config/neomutt/themes/colors-gruvbox-shuber-extended.muttrc
 
 # Index Key Bindings
-bind index g   noop
-bind index gg  first-entry
-bind index G   last-entry
+bind  index g   noop
+bind  index gg  first-entry
+bind  index G   last-entry
+macro index O   "<shell-escape>offlineimap <enter>" "run offlineimap to sync all mail"
 
 # Sidebar
 set sidebar_visible = yes
@@ -24,7 +25,8 @@ color sidebar_new  yellow default
 
 # Notmuch
 set nm_default_url = "notmuch:///home/djwhitt/.mail"
-virtual-mailboxes "Today" "notmuch://?query=date:today"
+virtual-mailboxes \
+  "INBOX" "notmuch://?query=date:today"
 
 # Trash
 folder-hook . 'macro index d "<save-message>=gmail/trash<enter>"'
