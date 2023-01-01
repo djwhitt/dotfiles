@@ -1,4 +1,4 @@
 TAGS="desktop"
 DOTFILES_DIRS="/home/djwhitt/.dotfiles /home/djwhitt/.dotfiles-private"
-EXCLUDES="*:*.org *:Makefile *:docs"
+EXCLUDES="*:*.html *:*.org *:Makefile *:docs"
 UNDOTTED="Scripts"
