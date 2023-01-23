@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export OPENAI_API_KEY=$(cat ~/.config/openai/apikey)
+
 # Used by conditionals in Neovim config
 export KITTY_NVIM=true
 

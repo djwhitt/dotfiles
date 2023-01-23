@@ -56,6 +56,11 @@
   :hrsh7th/cmp-nvim-lsp {}
   :hrsh7th/cmp-path {}
   :hrsh7th/nvim-cmp {:mod :cmp}
+  :jackMort/ChatGPT.nvim {:mod :chatgpt
+                          :requires
+                          [[:MunifTanjim/nui.nvim]
+                           [:nvim-lua/plenary.nvim]
+                           [:nvim-telescope/telescope.nvim]]}
   :jose-elias-alvarez/null-ls.nvim {:mod :null-ls}
   :jose-elias-alvarez/nvim-lsp-ts-utils {}
   ; :jiangmiao/auto-pairs {:mod :auto-pairs}
