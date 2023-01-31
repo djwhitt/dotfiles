@@ -12,7 +12,6 @@
                                {:noremap true
                                 :silent true})]
                 (each [_ mode (ipairs modes)]
-                  (print mode)
                   (nvim.buf_set_keymap bufnr mode from to map-opts))))]
 
     ;; Navigation
