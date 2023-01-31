@@ -37,7 +37,6 @@
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
   :PaterJason/cmp-conjure {}
-  ;:airblade/vim-gitgutter {}
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {:mod :clojure}
   :clojure-vim/vim-jack-in {}
@@ -47,7 +46,6 @@
   :github/copilot.vim {}
   :glepnir/lspsaga.nvim {:mod :lspsaga}
   :google/vim-jsonnet {}
-  :gpanders/nvim-parinfer {}
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
   :hoob3rt/lualine.nvim {:mod :lualine}
