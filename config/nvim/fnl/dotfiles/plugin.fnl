@@ -79,7 +79,7 @@
                                    [:nvim-telescope/telescope-project.nvim]
                                    [:nvim-telescope/telescope-file-browser.nvim]]
                                   :mod :telescope}
-  ; :nvim-treesitter/nvim-treesitter {:run ":TSUpdate" :mod :treesitter}
+  :nvim-treesitter/nvim-treesitter {:run ":TSUpdate" :mod :treesitter}
   :pangloss/vim-javascript {}
   :prettier/vim-prettier {:ft :javascript}
   :radenling/vim-dispatch-neovim {}
