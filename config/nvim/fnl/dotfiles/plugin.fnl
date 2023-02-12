@@ -53,7 +53,11 @@
   :hrsh7th/cmp-cmdline {}
   :hrsh7th/cmp-nvim-lsp {}
   :hrsh7th/cmp-path {}
-  :hrsh7th/nvim-cmp {:mod :cmp}
+  :hrsh7th/nvim-cmp {:mod :cmp
+                     :require [[:hrsh7th/cmp-buffer]
+                               [:hrsh7th/cmp-cmdline]
+                               [:hrsh7th/cmp-nvim-lsp]
+                               [:hrsh7th/cmp-path]]}
   :jackMort/ChatGPT.nvim {:mod :chatgpt
                           :requires
                           [[:MunifTanjim/nui.nvim]
