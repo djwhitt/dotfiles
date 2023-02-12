@@ -1,13 +1,19 @@
 (module dotfiles.plugin.lspconfig
-  {autoload {util dotfiles.util
-             nvim aniseed.nvim}})
+  {autoload {a aniseed.core 
+             nvim aniseed.nvim
+             util dotfiles.util}})
 
-(defn- map [from to]
-  (util.nnoremap from to))
+(defn- map [mode from to]
+  (vim.keymap.set mode from to))
 
-(defn- on-attach [client bufnr]
-  (if client.resolved_capabilities.document_formatting
-    (nvim.ex.autocmd "BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")))
+(defn- nmap [from to]
+  (map :n from to))
+
+(defn- format-buffer []
+  (vim.lsp.buf.format
+    {:timeout_ms 2000
+     :filter (fn [client]
+               (string.match client.name "tsserver"))}))
 
 (let [lsp (require :lspconfig)]
   (when lsp
@@ -21,20 +27,34 @@
 
          (let [ts-utils (require :nvim-lsp-ts-utils)]
            (ts-utils.setup {})
-           (ts-utils.setup client))
+           (ts-utils.setup client)))})
 
-         (on-attach client bufnr))})
+    ;; More visually pleasing border styles
+    (let [border "single"]
+      (tset vim.lsp.handlers "textDocument/hover"
+            (vim.lsp.with
+              vim.lsp.handlers.hover
+              {:border "single"}))
+
+      (tset vim.lsp.handlers "textDocument/signatureHelp"
+            (vim.lsp.with
+              vim.lsp.handlers.signature_help
+              {:border "single"}))
+
+      (let [windows (require :lspconfig.ui.windows)]
+        (when windows
+          (tset windows.default_options :border border))))
 
     ;; https://www.chrisatmachine.com/Neovim/27-native-lsp/
-    (map :gd "lua vim.lsp.buf.definition()")
-    (map :<c-k> "lua vim.lsp.buf.signature_help()")
-    (map :<c-n> "lua vim.diagnostic.goto_prev()")
-    (map :<c-p> "lua vim.diagnostic.goto_next()")
-
-    ;; TODO this doesn't save the files, can it?
-    ;;(map :<leader>lr "lua vim.lsp.buf.rename()")
-    ;; TODO implement a custom function for this?
-    (map :<leader>lf "lua vim.lsp.buf.format({ filter = function(client) return client.name ~= \"tsserver\" end })")))
+    (nmap :gd vim.lsp.buf.definition)
+    (nmap :gD vim.lsp.buf.declaration)
+    (nmap :gr vim.lsp.buf.references)
+    (nmap :K vim.lsp.buf.hover)
+    (nmap :<c-k> vim.lsp.buf.signature_help)
+    (nmap :<c-n> vim.diagnostic.goto_prev)
+    (nmap :<c-p> vim.diagnostic.goto_next)
+    (nmap :<leader>lr vim.lsp.buf.rename)
+    (nmap :<leader>lf format-buffer)))
 
 (let [null-ls (require :null-ls)]
   (null-ls.setup
