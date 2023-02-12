@@ -15,6 +15,15 @@
      :filter (fn [client]
                (string.match client.name "tsserver"))}))
 
+(def border-type "single")
+
+(vim.diagnostic.config 
+  {:float 
+   {:style "minimal"
+    :border border-type
+    :source "always"
+    :header ""}})
+
 (let [lsp (require :lspconfig)]
   (when lsp
     (lsp.clojure_lsp.setup {})
@@ -30,20 +39,19 @@
            (ts-utils.setup client)))})
 
     ;; More visually pleasing border styles
-    (let [border "single"]
-      (tset vim.lsp.handlers "textDocument/hover"
-            (vim.lsp.with
-              vim.lsp.handlers.hover
-              {:border "single"}))
+    (tset vim.lsp.handlers "textDocument/hover"
+          (vim.lsp.with
+            vim.lsp.handlers.hover
+            {:border boder-type}))
 
-      (tset vim.lsp.handlers "textDocument/signatureHelp"
-            (vim.lsp.with
-              vim.lsp.handlers.signature_help
-              {:border "single"}))
+    (tset vim.lsp.handlers "textDocument/signatureHelp"
+          (vim.lsp.with
+            vim.lsp.handlers.signature_help
+            {:border border-type}))
 
-      (let [windows (require :lspconfig.ui.windows)]
-        (when windows
-          (tset windows.default_options :border border))))
+    (let [windows (require :lspconfig.ui.windows)]
+      (when windows
+        (tset windows.default_options :border border-type)))
 
     ;; https://www.chrisatmachine.com/Neovim/27-native-lsp/
     (nmap :gd vim.lsp.buf.definition)
