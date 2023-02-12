@@ -43,7 +43,7 @@
   :dag/vim-fish {}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
   :ggandor/leap.nvim {:mod :leap}
-  :github/copilot.vim {}
+  :github/copilot.vim {:mod :copilot}
   ; :glepnir/lspsaga.nvim {:mod :lspsaga}
   :google/vim-jsonnet {}
   :guns/vim-sexp {:mod :sexp}
