@@ -36,7 +36,6 @@
   ; :Olical/nvim-local-fennel {}
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
-  :PaterJason/cmp-conjure {}
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {:mod :clojure}
   :clojure-vim/vim-jack-in {}
@@ -51,7 +50,8 @@
   :hoob3rt/lualine.nvim {:mod :lualine}
   :hrsh7th/nvim-cmp {:mod :cmp
                      :requires
-                     [[:hrsh7th/cmp-buffer]
+                     [[:PaterJason/cmp-conjure]
+                      [:hrsh7th/cmp-buffer]
                       [:hrsh7th/cmp-cmdline]
                       [:hrsh7th/cmp-nvim-lsp]
                       [:hrsh7th/cmp-path]
