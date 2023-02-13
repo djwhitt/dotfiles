@@ -49,15 +49,13 @@
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
   :hoob3rt/lualine.nvim {:mod :lualine}
-  :hrsh7th/cmp-buffer {}
-  :hrsh7th/cmp-cmdline {}
-  :hrsh7th/cmp-nvim-lsp {}
-  :hrsh7th/cmp-path {}
   :hrsh7th/nvim-cmp {:mod :cmp
-                     :require [[:hrsh7th/cmp-buffer]
-                               [:hrsh7th/cmp-cmdline]
-                               [:hrsh7th/cmp-nvim-lsp]
-                               [:hrsh7th/cmp-path]]}
+                     :requires
+                     [[:hrsh7th/cmp-buffer]
+                      [:hrsh7th/cmp-cmdline]
+                      [:hrsh7th/cmp-nvim-lsp]
+                      [:hrsh7th/cmp-path]
+                      [:ray-x/cmp-treesitter]]}
   :jackMort/ChatGPT.nvim {:mod :chatgpt
                           :requires
                           [[:MunifTanjim/nui.nvim]
