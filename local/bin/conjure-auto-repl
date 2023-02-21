@@ -2,8 +2,11 @@
 
 export AWS_PROFILE=${AWS_PROFILE:-personal}
 
+# trap exist and cleanup .nrepl-port
+trap "rm -f .nrepl-port" EXIT
+
 if [ -e node_modules/.bin/nbb ]; then
-  exec ./node_modules/.bin/nbb nrepl-server :port 8794 
+  ./node_modules/.bin/nbb -cp src:src/cljs nrepl-server :port 8794 
 else
-  exec bb nrepl-server localhost:8794
+  bb nrepl-server localhost:8794
 fi
