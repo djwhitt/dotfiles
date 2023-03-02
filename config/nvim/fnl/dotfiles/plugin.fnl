@@ -36,6 +36,8 @@
   ; :Olical/nvim-local-fennel {}
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
+  :aymericbeaumet/vim-symlink {:requires 
+                               [:moll/vim-bbye]}
   :airblade/vim-rooter {}
   :clojure-vim/clojure.vim {:mod :clojure}
   :clojure-vim/vim-jack-in {}
