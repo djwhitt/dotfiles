@@ -16,6 +16,10 @@
 (set nvim.g.mapleader " ")
 (set nvim.g.maplocalleader ",")
 
+;; Don't exit visual mode when indenting
+(noremap :v :< :<gv)
+(noremap :v :> :>gv)
+
 ;; jk escape sequences
 (noremap :i :jk :<esc>)
 (noremap :c :jk :<c-c>)
