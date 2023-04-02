@@ -55,8 +55,11 @@
 ;; Trim trialing whitespace
 (noremap :n :<leader>bt ":%s/\\s\\+$//e<cr>")
 
+;; ChatGPT
+(noremap :n :<leader><leader> ":ChatGPT<cr>")
+
 ;; Dispatch
-(noremap :n :<leader><leader> ":Dispatch<cr>")
+(noremap :n :<leader>n ":Dispatch<cr>")
 
 (nu.fn-bridge
   :DeleteHiddenBuffers
