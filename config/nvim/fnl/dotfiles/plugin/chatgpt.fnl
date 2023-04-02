@@ -4,4 +4,5 @@
 
 (let [(ok? chatgpt) (pcall require :chatgpt)]
   (when ok?
-    (chatgpt.setup)))
+    (chatgpt.setup
+      {:yank_register "\""})))
