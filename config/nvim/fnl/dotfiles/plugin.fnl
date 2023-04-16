@@ -44,6 +44,9 @@
   :dag/vim-fish {}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
   :ggandor/leap.nvim {:mod :leap}
+  :folke/trouble.nvim {:mod :trouble
+                       :requires
+                       [[:nvim-tree/nvim-web-devicons]]}
   :github/copilot.vim {:mod :copilot}
   ; :glepnir/lspsaga.nvim {:mod :lspsaga}
   :google/vim-jsonnet {}
