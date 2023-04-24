@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -eu
+
+whisper_dir="$HOME/Work/oss/whisper.cpp"
+state_dir="$HOME/.local/share/vtt"
+
+wav_file="$state_dir/vtt.wav"
+txt_file="$state_dir/vtt.wav.txt"
+trap "rm $wav_file" ERR INT
+
+# Quiet, 16kHz, mono, 16-bit little-endian
+arecord -q -r 16000 -c 1 -f S16_LE "$wav_file" &> "$state_dir/vtt.log" &
+pid=$!
+trap "kill $pid" ERR INT
+
+zenity --info --text="Recording. Hit enter to stop."
+kill $pid
+
+$whisper_dir/main -otxt -m $whisper_dir/models/ggml-base.en.bin -f "$wav_file" "$@" &>>/tmp/vtt.log
+
+# Replace newlines with spaces and trim
+cat "$txt_file" | tr $'\n' ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+
+# Cleanup
+rm "$wav_file" "$txt_file"
