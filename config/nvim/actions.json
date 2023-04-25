@@ -1,0 +1,15 @@
+{
+  "follow_instructions": {
+    "type": "chat",
+    "opts": {
+      "template": "Rewrite the following code written in {{lang}} by following the instructions in the first comment in the code.\n\nExisting code:\n```{{filetype}}\n{{input}}\n```\n\n```{{filetype}}\n",
+      "strategy": "replace",
+      "params": {
+        "model": "gpt-3.5-turbo",
+        "stop": [
+          "```"
+        ]
+      }
+    }
+  }
+}
