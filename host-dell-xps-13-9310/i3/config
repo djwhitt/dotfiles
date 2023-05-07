@@ -145,7 +145,7 @@ for_window [title="Pinboard - Save a Bookmark"] floating enable
 for_window [title="Steam"] floating enable
 for_window [title="Xscratch"] move scratchpad
 for_window [class="kitty-nvim"] move workspace "2:edit"
-for_window [class="kitty-ranger"] move workspace "2:edit"
+for_window [class="kitty-nnn"] move workspace "2:edit"
 
 # UI
 font pango:DejaVu Sans 10
@@ -166,7 +166,7 @@ bindsym XF86MonBrightnessUp   exec brightnessctl set +2%
 bindsym XF86TouchpadToggle    exec toggle-touchpad
 bindsym $mod+Return           exec kitty
 bindsym $mod+period           exec ensure-kitty-nvim
-bindsym $mod+comma            exec ensure-kitty-ranger
+bindsym $mod+comma            exec ensure-kitty-nnn
 bindsym $mod+apostrophe       exec rofi-copyq
 bindsym Print                 exec flameshot gui
 
