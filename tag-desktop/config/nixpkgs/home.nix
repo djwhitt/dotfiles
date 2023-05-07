@@ -8,12 +8,15 @@
 
   fonts.fontconfig.enable = true;
 
+  programs.chromium.enable = true;
+  programs.google-chrome.enable = true;
   programs.vscode = {
     enable = true;
-    extensions = with pkgs.vscode-extensions; [
-      github.copilot
-      vscodevim.vim
-    ];
+    package = pkgs.vscode.fhs;
+    #extensions = with pkgs.vscode-extensions; [
+    #  github.copilot
+    #  vscodevim.vim
+    #];
   };
 
   home.homeDirectory = "/home/djwhitt";
@@ -24,6 +27,9 @@
 
     (aspellWithDicts (d: [d.en]))
     (hunspellWithDicts (with hunspellDicts; [en-us]))
+    (nnn.override { withNerdIcons = true; })
+    asciidoctor
+    aws-vault
     awscli
     babashka
     bat           # cat clone with syntax highlighting and git integration
@@ -32,42 +38,70 @@
     clojure
     coursier      # jvm artifact fetcher + runner
     difftastic
+    direnv
     ditaa
     docker-compose
     duply
     exiftool      # cli app for reading, writing and editing meta information
     fd            # alternative to find
+    ffmpeg
     file
-    fzf           # cli fuzzy finder
+    #fzf          # cli fuzzy finder
+    gcc
     git
     git-lfs
     gitAndTools.git-annex
     gnuplot
+    go_1_18
     graphviz
+    hledger
     httperf
     httpie
+    jekyll
     jq
+    jsonnet
     lazygit       # terminal UI for git
     leiningen
     mediainfo     # unified display of technical and tag data for video and audio files
+    mitmproxy
+    mr
     neovim
     nixfmt        # Nix code formatter
     nmap
-    nodejs-16_x
+    nodejs-18_x
     odt2txt       # for opendocument previews
     offlineimap
     openjdk
+    packer
+    perkeep
     plantuml
     poppler_utils # for pdf previews
-    python3
-    python38Packages.pdftotext
+    postgresql_15
+    #python38Packages.html2text
+    #python38Packages.pdftotext
+    #python38Packages.pip
     ranger
     ripgrep
     rmapi         # cli tool for interacting with reMarkable cloud
     shellcheck
+    sonic-pi
+    sox
+    sqlite
+    swiProlog
+    terraform
+    terraform-docs
+    terraform-ls
+    terragrunt
     tmuxp         # tmux workspace manager
     w3m
     yamllint
+    zip
+
+    # Python
+    python3
+    python310Packages.flake8
+    python310Packages.isort
+    yapf
 
     ## Desktop
 
@@ -75,15 +109,17 @@
     copyq         # clipboard manager
     flameshot     # screenshot tool
     glxinfo
+    gnome.eog     # image viewer
+    gnome.zenity  # dialog boxes
     hacksaw       # area selection tool
     libnotify
-    gnome.eog     # image viewer
+    lsix
     rofi
     shotgun       # screenshot tool
     wmctrl
+    xclip
     xdotool
-    xdotool
-    xorg.xev
+    xorg.xev      # X event viewer
     xorg.xprop
     xorg.xwininfo
 
@@ -93,22 +129,30 @@
     notmuch       # mail indexer
     signal-desktop
     slack
+    tdesktop      # telegram desktop
     teams
+    thunderbird
 
     # Fonts
     carlito
 
     # Gnome utils
-    gnome3.dconf-editor
+    gnome.dconf-editor
 
     # Graphics
     drawio
     gimp
     inkscape
 
-    # misc
+    # Video
+    kdenlive
+    obs-studio
+    #openshot-qt
+
+    # Misc
+    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
     anki
-    appimage-run
+    #appimage-run
     bitwarden
     brave
     clj-kondo
@@ -118,28 +162,39 @@
     evince
     feh
     ffmpegthumbnailer  # video thumbnailer
+    fira-code
     firefox
     freeplane
-    fira-code
+    gnome.simple-scan
     gnumeric
-    kitty
+    gscan2pdf
+    keybase
+    keybase-gui
     leafpad
     ledger-live-desktop
     libreoffice
     mplayer
-    obs-studio
+    ncftp
+    netlogo
+    neovim-remote
+    nyxt
+    pamixer
+    paperwork
     pasystray
-    playonlinux
-    python310Packages.py3status
+    pulseaudio
+    #playonlinux
+    #python310Packages.py3status
+    spaceFM
     spotify
     standardnotes
     steam
     steam-run
-    treesheets
+    transmission-gtk
+    #treesheets
     trezor-suite
-    wine
+    #xpad
     youtube-dl
-    zoom-us
+    #zoom-us
   ];
 
   services.dunst ={
