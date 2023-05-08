@@ -57,6 +57,7 @@
 
 ;; ChatGPT
 (noremap :n :<leader><leader> ":ChatGPT<cr>")
+(noremap :v :<leader><leader> ":ChatGPTRun follow_instructions<cr>")
 
 ;; Dispatch
 (noremap :n :<leader>n ":Dispatch<cr>")
