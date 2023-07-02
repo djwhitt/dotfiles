@@ -11,4 +11,3 @@
 (set nvim.o.shada "!,'1000,<50,s10,h") ;; 1000 oldfiles
 
 ;(nvim.ex.set :spell)
-(nvim.ex.set :list)
