@@ -1,6 +1,3 @@
 # Clojure
 .clj-kondo
 .lsp
-
-# Neovim
-/config/nvim/lua
