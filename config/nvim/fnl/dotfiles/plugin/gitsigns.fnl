@@ -3,6 +3,7 @@
              nvim aniseed.nvim
              util dotfiles.util}})
 
+;; TODO can this map be simplified and extracted?
 (defn- on-attach [bufnr]
   (let [map (fn [modes from to opts]
               (let [map-opts (if (a.get opts :expr?)
@@ -17,6 +18,8 @@
     ;; Navigation
     (map [:n] "]c" "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'" {:expr? true})
     (map [:n] "[c" "&diff ? ']c' : '<cmd>Gitsigns prev_hunk<CR>'" {:expr? true})
+
+    ;; TODO compare to bindings here https://vimawesome.com/plugin/vim-gitgutter
 
     ;; Actions
     (map [:n :v] :<leader>hs ":Gitsigns stage_hunk<CR>")

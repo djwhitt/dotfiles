@@ -7,8 +7,10 @@
 
 (let [(ok? saga) (pcall require :lspsaga)]
   (when ok?
-    (saga.init_lsp_saga
-      {:code_action_lightbulb
+    (saga.setup
+      {:lightbulb
+       {:enable false}
+       :symbol_in_winbar
        {:enable false}})
 
     (map :K  "Lspsaga hover_doc")
@@ -17,5 +19,4 @@
     (map :<leader>lr "Lspsaga rename")
     ;; TODO do this in visual mode too
     (map :<leader>la "Lspsaga code_action")
-    (map :<leader>lo "LSoutlineToggle")
-    ))
+    (map :<leader>lo "LSoutlineToggle")))

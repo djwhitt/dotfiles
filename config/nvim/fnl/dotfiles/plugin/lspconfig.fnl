@@ -24,8 +24,23 @@
     :source "always"
     :header ""}})
 
+;; https://github.com/jamesnvc/lsp_server
+;; (set lsp.configs "prolog_lsp"
+;;      {:default_config
+;;       {:filetypes ["prolog"]
+;;        :cmd ["swipl"
+;;              "-g" "use_module(library(lsp_server))"
+;;              "-g" "lsp_server:main"
+;;              "-t" "halt"
+;;              "--" "--stdio"]
+;;        :root_dir lsp.util.root_pattern("pack.pl")}
+;;       :docs 
+;;       {:description "Prolog language server"}}}})
+;; (lsp.prolog_lsp.setup {})
+
 (let [lsp (require :lspconfig)]
   (when lsp
+    (lsp.pyright.setup {})
     (lsp.clojure_lsp.setup {})
     (lsp.terraformls.setup {})
     (lsp.tsserver.setup 
@@ -44,14 +59,15 @@
             {:border border-type}))
 
     (tset vim.lsp.handlers "textDocument/signatureHelp"
-          (vim.lsp.with
-            vim.lsp.handlers.signature_help
-            {:border border-type}))
+     (vim.lsp.with
+       vim.lsp.handlers.signature_help
+       {:border border-type}))
 
     (let [windows (require :lspconfig.ui.windows)]
       (when windows
         (tset windows.default_options :border border-type)))
 
+    ;; TODO make binding buffer local
     ;; https://www.chrisatmachine.com/Neovim/27-native-lsp/
     (nmap :gd vim.lsp.buf.definition)
     (nmap :gD vim.lsp.buf.declaration)
@@ -64,6 +80,7 @@
     (nmap :<leader>lr vim.lsp.buf.rename)
     (nmap :<leader>lf format-buffer)))
 
+;; TODO should this go in another file?
 (let [null-ls (require :null-ls)]
   (null-ls.setup
     {:sources

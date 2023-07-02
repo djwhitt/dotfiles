@@ -25,30 +25,30 @@
 
 ;; Plugins to be managed by packer.
 (use
-  ; "~/repos/Olical/conjure" {:mod :conjure}
-  ; "~/repos/Olical/aniseed" {}
-  ; "~/repos/Olical/nvim-local-fennel" {}
-
   :LnL7/vim-nix {}
   :Olical/AnsiEsc {}
   :Olical/aniseed {}
-  :Olical/conjure {}
+  :Olical/conjure {:mod :conjure}
   ; :Olical/nvim-local-fennel {}
   ; :Olical/vim-enmasse {}
   ; :PeterRincker/vim-argumentative {}
+  :aklt/plantuml-syntax {}
+  :airblade/vim-rooter {}
   :aymericbeaumet/vim-symlink {:requires 
                                [:moll/vim-bbye]}
-  :airblade/vim-rooter {}
+  :chrisbra/csv.vim {}
   :clojure-vim/clojure.vim {:mod :clojure}
   :clojure-vim/vim-jack-in {}
   :dag/vim-fish {}
+  :direnv/direnv.vim {}
   :editorconfig/editorconfig-vim {:mod :editorconfig}
-  :ggandor/leap.nvim {:mod :leap}
   :folke/trouble.nvim {:mod :trouble
                        :requires
                        [[:nvim-tree/nvim-web-devicons]]}
+  ; :ggandor/leap.nvim {:mod :leap}
   :github/copilot.vim {:mod :copilot}
   ; :glepnir/lspsaga.nvim {:mod :lspsaga}
+  ; :gpanders/nvim-parinfer {}
   :google/vim-jsonnet {}
   :guns/vim-sexp {:mod :sexp}
   :hashivim/vim-terraform {}
@@ -73,6 +73,7 @@
   ; :kyazdani42/nvim-tree.lua {:mod :nvimtree}
   :kchmck/vim-coffee-script {}
   ; :lambdalisue/suda.vim {}
+  :ledger/vim-ledger {}
   :lewis6991/gitsigns.nvim {:mod :gitsigns}
   ; :liuchengxu/vim-better-default {:mod :better-default}
   :marko-cerovac/material.nvim {:mod :material :commit "901dae9cc3a0afafb6b86fabd2a10235d5865f2f"}
@@ -105,5 +106,6 @@
   ; :tpope/vim-unimpaired {}
   :tpope/vim-vinegar {}
   ; :tweekmonster/startuptime.vim {}
+  :vim-test/vim-test {:mod :vim-test}
   :wakatime/vim-wakatime {}
   :wbthomason/packer.nvim {})

@@ -16,13 +16,18 @@
 
 (def config-path (nvim.fn.stdpath "config"))
 
-(defn nnoremap [from to opts]
+;; TODO refactor and consolidate mapping functions (use vim.keymap.set)
+(defn noremap [modes from to opts]
   (let [map-opts {:noremap true
                   :silent true}
         to (.. ":" to "<cr>")]
-    (if (a.get opts :local?)
-      (nvim.buf_set_keymap 0 :n from to map-opts)
-      (nvim.set_keymap :n from to map-opts))))
+    (each [_ mode (ipairs modes)]
+      (if (a.get opts :local?)
+        (nvim.buf_set_keymap 0 mode from to map-opts)
+        (nvim.set_keymap mode from to map-opts)))))
+
+(defn nnoremap [from to opts]
+  (noremap [:n] from to opts))
 
 (defn lnnoremap [from to]
   (nnoremap (.. "<leader>" from) to))

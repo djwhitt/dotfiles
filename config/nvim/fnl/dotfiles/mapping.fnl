@@ -59,6 +59,10 @@
 (noremap :n :<leader><leader> ":ChatGPT<cr>")
 (noremap :v :<leader><leader> ":ChatGPTRun follow_instructions<cr>")
 
+;; Voice input
+(noremap :n :<leader>v ":r !vtt<cr>")
+;(noremap :n :<leader>yv ":silent !vtt | xclip -i -selection clipboard<cr>")
+
 ;; Dispatch
 (noremap :n :<leader>n ":Dispatch<cr>")
 
