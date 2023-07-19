@@ -7,6 +7,13 @@ return {
     end,
   },
   {
+    "aymericbeaumet/vim-symlink",
+    lazy = false,
+    dependencies = {
+      "moll/vim-bbye",
+    },
+  },
+  {
     "clojure-vim/clojure.vim",
     event = "VeryLazy",
   },
