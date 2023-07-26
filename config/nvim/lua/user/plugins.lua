@@ -91,4 +91,8 @@ return {
       vim.g['conjure#client#clojure#nrepl#connection#auto_repl#cmd'] = "conjure-auto-repl"
     end,
   },
+  {
+    "tpope/vim-fugitive",
+    lazy = false,
+  }
 }
