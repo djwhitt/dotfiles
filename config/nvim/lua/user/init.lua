@@ -1,6 +1,8 @@
 return {
   options = {
     opt = {
+      cmdheight = 1,
+      foldcolumn = "0",
       history = 1000,
       number = false,
       relativenumber = false,
