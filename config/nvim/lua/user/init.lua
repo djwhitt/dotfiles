@@ -6,6 +6,7 @@ return {
       history = 1000,
       number = false,
       relativenumber = false,
+      splitbelow = false,
     },
   },
   lsp = {
