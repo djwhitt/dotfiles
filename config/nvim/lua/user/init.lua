@@ -3,9 +3,9 @@ return {
     opt = {
       cmdheight = 1,
       foldcolumn = "0",
-      history = 1000,
       number = false,
       relativenumber = false,
+      shada = "!,'1000,<50,s10,h",
       splitbelow = false,
     },
   },
