@@ -32,6 +32,10 @@ return {
         "<cmd>ChatGPT<cr>",
         desc = "ChatGPT",
       },
+      ["<leader>gg"] = {
+        "<cmd>G<cr>",
+        desc = "Vim fugitive G",
+      },
     },
     v = {
       ["<leader><leader>"] = {
