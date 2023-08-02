@@ -5,14 +5,15 @@ return {
     lazy = false,
     init = function()
       vim.g['conjure#client#clojure#nrepl#connection#auto_repl#cmd'] = "conjure-auto-repl"
+      vim.g['conjure#client#clojure#nrepl#refresh#before'] = 'user/stop'
+      vim.g['conjure#client#clojure#nrepl#refresh#after'] = 'user/start'
 
-      -- Disable LSP diagnostics in log buffers
+      -- Disable LSP diagnostics in Conjure log buffers
       vim.api.nvim_create_autocmd('BufNewFile', {
         callback = function(ev)
           vim.diagnostic.disable(0)
         end,
-        desc = 'Conjure Log disable LSP diagnostics',
-        group = vim.api.nvim_create_augroup('conjure_log_disable_lsp', { clear = true }),
+        group = vim.api.nvim_create_augroup('MyConjureLogDisableLSP', { clear = true }),
         pattern = 'conjure-log-*',
       })
 
@@ -21,8 +22,7 @@ return {
         callback = function(ev)
           vim.bo.commentstring = ";; %s"
         end,
-        desc = 'Lisp style line comments',
-        group = vim.api.nvim_create_augroup('comment_config', { clear = true }),
+        group = vim.api.nvim_create_augroup('MyClojureCommentConfig', { clear = true }),
         pattern = 'clojure',
       })
     end,
