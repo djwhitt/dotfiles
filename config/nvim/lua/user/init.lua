@@ -6,6 +6,7 @@ return {
       number = false,
       relativenumber = false,
       shada = "!,'1000,<50,s10,h",
+      showtabline = 0,
       splitbelow = false,
     },
   },
