@@ -14,15 +14,7 @@ return {
     },
   },
   {
-    "clojure-vim/clojure.vim",
-    event = "VeryLazy",
-  },
-  {
     "github/copilot.vim",
-    event = "VeryLazy",
-  },
-  {
-    "guns/vim-sexp",
     event = "VeryLazy",
   },
   {

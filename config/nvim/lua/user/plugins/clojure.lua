@@ -1,6 +1,14 @@
 
 return {
   {
+    "clojure-vim/clojure.vim",
+    lazy = false,
+  },
+  {
+    "guns/vim-sexp",
+    lazy = false,
+  },
+  {
     "Olical/conjure",
     lazy = false,
     init = function()
@@ -27,4 +35,8 @@ return {
       })
     end,
   },
+  {
+    "tpope/vim-sexp-mappings-for-regular-people",
+    lazy = false,
+  }
 }
