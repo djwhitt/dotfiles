@@ -1,20 +1,50 @@
+local sexp_filetypes = { 'clojure', 'lisp', 'scheme', 'racket', 'fennel' }
 
 return {
+  -- Syntax
+  {
+    'nvim-treesitter/nvim-treesitter',
+    opts = function(_, opts)
+      if type(opts.ensure_installed) == 'table' then
+        vim.list_extend(opts.ensure_installed, { 'clojure' })
+      end
+    end,
+  },
   {
     "clojure-vim/clojure.vim",
-    lazy = false,
+    ft = "clojure",
+    init = function()
+      -- Attempt to follow cljfmt defaults
+      vim.g['clojure_align_subforms'] = 1
+      vim.g['clojure_fuzzy_indent_patterns'] = {
+        '^comment$', 
+        '^def',
+        '^do',
+        '^future$',
+        '^let',
+        '^tests',
+        '^thread$',
+        '^try$',
+        '^with',
+      }
+    end,
   },
-  {
-    "guns/vim-sexp",
-    lazy = false,
-  },
+
+  -- Editing
+  { "guns/vim-sexp", ft = sexp_filetypes, },
+  { "tpope/vim-sexp-mappings-for-regular-people", ft = sexp_filetypes, },
+
+  -- Runtime and REPL
+  { 'tpope/vim-classpath', lazy = true, ft = { 'java', 'clojure' } },
   {
     "Olical/conjure",
-    lazy = false,
+    ft = { 'clojure', 'fennel' },
     init = function()
-      vim.g['conjure#client#clojure#nrepl#connection#auto_repl#cmd'] = "conjure-auto-repl"
+      vim.g['conjure#client#clojure#nrepl#connection#auto_repl#cmd'] = 'conjure-auto-repl'
       vim.g['conjure#client#clojure#nrepl#refresh#before'] = 'user/stop'
       vim.g['conjure#client#clojure#nrepl#refresh#after'] = 'user/start'
+      vim.g['conjure#log#botright'] = true
+      vim.g['conjure#mapping#doc_word'] = 'gk'
 
       -- Disable LSP diagnostics in Conjure log buffers
       vim.api.nvim_create_autocmd('BufNewFile', {
@@ -35,8 +65,4 @@ return {
       })
     end,
   },
-  {
-    "tpope/vim-sexp-mappings-for-regular-people",
-    lazy = false,
-  }
 }
