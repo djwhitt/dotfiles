@@ -102,5 +102,14 @@ return {
 
       return opts
     end,
+  },
+  {
+    "https://gitlab.com/HiPhish/rainbow-delimiters.nvim.git",
+    lazy = false,
+    init = function() 
+      vim.g.rainbow_delimiters = {
+        whitelist = { 'clojure' }
+      }
+    end,
   }
 }
