@@ -18,6 +18,7 @@ return {
       vim.g['clojure_align_subforms'] = 1
       vim.g['clojure_fuzzy_indent_patterns'] = {
         '^comment$', 
+        '^cond$',
         '^def',
         '^do',
         '^future$',
