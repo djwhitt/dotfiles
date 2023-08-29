@@ -7,6 +7,14 @@ return {
     end,
   },
   {
+    "andythigpen/nvim-coverage",
+    lazy = false,
+    requires = "nvim-lua/plenary.nvim",
+    config = function()
+      require("coverage").setup()
+    end,
+  },
+  {
     "aymericbeaumet/vim-symlink",
     lazy = false,
     dependencies = {
