@@ -41,9 +41,9 @@ return {
         "<cmd>A<cr>",
         desc = "Switch to alternate file as defined by vim-projectionist",
       },
-      ["<localleader>ts"] = {
-        "<cmd>TestSuite<cr>",
-        desc = "Run test suite using vim-test",
+      ["<localleader>d"] = {
+        "<cmd>Dispatch<cr>",
+        desc = "Runs the default Dispatch command",
       }
     },
     v = {

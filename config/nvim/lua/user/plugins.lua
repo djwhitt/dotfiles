@@ -81,6 +81,10 @@ return {
     enabled = false,
   },
   {
+    "tpope/vim-dispatch",
+    lazy = false,
+  },
+  {
     "tpope/vim-fugitive",
     lazy = false,
   },
@@ -110,22 +114,5 @@ return {
 
       return opts
     end,
-  },
-  --{
-  --  "https://gitlab.com/HiPhish/rainbow-delimiters.nvim.git",
-  --  lazy = false,
-  --  init = function() 
-  --    vim.g.rainbow_delimiters = {
-  --      whitelist = { 'clojure' }
-  --    }
-  --  end,
-  --},
-  {
-    "vim-test/vim-test",
-    lazy = false,
-    init = function()
-      vim.g['test#strategy'] = 'neovim'
-      vim.g['test#javascript#mocha#executable'] = 'npx mocha --no-warnings --color=false'
-    end
   },
 }
