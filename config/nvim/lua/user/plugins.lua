@@ -111,13 +111,21 @@ return {
       return opts
     end,
   },
+  --{
+  --  "https://gitlab.com/HiPhish/rainbow-delimiters.nvim.git",
+  --  lazy = false,
+  --  init = function() 
+  --    vim.g.rainbow_delimiters = {
+  --      whitelist = { 'clojure' }
+  --    }
+  --  end,
+  --},
   {
-    "https://gitlab.com/HiPhish/rainbow-delimiters.nvim.git",
+    "vim-test/vim-test",
     lazy = false,
-    init = function() 
-      vim.g.rainbow_delimiters = {
-        whitelist = { 'clojure' }
-      }
-    end,
-  }
+    init = function()
+      vim.g['test#strategy'] = 'neovim'
+      vim.g['test#javascript#mocha#executable'] = 'npx mocha --no-warnings --color=false'
+    end
+  },
 }

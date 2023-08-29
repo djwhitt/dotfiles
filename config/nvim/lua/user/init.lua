@@ -40,6 +40,10 @@ return {
       ["<leader><tab>"] = {
         "<cmd>A<cr>",
         desc = "Switch to alternate file as defined by vim-projectionist",
+      },
+      ["<localleader>ts"] = {
+        "<cmd>TestSuite<cr>",
+        desc = "Run test suite using vim-test",
       }
     },
     v = {
