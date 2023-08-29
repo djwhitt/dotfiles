@@ -18,6 +18,10 @@ return {
     event = "VeryLazy",
   },
   {
+    "direnv/direnv.vim",
+    lazy = false,
+  },
+  {
     "hrsh7th/nvim-cmp",
     opts = function (_, opts)
       local cmp = require "cmp"
