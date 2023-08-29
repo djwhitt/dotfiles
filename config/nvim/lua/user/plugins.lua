@@ -81,6 +81,10 @@ return {
     lazy = false,
   },
   {
+    "tpope/vim-projectionist",
+    lazy = false,
+  },
+  {
     "rebelot/heirline.nvim",
     opts = function(_, opts)
       local status = require("astronvim.utils.status")

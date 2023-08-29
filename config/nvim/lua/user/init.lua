@@ -37,6 +37,10 @@ return {
         "<cmd>G<cr>",
         desc = "Vim fugitive G",
       },
+      ["<leader><tab>"] = {
+        "<cmd>A<cr>",
+        desc = "Switch to alternate file as defined by vim-projectionist",
+      }
     },
     v = {
       ["<leader><leader>"] = {
