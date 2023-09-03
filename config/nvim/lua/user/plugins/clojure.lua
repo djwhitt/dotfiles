@@ -2,14 +2,14 @@ local sexp_filetypes = { 'clojure', 'lisp', 'scheme', 'racket', 'fennel' }
 
 return {
   -- Syntax
-  {
-    'nvim-treesitter/nvim-treesitter',
-    opts = function(_, opts)
-      if type(opts.ensure_installed) == 'table' then
-        vim.list_extend(opts.ensure_installed, { 'clojure' })
-      end
-    end,
-  },
+  --{
+  --  'nvim-treesitter/nvim-treesitter',
+  --  opts = function(_, opts)
+  --    if type(opts.ensure_installed) == 'table' then
+  --      vim.list_extend(opts.ensure_installed, { 'clojure' })
+  --    end
+  --  end,
+  --},
   {
     "clojure-vim/clojure.vim",
     ft = "clojure",
@@ -31,8 +31,16 @@ return {
       }
     end,
   },
+  {
+    "luochen1990/rainbow",
+    ft = sexp_filetypes,
+    init = function()
+      vim.g['rainbow_active'] = 1
+    end,
+  },
 
   -- Editing
+  { "gpanders/nvim-parinfer", ft = sexp_filetypes },
   { "guns/vim-sexp", ft = sexp_filetypes, },
   { "tpope/vim-sexp-mappings-for-regular-people", ft = sexp_filetypes, },
 
