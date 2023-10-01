@@ -16,7 +16,7 @@
   (let [json (json/generate-string actions {:pretty true})]
     (spit actions-json-path json)))
 
-(defn -main [& args]
+(defn -main [& _]
   (let [actions (parse-yaml-actions)]
     (write-json-actions actions)))
 
@@ -24,14 +24,6 @@
   (apply -main *command-line-args*))
 
 (comment 
-
-  (-main)
-
-  (println (json/generate-string actions {:pretty true}))
-  
-  (slurp actions-json-path)
-
-  (slurp "~/.config/nvim/lua/user/actions.json"))
-  
+  (-main))
 
 ;; vim:filetype=clojure
