@@ -1,58 +1,26 @@
 {
-  "follow_instructions": {
-    "type": "chat",
-    "opts": {
-      "template": "Rewrite the following code in accordance with the TODO comments.\n\nExisting code:\n```{{filetype}}\n{{input}}\n```\n\nRewritten code:\n```{{filetype}}\n",
-      "strategy": "replace",
-      "params": {
-        "model": "gpt-3.5-turbo",
-        "max_tokens": 2048,
-        "stop": [
-          "```"
-        ]
-      }
+  "follow_instructions" : {
+    "type" : "chat",
+    "opts" : {
+      "strategy" : "replace",
+      "params" : {
+        "model" : "gpt-4",
+        "max_tokens" : 2048,
+        "stop" : [ "```" ]
+      },
+      "template" : "Rewrite the following code in accordance with the TODO comments in it.\n\nExisting code: ```{{filetype}} {{input}} ```\n\nRewritten code: ```{{filetype}}\n"
     }
   },
-  "follow_instructions_gpt4": {
-    "type": "chat",
-    "opts": {
-      "template": "Rewrite the following code in accordance with the TODO comments.\n\nExisting code:\n```{{filetype}}\n{{input}}\n```\n\nRewritten code:\n```{{filetype}}\n",
-      "strategy": "replace",
-      "params": {
-        "model": "gpt-4",
-        "max_tokens": 2048,
-        "stop": [
-          "```"
-        ]
-      }
-    }
-  },
-  "add_mocha_tests": {
-    "type": "chat",
-    "opts": {
-      "template": "Implement Mocha tests for the following code.\n\nCode:\n```{{filetype}}\n{{input}}\n```\n\nTests:\n```{{filetype}}",
-      "strategy": "append",
-      "params": {
-        "model": "gpt-4",
-        "max_tokens": 2048,
-        "stop": [
-          "```"
-        ]
-      }
-    }
-  },
-  "add_tsdoc_comments": {
-    "type": "chat",
-    "opts": {
-      "template": "Add TSDoc comments to the following code.\n\nCode:\n```{{filetype}}\n{{input}}\n```\n\nCode with TSDoc comments:\n```{{filetype}}",
-      "strategy": "replace",
-      "params": {
-        "model": "gpt-4",
-        "max_tokens": 2048,
-        "stop": [
-          "```"
-        ]
-      }
+  "append_mocha_tests" : {
+    "type" : "chat",
+    "opts" : {
+      "strategy" : "append",
+      "params" : {
+        "model" : "gpt-4",
+        "max_tokens" : 2048,
+        "stop" : [ "```" ]
+      },
+      "template" : "Implement Mocha tests for the following code.\n\nCode: ```{{filetype}} {{input}} ```\n\nTests: ```{{filetype}}\n"
     }
   }
 }
