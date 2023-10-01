@@ -1,5 +1,7 @@
-local sexp_filetypes = { 'clojure', 'lisp', 'scheme', 'racket', 'fennel' }
-
+local sexp_filetypes = {
+  'clojure', 'scheme', 'lisp', 'racket', 'hy', 'fennel', 'janet', 'carp',
+  'wast', 'yuck'
+}
 return {
   -- Syntax
   --{
@@ -40,7 +42,18 @@ return {
   },
 
   -- Editing
-  { "gpanders/nvim-parinfer", ft = sexp_filetypes },
+  { "gpanders/nvim-parinfer",
+    ft = sexp_filetypes,
+    config = function ()
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('MyParinferMappings', { clear = true }),
+        callback = function()
+          vim.api.nvim_buf_set_keymap(0, 'n', '<localleader>p', '<cmd>ParinferToggle<cr>', {})
+        end,
+        pattern = 'clojure',
+      })
+    end,
+  },
   { "guns/vim-sexp", ft = sexp_filetypes, },
   { "tpope/vim-sexp-mappings-for-regular-people", ft = sexp_filetypes, },
 
@@ -50,7 +63,7 @@ return {
     "Olical/conjure",
     ft = { 'clojure', 'fennel' },
     init = function()
-      vim.g['conjure#client#clojure#nrepl#connection#auto_repl#cmd'] = 'conjure-auto-repl'
+      vim.g['conjure#client#clojure#nrepl#connection#auto_repl#cmd'] = 'conjure-auto-repl $port'
       vim.g['conjure#client#clojure#nrepl#refresh#before'] = 'user/stop'
       vim.g['conjure#client#clojure#nrepl#refresh#after'] = 'user/start'
       vim.g['conjure#log#botright'] = true
