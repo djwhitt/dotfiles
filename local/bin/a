@@ -8,7 +8,9 @@
 (import '[java.text SimpleDateFormat])
 (import '[java.util Date])
 
-(def home (str (fs/home)))
+(def home-dir (fs/home))
+(def annex-dir (str home-dir "/Annex"))
+(def inbox-dir (str annex-dir "/inbox"))
 
 (defn sha256sum [file]
   (-> (shell {:out :string} "sha256sum" file)
@@ -25,10 +27,10 @@
   (let [basename (fs/file-name file)
         d (date)
         h (sha256sum file)]
-    (shell "mv" file (str home "/Archive/docs/" d "-sha256-" h "-" basename))
-    (shell (str "bash -c 'cd " home "/Archive/docs && git annex add .'"))
-    (shell (str "bash -c 'cd " home "/Archive && git commit -m \"archive-doc: " basename "\"'"))
-    (shell (str "bash -c 'cd " home "/Archive && git annex copy . --to cloud'"))))
+    (shell "mv" file (str inbox-dir "/" d "-sha256-" h "-" basename))
+    (shell (str "bash -c 'cd " inbox-dir " && git annex add .'"))
+    (shell (str "bash -c 'cd " annex-dir " && git commit -m \"archive-doc: " basename "\"'"))
+    (shell (str "bash -c 'cd " annex-dir " && git annex copy . --to s3' && git push"))))
   
 (when (= *file* (System/getProperty "babashka.file"))
   (prn (fs/home))
