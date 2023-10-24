@@ -51,7 +51,8 @@ comments:
       stop:
         - '```'
     template: >
-      Add comments to the following code.
+      Add comments to the following code. The comments should explain 'why'
+      more than 'how'.
 
 
       Existing code:
