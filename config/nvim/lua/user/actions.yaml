@@ -52,7 +52,7 @@ comments:
         - '```'
     template: >
       Add comments to the following code. The comments should explain 'why'
-      more than 'how'.
+      rather than 'how'.
 
 
       Existing code:

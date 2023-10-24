@@ -32,7 +32,7 @@
         "max_tokens" : 2048,
         "stop" : [ "```" ]
       },
-      "template" : "Add comments to the following code. The comments should explain 'why' more than 'how'.\n\nExisting code: ```{{filetype}} {{input}} ```\n\nRewritten code: ```{{filetype}}\n"
+      "template" : "Add comments to the following code. The comments should explain 'why' rather than 'how'.\n\nExisting code: ```{{filetype}} {{input}} ```\n\nRewritten code: ```{{filetype}}\n"
     }
   }
 }
