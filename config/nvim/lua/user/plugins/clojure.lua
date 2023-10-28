@@ -45,10 +45,14 @@ return {
   { "gpanders/nvim-parinfer",
     ft = sexp_filetypes,
     config = function ()
+      vim.g['parinfer_enabled'] = false
+
       vim.api.nvim_create_autocmd('FileType', {
         group = vim.api.nvim_create_augroup('MyParinferMappings', { clear = true }),
         callback = function()
-          vim.api.nvim_buf_set_keymap(0, 'n', '<localleader>p', '<cmd>ParinferToggle<cr>', {})
+          vim.api.nvim_buf_set_keymap(0, 'n', '<localleader>pt', '<cmd>ParinferToggle<cr>', {})
+          vim.api.nvim_buf_set_keymap(0, 'n', '<localleader>pe', '<cmd>ParinferOn<cr>', {})
+          vim.api.nvim_buf_set_keymap(0, 'n', '<localleader>pd', '<cmd>ParinferOff<cr>', {})
         end,
         pattern = 'clojure',
       })
