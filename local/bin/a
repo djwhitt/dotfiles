@@ -30,7 +30,9 @@
     (shell "mv" file (str inbox-dir "/" d "-sha256-" h "-" basename))
     (shell (str "bash -c 'cd " inbox-dir " && git annex add .'"))
     (shell (str "bash -c 'cd " annex-dir " && git commit -m \"archive-doc: " basename "\"'"))
-    (shell (str "bash -c 'cd " annex-dir " && git annex copy . --to s3' && git push"))))
+    (shell (str "bash -c 'cd " annex-dir " && git annex copy . --to s3'"))
+    (shell (str "bash -c 'cd " annex-dir " && git annex copy . --to rsync-dot-net'"))
+    (shell (str "bash -c 'cd " annex-dir " && git push'"))))
   
 (when (= *file* (System/getProperty "babashka.file"))
   (prn (fs/home))
