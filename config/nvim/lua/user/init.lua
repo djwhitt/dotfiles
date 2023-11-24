@@ -20,11 +20,12 @@ return {
         end
 
         return true
-      end 
+      end,
+      timeout_ms = 5000,
     },
     servers = {
       "clojure_lsp",
-      "tsserver"
+      "tsserver",
     },
   },
   mappings = {
