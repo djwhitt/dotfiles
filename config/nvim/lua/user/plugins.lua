@@ -105,4 +105,12 @@ return {
       return opts
     end,
   },
+  {
+    "mustache/vim-mustache-handlebars",
+    lazy = false,
+  },
+  {
+    "ledger/vim-ledger",
+    lazy = false,
+  },
 }
