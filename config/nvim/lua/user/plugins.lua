@@ -113,4 +113,13 @@ return {
     "ledger/vim-ledger",
     lazy = false,
   },
+  {
+    "vimwiki/vimwiki",
+    lazy = false,
+    init = function() 
+      vim.g.vimwiki_list = {
+        { path = "~/Wiki" }
+      }
+    end,
+  },
 }
