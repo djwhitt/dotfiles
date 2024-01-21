@@ -26,8 +26,8 @@ return {
     ft = 'clojure',
     init = function()
       -- Attempt to follow cljfmt defaults
-      vim.g['clojure_align_subforms'] = 1 -- luacheck: ignore vim
-      vim.g['clojure_fuzzy_indent_patterns'] = { -- luacheck: ignore vim
+      vim.g['clojure_align_subforms'] = 1
+      vim.g['clojure_fuzzy_indent_patterns'] = {
         '^case$',
         '^comment$',
         '^cond$',
@@ -45,7 +45,7 @@ return {
     'luochen1990/rainbow',
     ft = sexp_filetypes,
     init = function()
-      vim.g['rainbow_active'] = 1 -- luacheck: ignore vim
+      vim.g['rainbow_active'] = 1
     end,
   },
 

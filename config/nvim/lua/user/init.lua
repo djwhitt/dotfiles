@@ -47,6 +47,7 @@ return {
     servers = {
       'clojure_lsp',
       'efm',
+      'terraformls',
       'tsserver',
     },
   },
