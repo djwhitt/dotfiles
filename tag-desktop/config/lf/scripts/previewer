@@ -126,6 +126,14 @@ case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
     *.ipynb)
         preview_nb "$1"
         ;;
+    *.pu|*.puml|*.plantuml)
+        [ ! -f "$CACHE.png" ] && plantuml -tpng  -pipe < "$1" > "$CACHE.png"
+        preview_image "$CACHE.png" "$2" "$3" "$4" "$5"
+        ;;
+    *.dot)
+        [ ! -f "$CACHE.png" ] && dot -Tpng "$1" > "$CACHE.png"
+        preview_image "$CACHE.png" "$2" "$3" "$4" "$5"
+        ;;
     *)
         exec pistol "$@"
         ;;
