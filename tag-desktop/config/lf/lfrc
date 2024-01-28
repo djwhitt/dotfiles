@@ -1,2 +1,4 @@
 set cleaner ~/.config/lf/scripts/cleaner
 set previewer ~/.config/lf/scripts/previewer
+
+map ar $$HOME/.local/bin/archive-record "$f"
