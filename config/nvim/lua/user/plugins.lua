@@ -62,7 +62,10 @@ return {
     'jay-babu/mason-null-ls.nvim',
     opts = {
       handlers = {
-        -- prettierd causes problems when switch between projects
+        -- using efm for these
+        eslint = function() end,
+        eslint_d = function() end,
+        prettier = function() end,
         prettierd = function() end,
       },
     },

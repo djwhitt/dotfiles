@@ -15,9 +15,9 @@ return {
     formatting = {
       format_on_save = false,
       filter = function(client)
-        -- Use null-ls only for typescript
+        -- Use only efm for typescript
         if vim.bo.filetype == 'typescript' then
-          return client.name == 'null-ls'
+          return client.name == 'efm'
         end
 
         return true
@@ -27,18 +27,34 @@ return {
     config = {
       efm = function()
         local util = require('lspconfig.util')
+
+        local eslint_d = require('efmls-configs.linters.eslint_d')
+        local luacheck = require('efmls-configs.linters.luacheck')
+        local nixfmt = require('efmls-configs.formatters.nixfmt')
+        local prettier = require('efmls-configs.formatters.prettier')
+        local shellcheck = require('efmls-configs.linters.shellcheck')
+        local stylua = require('efmls-configs.formatters.stylua')
+
         return {
           cmd = { 'efm-langserver' },
           root_dir = util.find_git_ancestor,
           single_file_support = true,
-          init_options = { documentFormatting = true },
+          init_options = {
+            documentFormatting = true,
+            documentRangeFormatting = true,
+          },
           settings = {
             rootMarkers = { '.git/' },
             languages = {
-              lua = {
-                require('efmls-configs.linters.luacheck'),
-                require('efmls-configs.formatters.stylua'),
-              },
+              bash = { shellcheck },
+              sh = { shellcheck },
+
+              javascript = { eslint_d, prettier },
+              typescript = { eslint_d, prettier },
+
+              lua = { luacheck, stylua },
+
+              nix = { nixfmt },
             },
           },
         }
