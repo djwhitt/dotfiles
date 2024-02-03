@@ -95,6 +95,9 @@ case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
         ssconvert --export-type=Gnumeric_pdf:pdf_assistant "$1" "fd://1" | pdftoppm -jpeg -f 1 -singlefile - "$CACHE" 
         preview_image "$CACHE.jpg" "$2" "$3" "$4" "$5"
         ;;
+    *.sc) 
+        sc-im --nocurses --quit_afterload --export_mkd "$1"
+        ;;
     *.wav|*.mp3|*.flac|*.m4a|*.wma|*.ape|*.ac3|*.og[agx]|*.spx|*.opus|*.as[fx]|*.mka)
         exiftool "$1"
         ;;
