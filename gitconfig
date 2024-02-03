@@ -25,3 +25,5 @@
 
 [diff]
 	external = difft
+[safe]
+	directory = /etc/nixos
