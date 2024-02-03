@@ -92,7 +92,8 @@ case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
         preview_docx "$1"
         ;;
     *.xls|*.xlsx)
-        ssconvert --export-type=Gnumeric_stf:stf_csv "$1" "fd://1" | preview_text --language=csv
+        ssconvert --export-type=Gnumeric_pdf:pdf_assistant "$1" "fd://1" | pdftoppm -jpeg -f 1 -singlefile - "$CACHE" 
+        preview_image "$CACHE.jpg" "$2" "$3" "$4" "$5"
         ;;
     *.wav|*.mp3|*.flac|*.m4a|*.wma|*.ape|*.ac3|*.og[agx]|*.spx|*.opus|*.as[fx]|*.mka)
         exiftool "$1"
