@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+
+file=$1
+
+eecho() {
+  echo "$@" >&2
+}
+
+error() {
+  eecho "$@"
+  exit 1
+}
+
+render() {
+  eecho "Rendering $file"
+  case $file in
+    *.puml)
+      plantuml -tpng  -pipe < "$file" | convert -resize 200% - png: | kitten icat
+      ;;
+    *)
+      error "Unknown file type"
+      ;;
+  esac
+}
+
+render
+
+while inotifywait -e close_write $file; do
+  echo "File $file has been modified"
+  render
+done
