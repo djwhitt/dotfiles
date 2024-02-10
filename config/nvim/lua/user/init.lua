@@ -63,6 +63,7 @@ return {
     servers = {
       'clojure_lsp',
       'efm',
+      'nil_ls',
       'terraformls',
       'tsserver',
     },
