@@ -1,4 +1,10 @@
 set cleaner ~/.config/lf/scripts/cleaner
 set previewer ~/.config/lf/scripts/previewer
 
+$mkdir -p ~/.trash
+
+cmd trash $IFS="$(printf '\n\t')"; mv $fx ~/.trash
+
+map D trash
+
 map ar $$HOME/.local/bin/archive-record "$f"
