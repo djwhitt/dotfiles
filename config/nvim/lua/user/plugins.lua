@@ -77,6 +77,18 @@ return {
   {
     'tpope/vim-dispatch',
     lazy = false,
+    config = function()
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup(
+          'MyPlantUMLDispatch',
+          { clear = true }
+        ),
+        callback = function()
+          vim.b.dispatch = 'ensure-kitty-render %'
+        end,
+        pattern = 'plantuml',
+      })
+    end,
   },
   {
     'tpope/vim-fugitive',
