@@ -123,15 +123,6 @@ return {
     lazy = false,
   },
   {
-    'vimwiki/vimwiki',
-    lazy = false,
-    init = function()
-      vim.g.vimwiki_list = {
-        { path = '~/Wiki' },
-      }
-    end,
-  },
-  {
     'creativenull/efmls-configs-nvim',
     lazy = false,
     dependencies = { 'neovim/nvim-lspconfig' },
