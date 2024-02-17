@@ -87,6 +87,10 @@ return {
     lazy = false,
   },
   {
+    'sheerun/vim-polyglot',
+    lazy = false,
+  },
+  {
     'rebelot/heirline.nvim',
     opts = function(_, opts)
       local status = require('astronvim.utils.status')
