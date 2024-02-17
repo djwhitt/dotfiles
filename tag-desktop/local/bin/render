@@ -8,16 +8,27 @@ eecho() {
   echo "$@" >&2
 }
 
+debug() {
+  if [ -n "$DEBUG" ]; then
+    eecho "$@"
+  fi
+}
+
 error() {
   eecho "$@"
   exit 1
 }
 
+basename="$(basename "$file")"
+dirname="$(dirname "$file")"
+
 render() {
-  eecho "Rendering $file"
+  debug "Rendering $file"
   case $file in
     *.puml)
-      plantuml -tpng  -pipe < "$file" | convert -resize 200% - png: | kitten icat
+      debug "Unsetting _JAVA_OPTIONS"
+      unset _JAVA_OPTIONS # Unset _JAVA_OPTIONS to quiet output
+      (cd "$dirname" && plantuml -tpng  -pipe < "$basename" | convert -resize 200% - png: | kitten icat)
       ;;
     *)
       error "Unknown file type"
@@ -25,9 +36,11 @@ render() {
   esac
 }
 
+debug "Initial render"
 render
 
-while inotifywait -e close_write $file; do
-  echo "File $file has been modified"
+debug "Watching $file for changes"
+while inotifywait -e close_write "$file" 2> /dev/null; do
+  debug "File $file has been modified"
   render
 done

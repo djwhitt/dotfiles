@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+exec appimage-run $HOME/.local/opt/obsidian/Obsidian-*.appimage

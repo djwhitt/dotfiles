@@ -2,10 +2,8 @@
 
 export VISUAL="$HOME/.local/bin/e"
 
-nnn="$HOME/.local/bin/nnn"
-
-window_class="kitty-nnn"
+window_class="kitty-lf"
 if ! wmctrl -x -a $window_class; then 
-  kitty --class $window_class --title nnn --detach $nnn -e -E
+  kitty --class $window_class --title lf --detach lf
   while ! wmctrl -x -a $window_class; do sleep 0.1; done
 fi

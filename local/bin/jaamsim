@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-steam-run java -jar ~/Lib/JaamSim/JaamSim*.jar
