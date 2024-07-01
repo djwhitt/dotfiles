@@ -4,6 +4,7 @@ Exec=remnote %u
 Terminal=false
 Type=Application
 StartupWMClass=RemNote
+Icon=remnote
 Comment=RemNote
 MimeType=x-scheme-handler/remnote;x-scheme-handler/rn;
 Categories=Utility;
