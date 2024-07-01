@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=RemNote
+Exec=remnote %u
+Terminal=false
+Type=Application
+StartupWMClass=RemNote
+Comment=RemNote
+MimeType=x-scheme-handler/remnote;x-scheme-handler/rn;
+Categories=Utility;
