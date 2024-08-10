@@ -6,19 +6,24 @@ eecho() {
   >&2 echo "$@"
 }
 
-records_dir="$HOME/Documents/Archive/Records/Misc"
+if [ -z "$1" ]; then
+  eecho "Usage: archive-doc <file>"
+  exit 1
+fi
+
+docs_dir="$HOME/Brain/data/docs/new"
 
 to_archive="$1"
 
 date="$(date +%Y%m%d)"
 sha256="$(sha256sum "$to_archive" | cut -d' ' -f1)"
 archive_file="$date-$sha256-$(basename "$to_archive")"
-archive_path="$records_dir/$archive_file"
+archive_path="$docs_dir/$archive_file"
 
 eecho "Archiving $to_archive to $archive_path..."
 mv "$to_archive" "$archive_path"
 
-cd "$records_dir"
+cd "$docs_dir"
 
 eecho "Adding $archive_path to git annex..."
 git annex add "$archive_path"
@@ -28,4 +33,8 @@ eecho "Copying $archive_path to annex remotes..."
 git annex copy "$archive_file" --to s3-us-east-1
 git annex copy "$archive_file" --to rsync-dot-net
 
-# NOTE: git push is not needed since this the repo is backed up in tarsnap
+eecho "Syncing git annex..."
+git annex sync
+
+eecho "Pushing..."
+git push
