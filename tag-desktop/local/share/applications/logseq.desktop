@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Logseq
+Exec=logseq
+Terminal=false
+Type=Application
+Icon=logseq
+StartupWMClass=Logseq
+Comment=A privacy-first, open-source knowledge base
+Categories=Office;
