@@ -1,2 +1,3 @@
 {:tasks
- {:requires ([d.tasks :as tasks])}}
+ {:requires ([d.tasks :as tasks])
+  ping (tasks/ping)}}
