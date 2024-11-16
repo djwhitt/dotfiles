@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd "$HOME" || exit 1
+
+bb -cp ".local/src/clj" --config .bb.edn "$@"
