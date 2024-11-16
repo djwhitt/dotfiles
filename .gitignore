@@ -1,3 +1,4 @@
 # Clojure
 .clj-kondo
 .lsp
+.nrepl-port

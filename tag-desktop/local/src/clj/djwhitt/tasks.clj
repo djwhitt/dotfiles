@@ -1,4 +1,4 @@
-(ns d.tasks)
+(ns djwhitt.tasks)
 
 (defn ping []
   (println "PONG!"))

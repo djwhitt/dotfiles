@@ -1,8 +1,8 @@
 {
   "tag-desktop/bb.edn": {
-    "alternate": "tag-desktop/local/src/clj/d/tasks.clj"
+    "alternate": "tag-desktop/local/src/clj/djwhitt/tasks.clj"
   },
-  "tag-desktop/local/src/clj/d/tasks.clj": {
+  "tag-desktop/local/src/clj/djwhitt/tasks.clj": {
     "alternate": "tag-desktop/bb.edn"
   }
 }
