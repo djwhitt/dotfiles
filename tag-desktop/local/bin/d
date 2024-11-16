@@ -2,4 +2,8 @@
 
 cd "$HOME" || exit 1
 
-bb -cp ".local/src/clj" --config .bb.edn "$@"
+if [ "$#" -eq 0 ]; then
+  exec rlwrap bb -cp ".local/src/clj"
+fi
+
+exec bb -cp ".local/src/clj" --config .bb.edn "$@"
