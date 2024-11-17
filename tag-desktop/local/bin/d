@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 cd "$HOME" || exit 1
 
 if [ "$#" -eq 0 ]; then
