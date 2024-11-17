@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$HOME" || exit 1
 
 if [ "$#" -eq 0 ]; then
-  exec rlwrap bb -cp ".local/src/clj"
+  exec rlwrap bb --config .bb.edn
 fi
 
-exec bb -cp ".local/src/clj" --config .bb.edn "$@"
+exec bb --config .bb.edn "$@"

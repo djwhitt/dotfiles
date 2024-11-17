@@ -1,4 +1,6 @@
-{:tasks
+{:paths ["local/src/clj"]
+ :deps {metosin/malli {:mvn/version "0.16.4"}}
+ :tasks
  {:requires ([djwhitt.tasks :as tasks])
   ping {:doc "Healthcheck"
         :task (tasks/ping)}}}
