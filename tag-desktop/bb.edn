@@ -1,3 +1,4 @@
 {:tasks
  {:requires ([djwhitt.tasks :as tasks])
-  ping (tasks/ping)}}
+  ping {:doc "Healthcheck"
+        :task (tasks/ping)}}}
