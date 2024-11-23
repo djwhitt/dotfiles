@@ -2,5 +2,14 @@
  :deps {metosin/malli {:mvn/version "0.16.4"}}
  :tasks
  {:requires ([djwhitt.tasks :as tasks])
-  ping {:doc "Healthcheck"
-        :task (tasks/ping)}}}
+  ping
+  {:doc "Healthcheck"
+   :task (tasks/ping)}
+
+  upload-nocodb-file
+  {:doc "Upload a file to NocoDB"
+   :task (tasks/upload-nocodb-file)}
+
+  archive-document
+  {:doc "Archive a document in NocoDB Records DB"
+   :task (tasks/archive-document)}}}

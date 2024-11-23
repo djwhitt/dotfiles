@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+ORIGINAL_PWD=$(pwd)
+export ORIGINAL_PWD
+
 cd "$HOME" || exit 1
 
 if [ "$#" -eq 0 ]; then
