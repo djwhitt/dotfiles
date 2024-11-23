@@ -3,5 +3,5 @@
 docker run --rm -it \
   --name "interpreter-$(date +%Y%m%d%H%M%S)" \
   --volume "$(pwd):/workspace" \
-  --env "OPENAI_API_KEY=$(openai-cli-key)" \
+  --env "OPENAI_API_KEY=$(openai-api-key)" \
   openinterpreter interpreter "$@"

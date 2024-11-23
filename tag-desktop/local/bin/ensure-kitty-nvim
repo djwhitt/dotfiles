@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-export OPENAI_API_KEY=$(cat ~/.config/openai/apikey)
+# Used by avante.nvim
+ANTHROPIC_API_KEY="$(anthropic-api-key)"
+export ANTHROPIC_API_KEY
+
+export SSH_AUTH_SOCK=/run/user/1000/gnupg/S.gpg-agent.ssh
 
 # Used by conditionals in Neovim config
 export KITTY_NVIM=true
 
 window_class="kitty-nvim"
 nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
-
-# KDE version (useful in Wayland)
-#ww -f "${window_class}" -c "kitty --class $window_class --detach nvim --listen ${nvimsocket}"
 
 # X11 version
 if ! wmctrl -x -a $window_class; then 

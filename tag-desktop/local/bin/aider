@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-/etc/profiles/per-user/djwhitt/bin/aider --no-check-update --openai-api-key "$(openai-cli-key)" --anthropic-api-key "$(anthropic-cli-key)" "$@"
+/etc/profiles/per-user/djwhitt/bin/aider --no-check-update \
+  --openai-api-key "$(openai-api-key)" \
+  --anthropic-api-key "$(anthropic-api-key)" "$@"
