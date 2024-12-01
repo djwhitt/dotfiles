@@ -1,0 +1,14 @@
+- model_id: qwq
+  model_name: qwq:latest
+  api_base: "http://192.168.1.14:11434/v1"
+  api_key_name: ollama
+  headers:
+    HTTP-Referer: "https://llm.datasette.io/"
+    X-Title: LLM
+- model_id: gemini-1.5-flash
+  model_name: gemini-1.5-flash
+  api_base: "https://generativelanguage.googleapis.com/v1beta/openai"
+  api_key_name: googleai
+  headers:
+    HTTP-Referer: "https://llm.datasette.io/"
+    X-Title: LLM
