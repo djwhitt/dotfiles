@@ -1,3 +1,6 @@
+# Aider
+.aider*
+
 # Clojure
 .clj-kondo
 .lsp
