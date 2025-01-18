@@ -1,5 +1,6 @@
 alias tl="tmuxp load"
 alias ls="ls --hyperlink=auto --color=auto"
+alias j="just"
 
 # Quick editing shortcuts
 alias ef="e ~/.config/fish/config.fish"

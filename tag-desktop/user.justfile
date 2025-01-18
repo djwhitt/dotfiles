@@ -3,3 +3,5 @@ default:
 
 hello: 
   @echo "hello world"
+
+# vim: set filetype=just:
