@@ -2,13 +2,4 @@
 
 set -euo pipefail
 
-ORIGINAL_PWD=$(pwd)
-export ORIGINAL_PWD
-
-cd "$HOME" || exit 1
-
-if [ "$#" -eq 0 ]; then
-  exec rlwrap bb --config .bb.edn
-fi
-
-exec bb --config .bb.edn "$@"
+exec just --justfile "$HOME/.user.justfile" "$@"
