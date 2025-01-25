@@ -1,40 +1,103 @@
 #!/usr/bin/env bash
 
-set -e
+# A script to archive a file into a Git Annex repository and sync to remotes,
+# with the archive name format: <date>-<filename>-<sha256>.
+
+set -euo pipefail
+
+##############################################################################
+# Helper functions
+##############################################################################
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") <file_to_archive>
+
+Archives the specified file into the Git Annex repository and syncs to remote.
+Skips duplication if a file with the same hash is already archived.
+EOF
+  exit 1
+}
 
 eecho() {
   >&2 echo "$@"
 }
 
-if [ -z "$1" ]; then
-  eecho "Usage: archive-doc <file>"
+##############################################################################
+# Main script
+##############################################################################
+
+# Ensure exactly one argument is provided
+if [[ $# -ne 1 ]]; then
+  usage
+fi
+
+# The file to archive
+to_archive="$1"
+
+# Validate the file exists and is readable
+if [[ ! -f "$to_archive" ]]; then
+  eecho "Error: '$to_archive' does not exist or is not a regular file."
   exit 1
 fi
 
+# Define the docs directory
 docs_dir="$HOME/Brain/data/media/archive"
 
-to_archive="$1"
+# Create the directory if not present
+mkdir -p "$docs_dir"
 
-date="$(date +%Y%m%d)"
+# Generate date, SHA-256 checksum, and archive filename
+archive_date="$(date +%Y%m%d)"
 sha256="$(sha256sum "$to_archive" | cut -d' ' -f1)"
-archive_file="$date-$sha256-$(basename "$to_archive")"
+archive_file="${archive_date}-$(basename "$to_archive")-${sha256}"
 archive_path="$docs_dir/$archive_file"
 
-eecho "Archiving $to_archive to $archive_path..."
-mv "$to_archive" "$archive_path"
+##############################################################################
+# Check for duplicates
+##############################################################################
+# If a file with the same hash portion already exists in the archive directory,
+# we skip the rest.
 
-cd "$docs_dir"
+if find "$docs_dir" -maxdepth 1 -type f -name "*-${sha256}" -print -quit | grep -q .; then
+  eecho "A file with hash '$sha256' is already archived. Skipping."
+  exit 0
+fi
 
-eecho "Adding $archive_path to git annex..."
-git annex add "$archive_path"
-git commit -m "Add $archive_path"
+##############################################################################
+# Move file and archive
+##############################################################################
 
-eecho "Copying $archive_path to annex remotes..."
-git annex copy "$archive_file" --to s3-us-east-1
-git annex copy "$archive_file" --to rsync-dot-net
+eecho "Archiving '$to_archive' to '$archive_path'..."
+mv -v "$to_archive" "$archive_path"
 
-eecho "Syncing git annex..."
+# Move into docs_dir (using pushd/popd so we don't permanently change directories)
+pushd "$docs_dir" >/dev/null
+
+##############################################################################
+# Git Annex steps
+##############################################################################
+
+eecho "Adding '$archive_file' to Git Annex..."
+git annex add "$archive_file"
+
+# Commit changes
+eecho "Committing new archive file..."
+git commit -m "Add $archive_file"
+
+# Attempt to copy to each remote; non-critical failures will show a warning
+eecho "Copying '$archive_file' to annex remotes..."
+git annex copy "$archive_file" --to s3-us-east-1 || eecho "Warning: failed to copy to s3-us-east-1."
+git annex copy "$archive_file" --to rsync-dot-net || eecho "Warning: failed to copy to rsync-dot-net."
+
+# Sync local repository with remotes
+eecho "Syncing Git Annex..."
 git annex sync
 
-eecho "Pushing..."
+# Push changes to the main git repo
+eecho "Pushing changes to Git..."
 git push
+
+popd >/dev/null
+
+eecho "Done. File archived as '$archive_file'."
