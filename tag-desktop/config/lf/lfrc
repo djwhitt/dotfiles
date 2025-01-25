@@ -7,4 +7,4 @@ cmd trash $IFS="$(printf '\n\t')"; mv $fx ~/.trash
 
 map D trash
 
-map ar $$HOME/.local/bin/archive-record "$f"
+map am $$HOME/.local/bin/archive-media "$f"
