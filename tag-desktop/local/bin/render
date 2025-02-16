@@ -40,6 +40,7 @@ debug "Initial render"
 render
 
 debug "Watching $file for changes"
+# Redirect both stderr andn stdout to /dev/null AI!
 while inotifywait -e close_write "$file" 2> /dev/null; do
   debug "File $file has been modified"
   render
