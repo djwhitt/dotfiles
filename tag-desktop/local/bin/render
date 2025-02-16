@@ -40,8 +40,7 @@ debug "Initial render"
 render
 
 debug "Watching $file for changes"
-# Improve quoting to avoid word splitting AI!
-while inotifywait -e close_write "$file" $([ -z "$DEBUG" ] && echo "&> /dev/null"); do
+while inotifywait -e close_write "$file" "$([ -z "$DEBUG" ] && echo "&> /dev/null")"; do
   debug "File $file has been modified"
   render
 done
