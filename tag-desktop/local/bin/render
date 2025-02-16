@@ -28,7 +28,7 @@ render() {
     *.puml)
       debug "Unsetting _JAVA_OPTIONS"
       unset _JAVA_OPTIONS # Unset _JAVA_OPTIONS to quiet output
-      (cd "$dirname" && plantuml -tpng  -pipe < "$basename" | magick - -resize 200% png: | kitten icat)
+      (cd "$dirname" && plantuml -tpng  -pipe < "$basename" | magick - -resize 150% png: | kitten icat)
       ;;
     *)
       error "Unknown file type"
