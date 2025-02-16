@@ -40,8 +40,7 @@ debug "Initial render"
 render
 
 debug "Watching $file for changes"
-# Only redirect output if $DEBUG is not set AI!
-while inotifywait -e close_write "$file" &> /dev/null; do
+while inotifywait -e close_write "$file" $([ -z "$DEBUG" ] && echo "&> /dev/null"); do
   debug "File $file has been modified"
   render
 done
