@@ -69,6 +69,11 @@ preview_nb() {
 CACHE="$HOME/.cache/lf/thumbnail.$(stat "$(readlink -f "$1")" | sha256sum | awk '{print $1}')"
 mkdir -p "$HOME/.cache/lf"
 
+# Adjust this to use 100MiB as the limit AI!
+if [ "$(stat -f%z "$1")" -gt 52428800 ]; then  # 50MiB = 52428800 bytes
+    echo "File too large to preview (>50MiB)"
+fi
+
 case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
     *.[1-8])
         man "$1" | col -b
@@ -139,11 +144,7 @@ case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
         preview_image "$CACHE.png" "$2" "$3" "$4" "$5"
         ;;
     *)
-        if [ "$(stat -f%z "$1")" -le 52428800 ]; then  # 50MiB = 52428800 bytes
-            exec pistol "$@"
-        else
-            echo "File too large to preview (>50MiB)"
-        fi
+        exec pistol "$@"
         ;;
 esac
 exit 0
