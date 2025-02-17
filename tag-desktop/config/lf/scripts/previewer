@@ -71,7 +71,7 @@ mkdir -p "$HOME/.cache/lf"
 
 # Don't attempt to preview that are too large
 if [ "$(stat -c%s "$1")" -gt 104857600 ]; then  # 100MiB = 104857600 bytes
-    echo "File too large to preview (>50MiB)"
+    echo "File too large to preview (>100MiB)"
     exit 0
 fi
 
