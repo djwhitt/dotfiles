@@ -138,6 +138,7 @@ case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
         [ ! -f "$CACHE.png" ] && dot -Tpng "$1" > "$CACHE.png"
         preview_image "$CACHE.png" "$2" "$3" "$4" "$5"
         ;;
+    # Only preview files less than 50MiB AI!
     *)
         exec pistol "$@"
         ;;
