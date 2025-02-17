@@ -138,9 +138,12 @@ case "$(printf "%s\n" "$(readlink -f "$1")" | awk '{print tolower($0)}')" in
         [ ! -f "$CACHE.png" ] && dot -Tpng "$1" > "$CACHE.png"
         preview_image "$CACHE.png" "$2" "$3" "$4" "$5"
         ;;
-    # Only preview files less than 50MiB AI!
     *)
-        exec pistol "$@"
+        if [ "$(stat -f%z "$1")" -le 52428800 ]; then  # 50MiB = 52428800 bytes
+            exec pistol "$@"
+        else
+            echo "File too large to preview (>50MiB)"
+        fi
         ;;
 esac
 exit 0
