@@ -69,8 +69,8 @@ preview_nb() {
 CACHE="$HOME/.cache/lf/thumbnail.$(stat "$(readlink -f "$1")" | sha256sum | awk '{print $1}')"
 mkdir -p "$HOME/.cache/lf"
 
-# Adjust this to use 100MiB as the limit AI!
-if [ "$(stat -f%z "$1")" -gt 52428800 ]; then  # 50MiB = 52428800 bytes
+# Don't attempt to preview that are too large
+if [ "$(stat -f%z "$1")" -gt 104857600 ]; then  # 100MiB = 104857600 bytes
     echo "File too large to preview (>50MiB)"
 fi
 
