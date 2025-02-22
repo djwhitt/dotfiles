@@ -12,7 +12,6 @@ export KITTY_NVIM=true
 window_class="kitty-nvim"
 nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 
-# X11 version
 if ! find-and-focus $window_class; then 
   pgrep nvim > /dev/null || rm -f "${nvimsocket}"
   kitty --class $window_class --detach nvim --listen "${nvimsocket}"
