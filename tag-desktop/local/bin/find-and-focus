@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if [ $# -eq 0 ]; then
-    echo "Error: No window class name provided"
-    echo "Usage: $(basename "$0") <window-class-name>"
+    echo "Error: No window class provided"
+    echo "Usage: $(basename "$0") <window-class>"
     exit 1
 fi
 

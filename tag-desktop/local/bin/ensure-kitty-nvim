@@ -13,8 +13,8 @@ window_class="kitty-nvim"
 nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 
 # X11 version
-if ! wmctrl -x -a $window_class; then 
-  pgrep nvim > /dev/null || rm "${nvimsocket}"
+if ! find-and-focus $window_class; then 
+  pgrep nvim > /dev/null || rm -f "${nvimsocket}"
   kitty --class $window_class --detach nvim --listen "${nvimsocket}"
-  while ! wmctrl -x -a $window_class; do sleep 0.05; done
+  while ! find-and-focus $window_class; do sleep 0.05; done
 fi

@@ -3,7 +3,8 @@
 export VISUAL="$HOME/.local/bin/e"
 
 window_class="kitty-lf"
-if ! wmctrl -x -a $window_class; then 
+
+if ! find-and-focus $window_class; then 
   kitty --class $window_class --title lf --detach lf
-  while ! wmctrl -x -a $window_class; do sleep 0.1; done
+  while ! find-and-focus $window_class; do sleep 0.05; done
 fi

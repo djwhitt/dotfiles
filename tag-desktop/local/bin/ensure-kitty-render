@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 window_class="kitty-render"
-if ! wmctrl -x -a $window_class; then 
+
+if ! find-and-focus $window_class; then 
   kitty --class $window_class --title render --detach render "$@"
-  while ! wmctrl -x -a $window_class; do sleep 0.1; done
+  while ! find-and-focus $window_class; do sleep 0.1; done
 fi
