@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-# Check that an argument was passed AI!
+if [ $# -eq 0 ]; then
+    echo "Error: No window class name provided"
+    echo "Usage: $(basename "$0") <window-class-name>"
+    exit 1
+fi
 
 success=$(busctl --user call org.gnome.Shell /de/lucaswerkmeister/ActivateWindowByTitle de.lucaswerkmeister.ActivateWindowByTitle activateByWmClass s "$1")
 if [ "$success" == "b true" ]; then
