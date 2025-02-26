@@ -9,19 +9,14 @@ rcup
 # Delete dead symlinks in ~/.local/bin directory
 find ~/.local/bin -xtype l -delete
 
-# Switch to latest home-manager generation
-if which home-manager 2> /dev/null; then
-    home-manager switch
-fi
-
 # GnuPG permissions
 if [[ -d ~/.gnupg ]]; then
-    chmod 700 $(realpath ~/.gnupg)
+    chmod 700 "$(realpath ~/.gnupg)"
     find -L ~/.gnupg -type f -regex '.+\.\(conf\|key\|gpg.?\)' -exec realpath {} \; -exec chmod 600 {} \; > /dev/null
 fi
 
 # SSH permissions
-chmod 700 $(realpath ~/.ssh)
+chmod 700 "$(realpath ~/.ssh)"
 find -L ~/.ssh -type f -name 'id_rsa*' -exec realpath {} \; -exec chmod 600 {} \; > /dev/null
 
 # Update desktop database
@@ -29,13 +24,36 @@ if which update-desktop-database 2> /dev/null; then
     update-desktop-database ~/.local/share/applications/
 fi
 
-# Symlink doom
-if [[ -e ~/.emacs.d/bin/doom ]]; then
-    ln -sf ~/.emacs.d/bin/doom
-fi
+##
+## Gnome Shell
+##
 
-# Set cursor for XFCE4
-if which xfconf-query 2> /dev/null; then
-    xfconf-query --channel xsettings --property /Gtk/CursorThemeName --set "Vanilla-DMZ"
-    xfconf-query --channel xsettings --property /Gtk/CursorThemeSize --set 64
-fi
+# Set Caps Lock to function as Control key
+echo "Setting Caps Lock to function as Control key..."
+gsettings set org.gnome.desktop.input-sources xkb-options "['ctrl:nocaps']"
+
+echo "Setting Meta + number shortcuts for GNOME workspaces..."
+
+# Ensure the required workspaces exist
+gsettings set org.gnome.desktop.wm.preferences num-workspaces 10
+
+# Set Meta + number shortcuts for workspaces 1-9
+for i in {1..9}; do
+  gsettings set org.gnome.desktop.wm.keybindings "switch-to-workspace-$i" "['<Super>$i']"
+  echo "Meta + $i will switch to workspace $i"
+done
+
+# Set Meta + 0 shortcut for workspaces 10
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-10 "['<Super>0']"
+echo "Meta + 0 will switch to workspace 10"
+
+# Disable conflicting default app shortcuts
+echo "Disabling conflicting application launch shortcuts..."
+for i in {1..10}; do
+  # Disable app shortcuts 1 - 10
+  gsettings set org.gnome.shell.keybindings "switch-to-application-$i" "[]"
+done
+
+# TODO: popshell shortcuts
+# TODO: focus follows mouse
+# TODO: emoji picker shortcut
