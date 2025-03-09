@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 export QT_AUTO_SCREEN_SCALE_FACTOR=true
-exec /etc/profiles/per-user/djwhitt/bin/copyq
+exec /etc/profiles/per-user/djwhitt/bin/copyq "$@"
