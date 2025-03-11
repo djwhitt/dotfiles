@@ -47,11 +47,13 @@ docs_dir="$HOME/Brain/data/media/archive"
 # Create the directory if not present
 mkdir -p "$docs_dir"
 
-# Adjust this to ensure that the file extension is at the end of the filename AI!
 # Generate date, SHA-256 checksum, and archive filename
 archive_date="$(date +%Y%m%d)"
 sha256="$(sha256sum "$to_archive" | cut -d' ' -f1)"
-archive_file="${archive_date}-$(basename "$to_archive")-${sha256}"
+filename=$(basename "$to_archive")
+extension="${filename##*.}"
+basename="${filename%.*}"
+archive_file="${archive_date}-${basename}-${sha256}.${extension}"
 archive_path="$docs_dir/$archive_file"
 
 ##############################################################################
@@ -60,7 +62,7 @@ archive_path="$docs_dir/$archive_file"
 # If a file with the same hash portion already exists in the archive directory,
 # we skip the rest.
 
-if find "$docs_dir" -maxdepth 1 -type f -name "*-${sha256}" -print -quit | grep -q .; then
+if find "$docs_dir" -maxdepth 1 -type f -name "*-${sha256}.*" -print -quit | grep -q .; then
   eecho "A file with hash '$sha256' is already archived. Skipping."
   exit 0
 fi
