@@ -47,6 +47,7 @@ docs_dir="$HOME/Brain/data/media/archive"
 # Create the directory if not present
 mkdir -p "$docs_dir"
 
+# Adjust this to ensure that the file extension is at the end of the filename AI!
 # Generate date, SHA-256 checksum, and archive filename
 archive_date="$(date +%Y%m%d)"
 sha256="$(sha256sum "$to_archive" | cut -d' ' -f1)"
