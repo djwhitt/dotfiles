@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+dir=`mktemp -d`
+cur=$PWD
+cd $dir
+scanimage -b --format png  -d 'brother5:bus2;dev2' --resolution 300
+archive-media *.png
