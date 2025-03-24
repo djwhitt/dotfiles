@@ -3,7 +3,7 @@
 # File to track recording status
 STATUS_FILE="$HOME/.recording_status"
 # Default timeout in seconds (0 means no timeout)
-DEFAULT_TIMEOUT=0
+DEFAULT_TIMEOUT=120
 # Output audio file
 AUDIO_FILE="/tmp/recording_audio.wav"
 # Detect desktop environment
