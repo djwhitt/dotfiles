@@ -12,6 +12,8 @@ WM="$XDG_SESSION_TYPE"
 CLIPBOARD=false
 # Notification ID for updating notifications
 NOTIFY_ID=0
+# Use OpenAI API by default
+USE_OPENAI=true
 
 # Check dependencies
 check_dependencies() {
@@ -25,8 +27,6 @@ check_dependencies() {
         command -v xsel &>/dev/null || { echo "xsel is required for X11. Please install xsel." >&2; exit 1; }
     fi
     
-    # Check whisper tools
-    command -v whisper-cpp &>/dev/null || USE_OPENAI=true
     
     if [[ "$USE_OPENAI" == true ]]; then
         command -v curl &>/dev/null || { echo "curl is required. Please install curl." >&2; exit 1; }
