@@ -1,0 +1,222 @@
+#!/usr/bin/env bash
+
+# File to track recording status
+STATUS_FILE="$HOME/.recording_status"
+# Default timeout in seconds (0 means no timeout)
+DEFAULT_TIMEOUT=0
+# Output audio file
+AUDIO_FILE="/tmp/recording_audio.wav"
+# Detect desktop environment
+WM="$XDG_SESSION_TYPE"
+# Use clipboard instead of PRIMARY selection
+CLIPBOARD=false
+# Notification ID for updating notifications
+NOTIFY_ID=0
+
+# Check dependencies
+check_dependencies() {
+    command -v notify-send &>/dev/null || { echo "notify-send is required. Please install libnotify-bin." >&2; exit 1; }
+    command -v sox &>/dev/null || { echo "sox is required. Please install sox." >&2; exit 1; }
+    
+    # Check clipboard tools
+    if [[ "$WM" == "wayland" ]]; then
+        command -v wl-copy &>/dev/null || { echo "wl-copy is required for Wayland. Please install wl-paste." >&2; exit 1; }
+    else # Default to X11
+        command -v xsel &>/dev/null || { echo "xsel is required for X11. Please install xsel." >&2; exit 1; }
+    fi
+    
+    # Check whisper tools
+    command -v whisper-cpp &>/dev/null || USE_OPENAI=true
+    
+    if [[ "$USE_OPENAI" == true ]]; then
+        command -v curl &>/dev/null || { echo "curl is required. Please install curl." >&2; exit 1; }
+        command -v jq &>/dev/null || { echo "jq is required. Please install jq." >&2; exit 1; }
+    fi
+}
+
+# Function to show notifications
+show_notification() {
+    local title="$1"
+    local message="$2"
+    local icon="$3"
+    local replace_id="$4"
+    
+    if [[ -n "$replace_id" ]]; then
+        NOTIFY_ID=$(notify-send -a "Recording Toggle" -p -r "$replace_id" -i "$icon" "$title" "$message")
+    else
+        NOTIFY_ID=$(notify-send -a "Recording Toggle" -p -i "$icon" "$title" "$message")
+    fi
+    
+    echo "$NOTIFY_ID"
+}
+
+# Function to copy text to clipboard
+copy_to_clipboard() {
+    local text="$1"
+    
+    if [[ "$WM" == "wayland" ]]; then
+        if [[ "$CLIPBOARD" == true ]]; then
+            echo "$text" | wl-copy
+        else
+            echo "$text" | wl-copy -p
+        fi
+    else # Default to X11
+        if [[ "$CLIPBOARD" == true ]]; then
+            echo "$text" | xsel -ib
+        else
+            echo "$text" | xsel -ip
+        fi
+    fi
+    
+    echo "Text copied to clipboard: $text"
+}
+
+# Function to transcribe audio using Whisper
+transcribe_audio() {
+    local audio_file="$1"
+    local transcript=""
+    
+    show_notification "Transcribing" "Converting speech to text..." "audio-input-microphone" "$NOTIFY_ID"
+    
+    if [[ "$USE_OPENAI" == true ]]; then
+        # Use OpenAI's Whisper API
+        transcript=$(curl -s \
+            --request POST \
+            --url https://api.openai.com/v1/audio/transcriptions \
+            --header "Authorization: Bearer $(openai-api-key)" \
+            --header 'Content-Type: multipart/form-data' \
+            --form "file=@$audio_file" \
+            --form model=whisper-1 | jq -r .text)
+    else
+        # Use local whisper-cpp
+        # Adjust the model path as needed
+        local model="$HOME/Models/whisper/ggml-base.en.bin"
+        transcript=$(whisper-cpp -m "$model" -f "$audio_file" 2>/dev/null)
+    fi
+    
+    # Clean up the transcript
+    # Remove text between parentheses (like sound effects)
+    transcript="${transcript/\(*\)}"
+    # Remove text between square brackets
+    transcript="${transcript/\[*\]}"
+    # Remove leading newlines and whitespace
+    transcript="${transcript#$'\n'}"
+    transcript="${transcript#$'\n'}"
+    transcript="${transcript##+([[:space:]])}"
+    # Capitalize first letter
+    transcript="${transcript^}"
+    
+    # Copy to clipboard
+    copy_to_clipboard "$transcript"
+    
+    # Show notification with transcript
+    show_notification "Transcription Complete" "$transcript" "audio-input-microphone" "$NOTIFY_ID"
+}
+
+# Function to start recording
+start_recording() {
+    local timeout=${1:-$DEFAULT_TIMEOUT}
+    
+    NOTIFY_ID=$(show_notification "Starting Recording" "Recording audio..." "audio-input-microphone")
+    
+    # Start sox recording (continuous recording until manually stopped)
+    rec -q "$AUDIO_FILE" rate 16k &
+    
+    # Store the PID of the recording process
+    echo "$!" > "$STATUS_FILE"
+    echo "$AUDIO_FILE" >> "$STATUS_FILE"
+    echo "$NOTIFY_ID" >> "$STATUS_FILE"
+    
+    # Add timeout if specified
+    if [ "$timeout" -gt 0 ]; then
+        echo "Recording will automatically stop after $timeout seconds."
+        # Schedule a stop after the timeout
+        (
+            sleep "$timeout"
+            if [ -f "$STATUS_FILE" ]; then
+                echo "Timeout reached. Stopping recording..."
+                PID=$(head -n 1 "$STATUS_FILE")
+                if ps -p "$PID" > /dev/null; then
+                    kill "$PID"
+                    AUDIO_FILE=$(sed -n '2p' "$STATUS_FILE")
+                    NOTIFY_ID=$(sed -n '3p' "$STATUS_FILE")
+                    show_notification "Recording Stopped" "Recording stopped after timeout." "audio-input-microphone" "$NOTIFY_ID"
+                    transcribe_audio "$AUDIO_FILE"
+                fi
+                rm "$STATUS_FILE"
+            fi
+        ) &
+        # Store the timeout process PID
+        echo "$!" >> "$STATUS_FILE"
+    fi
+    
+    echo "Recording started. Run this script again to stop."
+}
+
+# Function to stop recording
+stop_recording() {
+    echo "Stopping recording..."
+    if [ -f "$STATUS_FILE" ]; then
+        # Read all data from the status file
+        mapfile -t STATUS_DATA < "$STATUS_FILE"
+        
+        # Extract information
+        PID="${STATUS_DATA[0]}"
+        AUDIO_FILE="${STATUS_DATA[1]}"
+        NOTIFY_ID="${STATUS_DATA[2]}"
+        
+        # Stop the recording
+        if ps -p "$PID" > /dev/null; then
+            kill "$PID"
+            show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
+            sleep 1 # Give ffmpeg time to finalize the file
+            
+            # Transcribe the audio
+            transcribe_audio "$AUDIO_FILE"
+        else
+            show_notification "Error" "Recording process not found" "dialog-error" "$NOTIFY_ID"
+        fi
+        
+        # Kill the timeout process if it exists (fourth line in file)
+        if [ ${#STATUS_DATA[@]} -gt 3 ] && ps -p "${STATUS_DATA[3]}" > /dev/null; then
+            kill "${STATUS_DATA[3]}"
+        fi
+        
+        # Remove the status file
+        rm "$STATUS_FILE"
+    else
+        show_notification "Error" "No active recording found" "dialog-error"
+    fi
+}
+
+# Parse command line arguments
+TIMEOUT=$DEFAULT_TIMEOUT
+
+# Check for options
+while getopts "t:c" opt; do
+    case $opt in
+        t)
+            TIMEOUT=$OPTARG
+            ;;
+        c)
+            CLIPBOARD=true
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            echo "Usage: $0 [-t timeout_seconds] [-c]" >&2
+            echo "  -t: Set timeout in seconds" >&2
+            echo "  -c: Use clipboard instead of PRIMARY selection" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Check dependencies
+check_dependencies
+
+# Check if recording is active and toggle accordingly
+if [ -f "$STATUS_FILE" ]; then
+    stop_recording
+else
+    start_recording "$TIMEOUT"
+fi
