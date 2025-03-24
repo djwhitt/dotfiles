@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 if [ $# -eq 0 ]; then
-    echo "Error: No window class provided"
-    echo "Usage: $(basename "$0") <window-class>"
-    exit 1
+  echo "Error: No window class provided"
+  echo "Usage: $(basename "$0") <window-class>"
+  exit 1
 fi
 
 success=$(busctl --user call org.gnome.Shell /de/lucaswerkmeister/ActivateWindowByTitle de.lucaswerkmeister.ActivateWindowByTitle activateByWmClass s "$1")
