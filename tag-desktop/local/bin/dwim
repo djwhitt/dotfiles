@@ -15,9 +15,13 @@ NOTIFY_ID=0
 # Use OpenAI API by default
 USE_OPENAI=true
 
+# TODO: ensure file is always cleaned up
+# TODO: add model option with gpt-4o-mini or whisper-1 as default (probably)
+
 # Check dependencies
 check_dependencies() {
     command -v notify-send &>/dev/null || { echo "notify-send is required. Please install libnotify-bin." >&2; exit 1; }
+    # TODO: check for ffmpeg instead of sox
     command -v sox &>/dev/null || { echo "sox is required. Please install sox." >&2; exit 1; }
     
     # Check clipboard tools
@@ -80,13 +84,15 @@ transcribe_audio() {
     
     if [[ "$USE_OPENAI" == true ]]; then
         # Use OpenAI's Whisper API
-        transcript=$(curl -s \
+        transcript=$(
+        curl -s \
             --request POST \
             --url https://api.openai.com/v1/audio/transcriptions \
             --header "Authorization: Bearer $(openai-api-key)" \
             --header 'Content-Type: multipart/form-data' \
             --form "file=@$audio_file" \
-            --form model=whisper-1 | jq -r .text)
+            --form model=gpt-4o-mini-transcribe | jq -r .text
+        )
     else
         # Use local whisper-cpp
         # Adjust the model path as needed
@@ -119,8 +125,8 @@ start_recording() {
     
     NOTIFY_ID=$(show_notification "Starting Recording" "Recording audio..." "audio-input-microphone")
     
-    # Start sox recording (continuous recording until manually stopped)
-    rec -q "$AUDIO_FILE" rate 16k &
+    # Start ffmpeg recording (continuous recording until manually stopped)
+    ffmpeg -f alsa -i default -ar 16000 "$AUDIO_FILE" >/dev/null &
     
     # Store the PID of the recording process
     echo "$!" > "$STATUS_FILE"
@@ -167,9 +173,10 @@ stop_recording() {
         
         # Stop the recording
         if ps -p "$PID" > /dev/null; then
-            kill "$PID"
+            kill -2 "$PID"
             show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
-            sleep 1 # Give ffmpeg time to finalize the file
+            # TODO: wait for process to stop
+            sleep 5 # Give ffmpeg time to finalize the file
             
             # Transcribe the audio
             transcribe_audio "$AUDIO_FILE"
