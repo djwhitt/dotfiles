@@ -15,9 +15,9 @@ CLIPBOARD=false
 NOTIFY_ID=0
 # Use OpenAI API by default
 USE_OPENAI=true
+# Add a model setting and default it gpt-4o-mini-transcription AI!
 
 # TODO: ensure file is always cleaned up
-# TODO: add model option with gpt-4o-mini or whisper-1 as default (probably)
 
 # Check dependencies
 check_dependencies() {
