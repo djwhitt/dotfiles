@@ -191,6 +191,7 @@ stop_recording() {
         if [ "$MODE" = "clipboard-question" ]; then
             copyq tab "questions" add "$transcript"
 
+            # This prompt seems a little verbose. Can you keep the essence of it, but make it shorter. AI!
             # Create a prompt combining the user's question and the clipboard text
             prompt="I have the following question or request about this text:\n\n\"$transcript\"\n\nHere's the text I'm asking about:\n\n$clipboard"
             # Get answer using the llm command
