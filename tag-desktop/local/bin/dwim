@@ -172,8 +172,7 @@ stop_recording() {
         if ps -p "$PID" > /dev/null; then
             kill -2 "$PID"
             show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
-            # Wait for process to terminate instead of sleeping AI!
-            sleep 5 # Give ffmpeg time to finalize the file
+            wait "$PID" # Wait for ffmpeg to terminate
             
             # Transcribe the audio
             transcribe_audio "$AUDIO_FILE"
