@@ -191,10 +191,8 @@ stop_recording() {
         if [ "$MODE" = "clipboard-question" ]; then
             copyq tab "questions" add "$transcript"
 
-            # The "Transcription:" below is a question or request about the
-            # "Clipboard:" text. Improve the prompt below to reflect that. AI!
-            # Create a prompt combining transcription and clipboard text
-            prompt="Transcription:\n$transcript\nClipboard:\n$clipboard"
+            # Create a prompt combining the user's question and the clipboard text
+            prompt="I have the following question or request about this text:\n\n\"$transcript\"\n\nHere's the text I'm asking about:\n\n$clipboard"
             # Get answer using the llm command
             answer=$(llm "$prompt")
             # Copy answer to clipboard and show notification
