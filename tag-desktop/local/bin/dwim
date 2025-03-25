@@ -169,8 +169,8 @@ stop_recording() {
         if ps -p "$PID" > /dev/null; then
             kill -2 "$PID"
             show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
-            # Fix this. We can't use wait because it's not a child of this shell. AI!
-            wait "$PID" # Wait for ffmpeg to terminate
+            # Wait for ffmpeg to terminate by polling process status
+            while kill -0 "$PID" 2>/dev/null; do sleep 1; done
             
             # Transcribe the audio
             transcribe_audio "$AUDIO_FILE"
