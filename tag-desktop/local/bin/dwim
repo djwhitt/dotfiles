@@ -5,8 +5,7 @@ STATUS_FILE="$HOME/.recording_status"
 # Default timeout in seconds (0 means no timeout)
 DEFAULT_TIMEOUT=120
 # Output audio file
-# TODO: use a better random file location (probably XDG_CACHE_HOME)
-AUDIO_FILE="/tmp/recording_audio.wav"
+AUDIO_FILE="$HOME/.cache/dwim/input.wav"
 # Detect desktop environment
 WM="$XDG_SESSION_TYPE"
 # Use clipboard instead of PRIMARY selection
@@ -59,21 +58,18 @@ show_notification() {
 copy_to_clipboard() {
     local text="$1"
     
-    # TODO: put in a particular copyq tab? 
-    # TODO: output to both selection and clipboard
     if [[ "$WM" == "wayland" ]]; then
-        if [[ "$CLIPBOARD" == true ]]; then
-            echo "$text" | wl-copy
-        else
-            echo "$text" | wl-copy -p
-        fi
+        # Copy to primary, clipboard, and 
+        echo "$text" | wl-copy
+        echo "$text" | wl-copy -p
     else # Default to X11
-        if [[ "$CLIPBOARD" == true ]]; then
-            echo "$text" | xsel -ib
-        else
-            echo "$text" | xsel -ip
-        fi
+        # Copy to primary and clipboard
+        echo "$text" | xsel -ib
+        echo "$text" | xsel -ip
     fi
+
+    # Copy to CopyQ tab
+    copyq tab "AI Output" add "$text"
     
     echo "Text copied to clipboard: $text"
 }
@@ -176,7 +172,7 @@ stop_recording() {
         if ps -p "$PID" > /dev/null; then
             kill -2 "$PID"
             show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
-            # TODO: wait for process to stop instead of sleeping
+            # Wait for process to terminate instead of sleeping AI!
             sleep 5 # Give ffmpeg time to finalize the file
             
             # Transcribe the audio
