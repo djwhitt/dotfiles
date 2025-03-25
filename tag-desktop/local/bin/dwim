@@ -195,11 +195,13 @@ stop_recording() {
 TIMEOUT=$DEFAULT_TIMEOUT
 
 # Check for options
-while getopts "t" opt; do
-    # Add a mode options that sets MODE and can be either transcribe or clipboard-question AI!
+while getopts "tc" opt; do
     case $opt in
         t)
             TIMEOUT=$OPTARG
+            ;;
+        c)
+            MODE="clipboard-question"
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
