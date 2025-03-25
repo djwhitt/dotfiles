@@ -126,9 +126,8 @@ start_recording() {
     
     NOTIFY_ID=$(show_notification "Starting Recording" "Recording audio..." "audio-input-microphone")
     
-    # Quiet all the stdout/stderr output from ffmpeg AI!
     # Start ffmpeg recording (continuous recording until manually stopped)
-    ffmpeg -f alsa -i default -ar 16000 "$AUDIO_FILE" &
+    ffmpeg -f alsa -i default -ar 16000 "$AUDIO_FILE" > /dev/null 2>&1 &
     
     # Store the PID of the recording process
     echo "$!" > "$STATUS_FILE"
