@@ -15,7 +15,7 @@ CLIPBOARD=false
 NOTIFY_ID=0
 # Use OpenAI API by default
 USE_OPENAI=true
-# Add a model setting and default it gpt-4o-mini-transcription AI!
+MODEL="gpt-4o-mini-transcribe"
 
 # TODO: ensure file is always cleaned up
 
@@ -93,7 +93,7 @@ transcribe_audio() {
             --header "Authorization: Bearer $(openai-api-key)" \
             --header 'Content-Type: multipart/form-data' \
             --form "file=@$audio_file" \
-            --form model=gpt-4o-mini-transcribe | jq -r .text)
+            --form model="$MODEL" | jq -r .text)
     else
         # Use local whisper-cpp
         # Adjust the model path as needed
