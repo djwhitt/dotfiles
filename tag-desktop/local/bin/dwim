@@ -63,9 +63,8 @@ copy_to_clipboard() {
         echo "$text" | xsel -ip
     fi
 
-    # TODO: copy to "transcriptions" tab
     # Copy to CopyQ tab
-    copyq tab "AI Output" add "$text"
+    copyq tab "transcripts" add "$text"
     
     echo "Text copied to clipboard: $text"
 }
@@ -105,6 +104,7 @@ transcribe_audio() {
     # Capitalize first letter
     transcript="${transcript^}"
     
+    # TODO: move this into stop_recording
     # Copy to clipboard
     copy_to_clipboard "$transcript"
     
@@ -189,21 +189,18 @@ stop_recording() {
         fi
 
         if [ "$MODE" = "clipboard-question" ]; then
-            copyq tab "questions" add "$transcript"
-
-            # This prompt seems a little verbose. Can you keep the essence of it, but make it shorter. AI!
-            # Create a prompt combining the user's question and the clipboard text
-            prompt="I have the following question or request about this text:\n\n\"$transcript\"\n\nHere's the text I'm asking about:\n\n$clipboard"
+            prompt="Respond to the following query about the text: $transcript\n\nText:\n\n$clipboard"
+            copyq tab "prompts" add "$prompt"
             # Get answer using the llm command
-            answer=$(llm "$prompt")
+            response=$(llm "$prompt")
             # Copy answer to clipboard and show notification
-            copy_to_clipboard "$answer"
-            show_notification "LLM Answer" "$answer" "dialog-information" "$NOTIFY_ID"
+            copy_to_clipboard "$response"
+            show_notification "Response" "$response" "dialog-information" "$NOTIFY_ID"
 
-            # TODO: add to "responses" copyq tab
+            copyq tab "responses" add "$response"
 
             # TODO: pop up kitty terminal with output
-            # TODO: highlight markdown output
+            # TODO: colorize markdown output in the terminal
         fi
 
         # Kill the timeout process if it exists (fourth line in file)
@@ -221,7 +218,7 @@ stop_recording() {
 # Parse command line arguments
 TIMEOUT=$DEFAULT_TIMEOUT
 
-# TODO: pass mode in as an argument somehow
+# TODO: pass mode as an argument somehow
 # Check for options
 while getopts "tc" opt; do
     case $opt in
