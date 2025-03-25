@@ -8,20 +8,15 @@ DEFAULT_TIMEOUT=120
 AUDIO_FILE="$HOME/.cache/dwim/input.wav"
 # Detect desktop environment
 WM="$XDG_SESSION_TYPE"
-# Use clipboard instead of PRIMARY selection
-CLIPBOARD=false
 # Notification ID for updating notifications
 NOTIFY_ID=0
 # Use OpenAI API by default
 USE_OPENAI=true
 MODEL="gpt-4o-mini-transcribe"
 
-# TODO: ensure file is always cleaned up
-
 # Check dependencies
 check_dependencies() {
     command -v notify-send &>/dev/null || { echo "notify-send is required. Please install libnotify-bin." >&2; exit 1; }
-    # Check for ffmpeg instead of sox
     command -v ffmpeg &>/dev/null || { echo "ffmpeg is required. Please install ffmpeg." >&2; exit 1; }
     
     # Check clipboard tools
@@ -30,7 +25,6 @@ check_dependencies() {
     else # Default to X11
         command -v xsel &>/dev/null || { echo "xsel is required for X11. Please install xsel." >&2; exit 1; }
     fi
-    
     
     if [[ "$USE_OPENAI" == true ]]; then
         command -v curl &>/dev/null || { echo "curl is required. Please install curl." >&2; exit 1; }
@@ -119,6 +113,9 @@ transcribe_audio() {
 # Function to start recording
 start_recording() {
     local timeout=${1:-$DEFAULT_TIMEOUT}
+
+    # Cleanup any old recordings
+    rm -f "$AUDIO_FILE"
     
     NOTIFY_ID=$(show_notification "Starting Recording" "Recording audio..." "audio-input-microphone")
     
@@ -172,6 +169,7 @@ stop_recording() {
         if ps -p "$PID" > /dev/null; then
             kill -2 "$PID"
             show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
+            # Fix this. We can't use wait because it's not a child of this shell. AI!
             wait "$PID" # Wait for ffmpeg to terminate
             
             # Transcribe the audio
@@ -196,19 +194,15 @@ stop_recording() {
 TIMEOUT=$DEFAULT_TIMEOUT
 
 # Check for options
-while getopts "t:c" opt; do
+while getopts "t" opt; do
     case $opt in
         t)
             TIMEOUT=$OPTARG
-            ;;
-        c)
-            CLIPBOARD=true
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
             echo "Usage: $0 [-t timeout_seconds] [-c]" >&2
             echo "  -t: Set timeout in seconds" >&2
-            echo "  -c: Use clipboard instead of PRIMARY selection" >&2
             exit 1
             ;;
     esac
