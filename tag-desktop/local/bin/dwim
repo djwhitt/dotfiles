@@ -13,6 +13,7 @@ NOTIFY_ID=0
 # Use OpenAI API by default
 USE_OPENAI=true
 MODEL="gpt-4o-mini-transcribe"
+MODE="transcribe"
 
 # Check dependencies
 check_dependencies() {
@@ -195,6 +196,7 @@ TIMEOUT=$DEFAULT_TIMEOUT
 
 # Check for options
 while getopts "t" opt; do
+    # Add a mode options that sets MODE and can be either transcribe or clipboard-question AI!
     case $opt in
         t)
             TIMEOUT=$OPTARG
