@@ -63,6 +63,7 @@ copy_to_clipboard() {
         echo "$text" | xsel -ip
     fi
 
+    # TODO: copy to "transcriptions" tab
     # Copy to CopyQ tab
     copyq tab "AI Output" add "$text"
     
@@ -190,6 +191,8 @@ stop_recording() {
         if [ "$MODE" = "clipboard-question" ]; then
             copyq tab "questions" add "$transcript"
 
+            # The "Transcription:" below is a question or request about the
+            # "Clipboard:" text. Improve the prompt below to reflect that. AI!
             # Create a prompt combining transcription and clipboard text
             prompt="Transcription:\n$transcript\nClipboard:\n$clipboard"
             # Get answer using the llm command
@@ -198,7 +201,9 @@ stop_recording() {
             copy_to_clipboard "$answer"
             show_notification "LLM Answer" "$answer" "dialog-information" "$NOTIFY_ID"
 
-            # TODO: stary a kitty terminal with output
+            # TODO: add to "responses" copyq tab
+
+            # TODO: pop up kitty terminal with output
             # TODO: highlight markdown output
         fi
 
