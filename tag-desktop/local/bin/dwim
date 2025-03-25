@@ -188,6 +188,8 @@ stop_recording() {
         fi
 
         if [ "$MODE" = "clipboard-question" ]; then
+            copyq tab "questions" add "$transcript"
+
             # Create a prompt combining transcription and clipboard text
             prompt="Transcription:\n$transcript\nClipboard:\n$clipboard"
             # Get answer using the llm command
