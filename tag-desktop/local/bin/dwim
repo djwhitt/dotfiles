@@ -5,6 +5,7 @@ STATUS_FILE="$HOME/.recording_status"
 # Default timeout in seconds (0 means no timeout)
 DEFAULT_TIMEOUT=120
 # Output audio file
+# TODO: use a better random file location (probably XDG_CACHE_HOME)
 AUDIO_FILE="/tmp/recording_audio.wav"
 # Detect desktop environment
 WM="$XDG_SESSION_TYPE"
@@ -58,6 +59,8 @@ show_notification() {
 copy_to_clipboard() {
     local text="$1"
     
+    # TODO: put in a particular copyq tab? 
+    # TODO: output to both selection and clipboard
     if [[ "$WM" == "wayland" ]]; then
         if [[ "$CLIPBOARD" == true ]]; then
             echo "$text" | wl-copy
@@ -83,16 +86,14 @@ transcribe_audio() {
     show_notification "Transcribing" "Converting speech to text..." "audio-input-microphone" "$NOTIFY_ID"
     
     if [[ "$USE_OPENAI" == true ]]; then
-        # Use OpenAI's Whisper API
-        transcript=$(
-        curl -s \
+        # Use OpenAI's transcription API
+        transcript=$(curl -s \
             --request POST \
             --url https://api.openai.com/v1/audio/transcriptions \
             --header "Authorization: Bearer $(openai-api-key)" \
             --header 'Content-Type: multipart/form-data' \
             --form "file=@$audio_file" \
-            --form model=gpt-4o-mini-transcribe | jq -r .text
-        )
+            --form model=gpt-4o-mini-transcribe | jq -r .text)
     else
         # Use local whisper-cpp
         # Adjust the model path as needed
@@ -125,8 +126,9 @@ start_recording() {
     
     NOTIFY_ID=$(show_notification "Starting Recording" "Recording audio..." "audio-input-microphone")
     
+    # Quiet all the stdout/stderr output from ffmpeg AI!
     # Start ffmpeg recording (continuous recording until manually stopped)
-    ffmpeg -f alsa -i default -ar 16000 "$AUDIO_FILE" >/dev/null &
+    ffmpeg -f alsa -i default -ar 16000 "$AUDIO_FILE" &
     
     # Store the PID of the recording process
     echo "$!" > "$STATUS_FILE"
@@ -175,7 +177,7 @@ stop_recording() {
         if ps -p "$PID" > /dev/null; then
             kill -2 "$PID"
             show_notification "Recording Stopped" "Processing audio..." "audio-input-microphone" "$NOTIFY_ID"
-            # TODO: wait for process to stop
+            # TODO: wait for process to stop instead of sleeping
             sleep 5 # Give ffmpeg time to finalize the file
             
             # Transcribe the audio
