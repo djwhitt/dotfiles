@@ -22,8 +22,8 @@ USE_OPENAI=true
 # Check dependencies
 check_dependencies() {
     command -v notify-send &>/dev/null || { echo "notify-send is required. Please install libnotify-bin." >&2; exit 1; }
-    # Check for ffmpeg instead of sox AI!
-    command -v sox &>/dev/null || { echo "sox is required. Please install sox." >&2; exit 1; }
+    # Check for ffmpeg instead of sox
+    command -v ffmpeg &>/dev/null || { echo "ffmpeg is required. Please install ffmpeg." >&2; exit 1; }
     
     # Check clipboard tools
     if [[ "$WM" == "wayland" ]]; then
