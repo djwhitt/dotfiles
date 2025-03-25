@@ -178,7 +178,11 @@ stop_recording() {
         else
             show_notification "Error" "Recording process not found" "dialog-error" "$NOTIFY_ID"
         fi
-        
+
+        # If the MODE is 'clipboard-question' create a prompt with the
+        # transcription and the current contents of the clipboard and then get
+        # an answer using the 'llm' command. AI!
+
         # Kill the timeout process if it exists (fourth line in file)
         if [ ${#STATUS_DATA[@]} -gt 3 ] && ps -p "${STATUS_DATA[3]}" > /dev/null; then
             kill "${STATUS_DATA[3]}"
