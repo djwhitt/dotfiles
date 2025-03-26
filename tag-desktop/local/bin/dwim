@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
+# TODO: is .cache the best place for this file?
 # File to track recording status
-STATUS_FILE="$HOME/.recording_status"
+STATUS_FILE="$HOME/.cache/dwim/status"
 # Default timeout in seconds (0 means no timeout)
 DEFAULT_TIMEOUT=120
 # Output audio file
@@ -188,21 +189,6 @@ stop_recording() {
             show_notification "Error" "Recording process not found" "dialog-error" "$NOTIFY_ID"
         fi
 
-        if [ "$MODE" = "clipboard-question" ]; then
-            prompt="Respond to the following query about the text: $transcript\n\nText:\n\n$clipboard"
-            copyq tab "prompts" add "$prompt"
-            # Get answer using the llm command
-            response=$(llm "$prompt")
-            # Copy answer to clipboard and show notification
-            copy_to_clipboard "$response"
-            show_notification "Response" "$response" "dialog-information" "$NOTIFY_ID"
-
-            copyq tab "responses" add "$response"
-
-            # TODO: pop up kitty terminal with output
-            # TODO: colorize markdown output in the terminal
-        fi
-
         # Kill the timeout process if it exists (fourth line in file)
         if [ ${#STATUS_DATA[@]} -gt 3 ] && ps -p "${STATUS_DATA[3]}" > /dev/null; then
             kill "${STATUS_DATA[3]}"
@@ -210,6 +196,23 @@ stop_recording() {
         
         # Remove the status file
         rm "$STATUS_FILE"
+
+        if [ "$MODE" = "clipboard-question" ]; then
+            prompt="Respond to the following query about the text: $transcript\n\nText:\n\n$clipboard"
+            copyq tab "prompts" add "$prompt"
+
+            # Get answer using the llm command
+            response=$(llm "$prompt")
+
+            # Copy answer to clipboard and show notification
+            copy_to_clipboard "$response"
+            show_notification "Response" "$response" "dialog-information" "$NOTIFY_ID"
+            copyq tab "responses" add "$response"
+
+            response_file="$HOME/.cache/dwim/response.md"
+            echo "$response" > "$response_file"
+            kitty glow -p -w 75 "$response_file"
+        fi
     else
         show_notification "Error" "No active recording found" "dialog-error"
     fi
