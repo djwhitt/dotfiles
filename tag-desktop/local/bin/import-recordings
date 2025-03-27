@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+
+# Script to transcribe audio files from a recorder and organize them by content
+
+# Configuration
+SOURCE_DIR="/run/media/$USER/IC RECORDER/REC_FILE/FOLDER01"
+
+# Check if OpenAI API key function is available
+if ! command -v openai-api-key &> /dev/null; then
+    echo "Error: openai-api-key command not found"
+    exit 1
+fi
+
+# Check if jq is installed
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed. Please install it first."
+    exit 1
+fi
+
+# Check if llm command is available
+if ! command -v llm &> /dev/null; then
+    echo "Error: llm command not found"
+    exit 1
+fi
+
+# Base transcripts directory
+BASE_TRANSCRIPTS_DIR="$HOME/Brain/data/transcripts"
+mkdir -p "$BASE_TRANSCRIPTS_DIR"
+
+# Base recordings directory
+BASE_RECORDINGS_DIR="$HOME/Brain/media/recordings"
+mkdir -p "$BASE_RECORDINGS_DIR"
+
+# Function to transcribe a file
+transcribe_file() {
+    local file="$1"
+    local filename=$(basename "$file")
+    
+    echo "Processing $filename..."
+    
+    # Extract date and time from filename (format: YYMMDD_HHMM.mp3)
+    if [[ $filename =~ ([0-9]{6})_([0-9]{4})\.mp3 ]]; then
+        local date_part=${BASH_REMATCH[1]}
+        local time_part=${BASH_REMATCH[2]}
+        
+        # Format as ISO date YYYY-MM-DD (assuming 20xx for the year)
+        local year="20${date_part:0:2}"
+        local month="${date_part:2:2}"
+        local day="${date_part:4:2}"
+        local formatted_date="${year}-${month}-${day}"
+        
+        # ISO format timestamp for metadata
+        local timestamp="${formatted_date}T${time_part:0:2}:${time_part:2:2}:00"
+    else
+        # Fallback to current date and time in ISO format if filename doesn't match
+        formatted_date="$(date +"%Y-%m-%d")"
+        timestamp="$(date +"%Y-%m-%dT%H:%M:%S")"
+    fi
+    
+    # Create target directory for this date
+    local date_dir="$HOME/Brain/data/transcripts/$formatted_date"
+    mkdir -p "$date_dir"
+    
+    # Get transcription from OpenAI API
+    local transcription=$(curl -s \
+      --request POST \
+      --url https://api.openai.com/v1/audio/transcriptions \
+      --header "Authorization: Bearer $(openai-api-key)" \
+      --header 'Content-Type: multipart/form-data' \
+      --form "file=@$file" \
+      --form model=gpt-4o-transcribe | jq -r .text)
+    
+    if [ -z "$transcription" ]; then
+        echo "Error: Failed to transcribe $filename"
+        return 1
+    fi
+    
+    # Generate a descriptive filename based on content using llm
+    local title=$(echo "$transcription" | llm "Summarize this transcription in 3-8 words to create a filename. Use only alphanumeric characters, hyphens, and underscores. No spaces. Don't include file extensions." | tr -d '[:space:]' | tr -cd 'a-zA-Z0-9_-')
+    
+    # Fallback to timestamp if title generation fails
+    if [ -z "$title" ]; then
+        title="transcription_${date_part}_${time_part}"
+    fi
+    
+    # Create the markdown file with transcription
+    local output_file="$date_dir/${title}.md"
+    
+    # Add metadata and content to the file
+    {
+        echo "---"
+        echo "source_file: \"$filename\""
+        echo "date: \"$timestamp\""
+        echo "---"
+        echo
+        echo "# $title"
+        echo
+        echo "$transcription"
+    } > "$output_file"
+    
+    echo "Transcription saved to $output_file"
+    
+    # Move the original recording to the recordings directory
+    local recordings_date_dir="$BASE_RECORDINGS_DIR/$formatted_date"
+    mkdir -p "$recordings_date_dir"
+    local recording_dest="$recordings_date_dir/$filename"
+    
+    if mv "$file" "$recording_dest"; then
+        echo "Moved original recording to $recording_dest"
+    else
+        echo "Failed to move original recording to $recording_dest"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Main execution
+echo "Starting transcription process..."
+
+# Check if source directory exists
+if [ ! -d "$SOURCE_DIR" ]; then
+    echo "Error: Source directory not found: $SOURCE_DIR"
+    exit 1
+fi
+
+# Process all audio files in the source directory
+count=0
+for file in "$SOURCE_DIR"/*; do
+    # Check if it's a file and has common audio extension
+    if [ -f "$file" ] && [[ "$file" =~ \.(wav|mp3|m4a|ogg)$ ]]; then
+        if transcribe_file "$file"; then
+            count=$((count + 1))
+        fi
+    fi
+done
+
+echo "Transcription complete. Processed $count files."
+
+##############################################################################
+# Git Annex steps
+##############################################################################
+
+pushd "$HOME/Brain" || exit
+
+git annex add "$BASE_TRANSCRIPTS_DIR" "$BASE_RECORDINGS_DIR"
+
+# Commit changes
+echo "Committing new archive file..."
+git commit -m "Add recordings and transcripts"
+
+# Attempt to copy to each remote; non-critical failures will show a warning
+echo "Copying to annex remotes..."
+git annex copy . --to s3-us-east-1 || eecho "Warning: failed to copy to s3-us-east-1."
+git annex copy . --to rsync-dot-net || eecho "Warning: failed to copy to rsync-dot-net."
+
+# Sync local repository with remotes
+echo "Syncing Git Annex..."
+git annex sync
+
+# Push changes to the main git repo
+echo "Pushing changes to Git..."
+git push
