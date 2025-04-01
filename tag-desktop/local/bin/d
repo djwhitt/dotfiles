@@ -2,4 +2,5 @@
 
 set -euo pipefail
 
-exec just --justfile "$HOME/.user.justfile" "$@"
+# Only choose if there are no arguments to the script AI!
+exec just --choose --justfile "$HOME/.user.justfile" "$@"
