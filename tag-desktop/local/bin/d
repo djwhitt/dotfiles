@@ -2,5 +2,9 @@
 
 set -euo pipefail
 
-# Only choose if there are no arguments to the script AI!
-exec just --choose --justfile "$HOME/.user.justfile" "$@"
+if [ $# -eq 0 ]; then
+  # Only choose if there are no arguments to the script
+  exec just --choose --justfile "$HOME/.user.justfile"
+else
+  exec just --justfile "$HOME/.user.justfile" "$@"
+fi
