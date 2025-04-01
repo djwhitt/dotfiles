@@ -1,7 +1,4 @@
-default:
-  @just --choose --justfile ~/.user.justfile
-
-hello: 
-  @echo "hello world"
+weekly-newsletter-to-kindle: 
+  send-to-kindle "$HOME/Graphs/main/pages/Weekly Newsletter.md"
 
 # vim: set filetype=just:
