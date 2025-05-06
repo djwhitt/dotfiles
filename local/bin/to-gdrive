@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+
+# to-gdrive - Convert markdown and source code files to PDF and upload to
+# Google Drive
+#
+# Usage: to-gdrive file1.md file2.py file3.js ...
+
+# Check if necessary tools are installed
+check_dependencies() {
+    local missing_deps=()
+    
+    for dep in pandoc highlight rclone mktemp; do
+        if ! command -v "$dep" &> /dev/null; then
+            missing_deps+=("$dep")
+        fi
+    done
+    
+    if [ ${#missing_deps[@]} -ne 0 ]; then
+        echo "Error: Missing dependencies: ${missing_deps[*]}"
+        echo "Please install the missing dependencies and try again."
+        exit 1
+    fi
+}
+
+# Create a temporary directory
+create_temp_dir() {
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    echo "$temp_dir"
+}
+
+# Process markdown file
+process_markdown() {
+    local input_file="$1"
+    local output_dir="$2"
+    local filename
+    filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
+    local output_file="$output_dir/${filename}.pdf"
+    
+    echo "Converting $input_file to PDF..."
+    
+    # Use pandoc to convert markdown to PDF via typst
+    pandoc "$input_file" \
+        -f markdown+raw_attribute \
+        -t typst \
+        -o "$output_file"
+    
+    if [ $? -eq 0 ]; then
+        echo "Successfully created $output_file"
+        return 0
+    else
+        echo "Failed to convert $input_file to PDF"
+        return 1
+    fi
+}
+
+# Process source code file
+process_source_code() {
+    local input_file="$1"
+    local output_dir="$2"
+    local filename
+    filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
+    local output_file="$output_dir/${filename}.pdf"
+    local highlight_file="$output_dir/${filename}.html"
+    
+    echo "Converting $input_file to PDF..."
+    
+    # Use highlight to convert source code to HTML with syntax highlighting
+    highlight -O html --inline-css -o "$highlight_file" "$input_file"
+    
+    if [ $? -ne 0 ]; then
+        echo "Failed to highlight $input_file"
+        return 1
+    fi
+    
+    # Use pandoc to convert the highlighted HTML to PDF
+    pandoc "$highlight_file" -t typst -o "$output_file"
+    
+    if [ $? -eq 0 ]; then
+        echo "Successfully created $output_file"
+        rm "$highlight_file"  # Remove the intermediate HTML file
+        return 0
+    else
+        echo "Failed to convert $highlight_file to PDF"
+        return 1
+    fi
+}
+
+# Upload file to Google Drive
+upload_to_gdrive() {
+    local input_file="$1"
+    
+    echo "Uploading $input_file to Google Drive Inbox..."
+    
+    # Use rclone to copy the file to Google Drive Inbox directory
+    rclone copy "$input_file" "gdrive:Inbox/"
+    
+    if [ $? -eq 0 ]; then
+        echo "Successfully uploaded $input_file to Google Drive"
+        return 0
+    else
+        echo "Failed to upload $input_file to Google Drive"
+        return 1
+    fi
+}
+
+# Main function
+main() {
+    # Check dependencies
+    check_dependencies
+    
+    # Create a temporary directory
+    local temp_dir
+    temp_dir=$(create_temp_dir)
+    echo "Created temporary directory: $temp_dir"
+    
+    # Process each file
+    local success_count=0
+    local failed_count=0
+    
+    for file in "$@"; do
+        if [ ! -f "$file" ]; then
+            echo "Warning: $file does not exist or is not a file, skipping"
+            continue
+        fi
+        
+        # Get file extension
+        local extension="${file##*.}"
+        local pdf_file
+        
+        # Process file based on its extension
+        case "$extension" in
+            md|markdown|txt)
+                if process_markdown "$file" "$temp_dir"; then
+                    pdf_file="$temp_dir/$(basename "$file" | sed 's/\.[^.]*$//').pdf"
+                    if upload_to_gdrive "$pdf_file"; then
+                        ((success_count++))
+                    else
+                        ((failed_count++))
+                    fi
+                else
+                    ((failed_count++))
+                fi
+                ;;
+            py|js|c|cpp|java|sh|rb|pl|php|html|css|xml|json|ts|*) # Handle source code files
+                if process_source_code "$file" "$temp_dir"; then
+                    pdf_file="$temp_dir/$(basename "$file" | sed 's/\.[^.]*$//').pdf"
+                    if upload_to_gdrive "$pdf_file"; then
+                        ((success_count++))
+                    else
+                        ((failed_count++))
+                    fi
+                else
+                    ((failed_count++))
+                fi
+                ;;
+        esac
+    done
+    
+    # Clean up temporary directory
+    echo "Cleaning up temporary directory..."
+    rm -rf "$temp_dir"
+    
+    # Print summary
+    echo ""
+    echo "Summary:"
+    echo "  Successfully processed and uploaded: $success_count"
+    echo "  Failed: $failed_count"
+    
+    if [ "$failed_count" -eq 0 ]; then
+        echo "All files were successfully processed and uploaded!"
+        return 0
+    else
+        echo "Some files failed to process or upload."
+        return 1
+    fi
+}
+
+# Check if any files were provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 file1.md file2.py file3.js ..."
+    echo "Please provide at least one file to process."
+    exit 1
+fi
+
+# Run the main function with all arguments
+main "$@"
