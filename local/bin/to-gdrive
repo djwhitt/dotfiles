@@ -34,10 +34,13 @@ process_markdown() {
     local input_file="$1"
     local output_dir="$2"
     local filename
+
+    # Strip out any 'http://' image references  in the markdown before sending it to pandoc AI!
     filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
     local output_file="$output_dir/${filename}.pdf"
     
     echo "Converting $input_file to PDF..."
+
     
     # Use pandoc to convert markdown to PDF via typst
     pandoc "$input_file" \
