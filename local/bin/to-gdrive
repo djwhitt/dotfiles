@@ -41,11 +41,8 @@ process_markdown() {
     
     echo "Converting $input_file to PDF..."
     
-    # The following reference was missed when stripping them out. Please fix it. AI!
-    # [![codecov](https://codecov.io/gh/ar-io/ar-io-node/graph/badge.svg?token=F3BJ7W74HY)](https://codecov.io/gh/ar-io/ar-io-node)
-    
-    # Strip out any 'http://' image references before sending to pandoc
-    sed 's|!\[[^]]*\]([hH][tT][tT][pP]://[^)]*)||g' "$input_file" > "$temp_md_file"
+    # Strip out any 'http://' or 'https://' image references before sending to pandoc
+    sed 's|!\[[^]]*\]([hH][tT][tT][pP][sS]\?://[^)]*)||g' "$input_file" > "$temp_md_file"
     
     # Use pandoc to convert markdown to PDF via typst
     pandoc "$temp_md_file" \
