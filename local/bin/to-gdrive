@@ -35,18 +35,23 @@ process_markdown() {
     local output_dir="$2"
     local filename
 
-    # Strip out any 'http://' image references  in the markdown before sending it to pandoc AI!
     filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
     local output_file="$output_dir/${filename}.pdf"
+    local temp_md_file="$output_dir/${filename}_temp.md"
     
     echo "Converting $input_file to PDF..."
-
+    
+    # Strip out any 'http://' image references before sending to pandoc
+    sed 's|!\[[^]]*\]([hH][tT][tT][pP]://[^)]*)||g' "$input_file" > "$temp_md_file"
     
     # Use pandoc to convert markdown to PDF via typst
-    pandoc "$input_file" \
+    pandoc "$temp_md_file" \
         -f markdown+raw_attribute \
         -t typst \
         -o "$output_file"
+    
+    # Clean up temporary markdown file
+    rm "$temp_md_file"
     
     if [ $? -eq 0 ]; then
         echo "Successfully created $output_file"
