@@ -9,7 +9,7 @@
 check_dependencies() {
     local missing_deps=()
     
-    for dep in pandoc highlight rclone mktemp; do
+    for dep in pandoc highlight rclone mktemp plantuml; do
         if ! command -v "$dep" &> /dev/null; then
             missing_deps+=("$dep")
         fi
@@ -94,6 +94,28 @@ process_source_code() {
     fi
 }
 
+# Process PlantUML file
+process_plantuml() {
+    local input_file="$1"
+    local output_dir="$2"
+    local filename
+    filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
+    local output_file="$output_dir/${filename}.pdf"
+    
+    echo "Converting $input_file to PDF..."
+    
+    # Use plantuml to convert PlantUML to PDF directly
+    plantuml -tpdf -o "$output_dir" "$input_file"
+    
+    if [ $? -eq 0 ]; then
+        echo "Successfully created $output_file"
+        return 0
+    else
+        echo "Failed to convert $input_file to PDF"
+        return 1
+    fi
+}
+
 # Upload file to Google Drive
 upload_to_gdrive() {
     local input_file="$1"
@@ -138,8 +160,29 @@ main() {
         
         # Process file based on its extension
         case "$extension" in
+            pdf|PDF)
+                # Pass through PDFs without conversion
+                echo "PDF file detected, uploading directly..."
+                if upload_to_gdrive "$file"; then
+                    ((success_count++))
+                else
+                    ((failed_count++))
+                fi
+                ;;
             md|markdown|txt)
                 if process_markdown "$file" "$temp_dir"; then
+                    pdf_file="$temp_dir/$(basename "$file" | sed 's/\.[^.]*$//').pdf"
+                    if upload_to_gdrive "$pdf_file"; then
+                        ((success_count++))
+                    else
+                        ((failed_count++))
+                    fi
+                else
+                    ((failed_count++))
+                fi
+                ;;
+            puml|plantuml|pu)
+                if process_plantuml "$file" "$temp_dir"; then
                     pdf_file="$temp_dir/$(basename "$file" | sed 's/\.[^.]*$//').pdf"
                     if upload_to_gdrive "$pdf_file"; then
                         ((success_count++))
