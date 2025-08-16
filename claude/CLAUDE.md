@@ -24,7 +24,7 @@
   - Watches a JSON file for changes and displays visual content in terminal
   - Supports images (PNG, JPG, SVG, etc.) and diagrams (PlantUML, Graphviz DOT, Gnuplot, Ditaa)
   - Uses Kitty terminal's image display capabilities
-  - Auto-detects git root and defaults to `.display.json` if no file specified
+  - Auto-detects git root and defaults to `.live-display.json` if no file specified
 
 #### JSON Format:
 ```json
@@ -57,6 +57,6 @@
 - **ditaa** - ASCII art to diagram conversion
 
 #### Usage examples:
-- `live-display` - Watch `.display.json` in git root
+- `live-display` - Watch `.live-display.json` in git root
 - `live-display /path/to/file.json` - Watch specific JSON file
 - Press Ctrl+C to stop watching

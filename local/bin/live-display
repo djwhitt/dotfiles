@@ -692,8 +692,8 @@ async function main(): Promise<void> {
   if (process.argv.length > 2 && process.argv[2]) {
     jsonPath = process.argv[2];
   } else {
-    // Default to .display.json in git root
-    jsonPath = path.join(gitRoot, ".display.json");
+    // Default to .live-display.json in git root
+    jsonPath = path.join(gitRoot, ".live-display.json");
   }
 
   // Create PID file to indicate live-display is running
