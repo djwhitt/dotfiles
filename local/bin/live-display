@@ -1,0 +1,761 @@
+#!/usr/bin/env bun
+import { watch } from "fs";
+import { readFile, writeFile, unlink, mkdtemp, rm, readdir, appendFile } from "fs/promises";
+import { existsSync } from "fs";
+import { tmpdir } from "os";
+import path from "path";
+
+async function logToFile(message: string): Promise<void> {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  try {
+    await appendFile('./.live-display.log', logMessage);
+  } catch {
+    // Ignore logging errors
+  }
+}
+
+function getTypeFromExtension(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  
+  switch (ext) {
+    case '.puml':
+    case '.plantuml':
+      return 'plantuml';
+    case '.dot':
+    case '.gv':
+      return 'dot';
+    case '.gp':
+    case '.gnuplot':
+    case '.plt':
+      return 'gnuplot';
+    case '.ditaa':
+    case '.dta':
+      return 'ditaa';
+    case '.png':
+    case '.jpg':
+    case '.jpeg':
+    case '.gif':
+    case '.bmp':
+    case '.webp':
+    case '.svg':
+      return 'image';
+    default:
+      throw new Error(`Unsupported file extension: ${ext}`);
+  }
+}
+
+function findGitRoot(startPath: string = process.cwd()): string {
+  let currentPath = path.resolve(startPath);
+  
+  while (currentPath !== path.dirname(currentPath)) {
+    const gitPath = path.join(currentPath, '.git');
+    if (existsSync(gitPath)) {
+      return currentPath;
+    }
+    currentPath = path.dirname(currentPath);
+  }
+  
+  // If no .git found, fall back to current working directory
+  return process.cwd();
+}
+
+async function createPidFile(gitRoot: string): Promise<string> {
+  const pidPath = path.join(gitRoot, ".live-display.pid");
+  await writeFile(pidPath, process.pid.toString());
+  return pidPath;
+}
+
+async function removePidFile(pidPath: string): Promise<void> {
+  try {
+    if (existsSync(pidPath)) {
+      await unlink(pidPath);
+    }
+  } catch (error) {
+    // Ignore errors when removing PID file
+  }
+}
+
+interface DisplayItem {
+  type?: string;
+  content?: string;
+  file?: string;
+  title?: string;
+}
+
+interface DisplayData {
+  items: DisplayItem[];
+}
+
+function validateDisplayData(data: unknown): DisplayData {
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid JSON: expected an object");
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  if (!Array.isArray(obj.items)) {
+    throw new Error("Invalid JSON: 'items' must be an array");
+  }
+
+  const items: DisplayItem[] = [];
+  for (let i = 0; i < obj.items.length; i++) {
+    const item = obj.items[i];
+    if (!item || typeof item !== "object") {
+      throw new Error(`Invalid JSON: item ${i} must be an object`);
+    }
+
+    const itemObj = item as Record<string, unknown>;
+
+    // Must have either 'file' or both 'type' and 'content'
+    const hasFile = itemObj.file !== undefined;
+    const hasTypeContent = itemObj.type !== undefined && itemObj.content !== undefined;
+    
+    if (!hasFile && !hasTypeContent) {
+      throw new Error(`Invalid JSON: item ${i} must have either 'file' or both 'type' and 'content'`);
+    }
+
+    if (hasFile && hasTypeContent) {
+      throw new Error(`Invalid JSON: item ${i} cannot have both 'file' and 'type'/'content' - choose one approach`);
+    }
+
+    if (itemObj.file !== undefined && typeof itemObj.file !== "string") {
+      throw new Error(`Invalid JSON: item ${i} 'file' must be a string`);
+    }
+
+    if (itemObj.type !== undefined && typeof itemObj.type !== "string") {
+      throw new Error(`Invalid JSON: item ${i} 'type' must be a string`);
+    }
+
+    if (itemObj.content !== undefined && typeof itemObj.content !== "string") {
+      throw new Error(`Invalid JSON: item ${i} 'content' must be a string`);
+    }
+
+    if (itemObj.title !== undefined && typeof itemObj.title !== "string") {
+      throw new Error(`Invalid JSON: item ${i} 'title' must be a string if provided`);
+    }
+
+    items.push({
+      type: itemObj.type as string | undefined,
+      content: itemObj.content as string | undefined,
+      file: itemObj.file as string | undefined,
+      title: itemObj.title as string | undefined,
+    });
+  }
+
+  return { items };
+}
+
+class DisplayHandler {
+  private jsonPath: string;
+  private gitRoot: string;
+  private plantumlAvailable: boolean = false;
+  private dotAvailable: boolean = false;
+  private gnuplotAvailable: boolean = false;
+  private ditaaAvailable: boolean = false;
+  private activeTempDirs = new Set<string>();
+
+  constructor(jsonPath: string) {
+    this.jsonPath = path.resolve(jsonPath);
+    this.gitRoot = findGitRoot();
+  }
+
+  async initialize(): Promise<void> {
+    await this.checkToolAvailability();
+  }
+
+  private async checkToolAvailability(): Promise<void> {
+    try {
+      const plantumlProc = Bun.spawn(["plantuml", "-version"], { 
+        stdout: "pipe", 
+        stderr: "pipe" 
+      });
+      await plantumlProc.exited;
+      this.plantumlAvailable = plantumlProc.exitCode === 0;
+    } catch {
+      this.plantumlAvailable = false;
+    }
+
+    try {
+      const dotProc = Bun.spawn(["dot", "-V"], { 
+        stdout: "pipe", 
+        stderr: "pipe" 
+      });
+      await dotProc.exited;
+      this.dotAvailable = dotProc.exitCode === 0;
+    } catch {
+      this.dotAvailable = false;
+    }
+
+    try {
+      const gnuplotProc = Bun.spawn(["gnuplot", "--version"], { 
+        stdout: "pipe", 
+        stderr: "pipe" 
+      });
+      await gnuplotProc.exited;
+      this.gnuplotAvailable = gnuplotProc.exitCode === 0;
+    } catch {
+      this.gnuplotAvailable = false;
+    }
+
+    try {
+      const ditaaProc = Bun.spawn(["ditaa", "--help"], { 
+        stdout: "pipe", 
+        stderr: "pipe" 
+      });
+      await ditaaProc.exited;
+      this.ditaaAvailable = ditaaProc.exitCode === 0;
+    } catch {
+      this.ditaaAvailable = false;
+    }
+  }
+
+  async updateDisplay(): Promise<void> {
+    try {
+      // Clean up temp files from previous render
+      await this.cleanupAllTempDirs();
+      
+      const content = await readFile(this.jsonPath, "utf-8");
+      const parsed: unknown = JSON.parse(content);
+      const data = validateDisplayData(parsed);
+
+      // Clear terminal
+      console.clear();
+
+      // Display all items
+      for (let i = 0; i < data.items.length; i++) {
+        const item = data.items[i];
+        
+        // Add separator between items (except for first item)
+        if (i > 0) {
+          console.log("\n" + "─".repeat(50) + "\n");
+        }
+        
+        await this.displayItem(item);
+      }
+
+    } catch (error: any) {
+      
+      if (error.code === "ENOENT") {
+        console.log(`Waiting for ${this.jsonPath} to be created...`);
+      } else if (error instanceof SyntaxError) {
+        console.log(`Error parsing JSON: ${error.message}`);
+      } else {
+        console.log(`Error: ${error.message}`);
+      }
+    }
+  }
+
+  private async displayItem(item: DisplayItem): Promise<void> {
+    // Display title if provided
+    if (item.title) {
+      console.log(`\n${item.title}\n`);
+    }
+
+    let displayType: string;
+    let content: string;
+    let isFile = false;
+
+    if (item.file) {
+      // File-based rendering: determine type from extension and read content
+      displayType = getTypeFromExtension(item.file);
+      isFile = true;
+      
+      // Resolve relative paths relative to git root
+      let filePath = path.resolve(item.file);
+      if (!path.isAbsolute(item.file)) {
+        filePath = path.join(this.gitRoot, item.file);
+      }
+
+      if (!existsSync(filePath)) {
+        console.log(`File not found: ${filePath}`);
+        return;
+      }
+
+      if (displayType === 'image') {
+        // For images, we use the file path directly
+        content = filePath;
+      } else {
+        // For diagrams, read the file content
+        try {
+          content = await readFile(filePath, 'utf-8');
+        } catch (error: any) {
+          console.log(`Error reading file ${filePath}: ${error.message}`);
+          return;
+        }
+      }
+    } else if (item.type && item.content) {
+      // Inline content rendering
+      displayType = item.type;
+      content = item.content;
+    } else {
+      console.log(`Invalid item: must have either 'file' or both 'type' and 'content'`);
+      return;
+    }
+
+    // Route to appropriate display handler
+    if (displayType === "image") {
+      if (isFile) {
+        await this.displayImageFromPath(content);
+      } else {
+        console.log(`Inline image content not supported`);
+      }
+    } else if (displayType === "plantuml") {
+      await this.displayPlantUMLFromContent(content);
+    } else if (displayType === "dot") {
+      await this.displayDotFromContent(content);
+    } else if (displayType === "gnuplot") {
+      await this.displayGnuplotFromContent(content);
+    } else if (displayType === "ditaa") {
+      await this.displayDitaaFromContent(content);
+    } else {
+      console.log(`Unsupported display type: ${displayType}`);
+    }
+  }
+
+  private async displayImageFromPath(imagePath: string): Promise<void> {
+    // Build kitty icat command
+    const cmd = ["kitty", "+kitten", "icat", imagePath];
+
+    try {
+      // Use spawn for better control over the kitty process
+      const proc = Bun.spawn(cmd, {
+        stdout: "inherit",
+        stderr: "pipe",  // Pipe stderr to suppress ImageMagick warnings
+        stdin: "inherit",
+      });
+      
+      // Wait for process to complete
+      await proc.exited;
+      
+      // Only show errors if exit code is non-zero
+      if (proc.exitCode !== 0) {
+        const stderr = await new Response(proc.stderr).text();
+        if (stderr && !stderr.includes("ImageMagick")) {
+          console.error(`Error displaying image: ${stderr}`);
+        }
+      }
+    } catch (error: any) {
+      console.log(`Error displaying image: ${error.message}`);
+    }
+  }
+
+  private async displayGeneratedImage(imagePath: string): Promise<void> {
+    await logToFile(`Displaying image: ${imagePath}`);
+    
+    if (!existsSync(imagePath)) {
+      await logToFile(`Image file does not exist: ${imagePath}`);
+      throw new Error(`Generated image not found: ${imagePath}`);
+    }
+
+    await logToFile(`Image file exists, proceeding with kitty icat`);
+    
+    // Reuse existing kitty icat logic
+    const proc = Bun.spawn(["kitty", "+kitten", "icat", imagePath], {
+      stdout: "inherit",
+      stderr: "pipe",
+      stdin: "inherit",
+    });
+
+    await proc.exited;
+    await logToFile(`kitty icat exit code: ${proc.exitCode}`);
+
+    if (proc.exitCode !== 0) {
+      const stderr = await new Response(proc.stderr).text();
+      await logToFile(`kitty icat stderr: ${stderr}`);
+      if (stderr && !stderr.includes("ImageMagick")) {
+        throw new Error(`Image display failed: ${stderr}`);
+      }
+    } else {
+      await logToFile("Image display completed successfully");
+    }
+  }
+
+  private async runPlantUML(pumlPath: string): Promise<void> {
+    await logToFile(`Running: plantuml -tpng ${pumlPath}`);
+    const proc = Bun.spawn(["plantuml", "-tpng", pumlPath], {
+      stdout: "pipe",
+      stderr: "pipe"
+    });
+
+    await proc.exited;
+    await logToFile(`PlantUML exit code: ${proc.exitCode}`);
+
+    if (proc.exitCode !== 0) {
+      const stderr = await new Response(proc.stderr).text();
+      await logToFile(`PlantUML stderr: ${stderr}`);
+      throw new Error(`PlantUML failed: ${stderr}`);
+    } else {
+      const stdout = await new Response(proc.stdout).text();
+      await logToFile(`PlantUML stdout: ${stdout}`);
+    }
+  }
+
+  private async runDot(dotPath: string, outputPath: string): Promise<void> {
+    await logToFile(`Running: dot -Tpng ${dotPath} -o ${outputPath}`);
+    const proc = Bun.spawn(["dot", "-Tpng", dotPath, "-o", outputPath], {
+      stdout: "pipe",
+      stderr: "pipe"
+    });
+
+    await proc.exited;
+    await logToFile(`DOT exit code: ${proc.exitCode}`);
+
+    if (proc.exitCode !== 0) {
+      const stderr = await new Response(proc.stderr).text();
+      await logToFile(`DOT stderr: ${stderr}`);
+      throw new Error(`Graphviz failed: ${stderr}`);
+    } else {
+      const stdout = await new Response(proc.stdout).text();
+      await logToFile(`DOT stdout: ${stdout}`);
+    }
+  }
+
+  private async runGnuplot(gnuplotPath: string): Promise<void> {
+    await logToFile(`Running: gnuplot ${gnuplotPath}`);
+    const proc = Bun.spawn(["gnuplot", gnuplotPath], {
+      stdout: "pipe",
+      stderr: "pipe"
+    });
+
+    await proc.exited;
+    await logToFile(`Gnuplot exit code: ${proc.exitCode}`);
+
+    if (proc.exitCode !== 0) {
+      const stderr = await new Response(proc.stderr).text();
+      await logToFile(`Gnuplot stderr: ${stderr}`);
+      throw new Error(`Gnuplot failed: ${stderr}`);
+    } else {
+      const stdout = await new Response(proc.stdout).text();
+      await logToFile(`Gnuplot stdout: ${stdout}`);
+    }
+  }
+
+  private async runDitaa(inputPath: string, outputPath: string): Promise<void> {
+    await logToFile(`Running: ditaa ${inputPath} ${outputPath}`);
+    const proc = Bun.spawn(["ditaa", inputPath, outputPath], {
+      stdout: "pipe",
+      stderr: "pipe"
+    });
+
+    await proc.exited;
+    await logToFile(`Ditaa exit code: ${proc.exitCode}`);
+
+    if (proc.exitCode !== 0) {
+      const stderr = await new Response(proc.stderr).text();
+      await logToFile(`Ditaa stderr: ${stderr}`);
+      throw new Error(`Ditaa failed: ${stderr}`);
+    } else {
+      const stdout = await new Response(proc.stdout).text();
+      await logToFile(`Ditaa stdout: ${stdout}`);
+    }
+  }
+
+  private async displayPlantUMLFromContent(content: string): Promise<void> {
+    if (!this.plantumlAvailable) {
+      console.log("PlantUML is not available on this system");
+      return;
+    }
+
+    try {
+      // Create temp directory - use /tmp directly if tmpdir() doesn't exist
+      let tempBase = tmpdir();
+      if (!existsSync(tempBase)) {
+        tempBase = "/tmp";
+      }
+      const tempDir = await mkdtemp(path.join(tempBase, "live-display-puml-"));
+      this.activeTempDirs.add(tempDir);
+
+      // Create input .puml file
+      const pumlPath = path.join(tempDir, "diagram.puml");
+      await writeFile(pumlPath, content);
+
+      // Generate PNG (PlantUML auto-names output)
+      await this.runPlantUML(pumlPath);
+      const pngPath = path.join(tempDir, "diagram.png");
+
+      // Display the generated image
+      await this.displayGeneratedImage(pngPath);
+
+    } catch (error: any) {
+      console.log(`Error rendering PlantUML: ${error.message}`);
+    }
+  }
+
+  private async displayDotFromContent(content: string): Promise<void> {
+    await logToFile("=== Starting DOT rendering ===");
+    
+    if (!this.dotAvailable) {
+      await logToFile("Graphviz DOT is not available on this system");
+      console.log("Graphviz DOT is not available on this system");
+      return;
+    }
+
+    await logToFile("Graphviz DOT is available, proceeding with rendering");
+
+    try {
+      // Create temp directory - use /tmp directly if tmpdir() doesn't exist
+      let tempBase = tmpdir();
+      if (!existsSync(tempBase)) {
+        tempBase = "/tmp";
+      }
+      const tempDir = await mkdtemp(path.join(tempBase, "live-display-dot-"));
+      await logToFile(`Created temp directory: ${tempDir}`);
+      this.activeTempDirs.add(tempDir);
+
+      // Create input .dot file
+      const dotPath = path.join(tempDir, "graph.dot");
+      await writeFile(dotPath, content);
+      await logToFile(`Wrote DOT content to: ${dotPath}`);
+      await logToFile(`Content length: ${content.length} chars`);
+
+      // Generate PNG with explicit output path
+      const pngPath = path.join(tempDir, "graph.png");
+      await logToFile(`Output PNG path: ${pngPath}`);
+      
+      await logToFile("Running DOT command...");
+      await this.runDot(dotPath, pngPath);
+      await logToFile("DOT command completed");
+
+      // Check if PNG was generated
+      if (existsSync(pngPath)) {
+        await logToFile(`PNG file exists, size: ${(await readFile(pngPath)).length} bytes`);
+      } else {
+        await logToFile("PNG file does not exist!");
+        const dirContents = await readdir(tempDir);
+        await logToFile(`Directory contents: ${JSON.stringify(dirContents)}`);
+      }
+
+      // Display the generated image
+      await logToFile("Attempting to display image...");
+      await this.displayGeneratedImage(pngPath);
+      await logToFile("Image display completed");
+
+    } catch (error: any) {
+      await logToFile(`Error in DOT rendering: ${error.message}`);
+      await logToFile(`Error stack: ${error.stack || 'No stack'}`);
+      console.log(`Error rendering DOT: ${error.message}`);
+    }
+    
+    await logToFile("=== DOT rendering complete ===");
+  }
+
+  private async displayGnuplotFromContent(content: string): Promise<void> {
+    await logToFile("=== Starting Gnuplot rendering ===");
+    
+    if (!this.gnuplotAvailable) {
+      await logToFile("Gnuplot is not available on this system");
+      console.log("Gnuplot is not available on this system");
+      return;
+    }
+
+    await logToFile("Gnuplot is available, proceeding with rendering");
+
+    try {
+      // Create temp directory - use /tmp directly if tmpdir() doesn't exist
+      let tempBase = tmpdir();
+      if (!existsSync(tempBase)) {
+        tempBase = "/tmp";
+      }
+      const tempDir = await mkdtemp(path.join(tempBase, "live-display-gnuplot-"));
+      await logToFile(`Created temp directory: ${tempDir}`);
+      this.activeTempDirs.add(tempDir);
+
+      // Prepare gnuplot script with PNG terminal configuration
+      const pngPath = path.join(tempDir, "plot.png");
+      let gnuplotScript = content;
+      
+      // Check if script already has terminal settings
+      const hasTerminal = /set\s+terminal/i.test(content);
+      const hasOutput = /set\s+output/i.test(content);
+      
+      if (!hasTerminal || !hasOutput) {
+        // Prepend PNG terminal settings if not present
+        const terminalConfig = `set terminal png size 800,600\nset output "${pngPath}"\n`;
+        gnuplotScript = terminalConfig + content;
+        await logToFile("Added PNG terminal configuration to script");
+      } else {
+        await logToFile("Script already contains terminal/output settings");
+      }
+
+      // Create input .gp file
+      const gnuplotPath = path.join(tempDir, "plot.gp");
+      await writeFile(gnuplotPath, gnuplotScript);
+      await logToFile(`Wrote Gnuplot script to: ${gnuplotPath}`);
+      await logToFile(`Script length: ${gnuplotScript.length} chars`);
+
+      // Generate PNG
+      await logToFile("Running Gnuplot command...");
+      await this.runGnuplot(gnuplotPath);
+      await logToFile("Gnuplot command completed");
+
+      // Check if PNG was generated
+      if (existsSync(pngPath)) {
+        await logToFile(`PNG file exists, size: ${(await readFile(pngPath)).length} bytes`);
+      } else {
+        await logToFile("PNG file does not exist!");
+        const dirContents = await readdir(tempDir);
+        await logToFile(`Directory contents: ${JSON.stringify(dirContents)}`);
+      }
+
+      // Display the generated image
+      await logToFile("Attempting to display image...");
+      await this.displayGeneratedImage(pngPath);
+      await logToFile("Image display completed");
+
+    } catch (error: any) {
+      await logToFile(`Error in Gnuplot rendering: ${error.message}`);
+      await logToFile(`Error stack: ${error.stack || 'No stack'}`);
+      console.log(`Error rendering Gnuplot: ${error.message}`);
+    }
+    
+    await logToFile("=== Gnuplot rendering complete ===");
+  }
+
+  private async displayDitaaFromContent(content: string): Promise<void> {
+    await logToFile("=== Starting Ditaa rendering ===");
+    
+    if (!this.ditaaAvailable) {
+      await logToFile("Ditaa is not available on this system");
+      console.log("Ditaa is not available on this system");
+      return;
+    }
+
+    await logToFile("Ditaa is available, proceeding with rendering");
+
+    try {
+      // Create temp directory - use /tmp directly if tmpdir() doesn't exist
+      let tempBase = tmpdir();
+      if (!existsSync(tempBase)) {
+        tempBase = "/tmp";
+      }
+      const tempDir = await mkdtemp(path.join(tempBase, "live-display-ditaa-"));
+      await logToFile(`Created temp directory: ${tempDir}`);
+      this.activeTempDirs.add(tempDir);
+
+      // Create input .ditaa file
+      const ditaaPath = path.join(tempDir, "diagram.ditaa");
+      await writeFile(ditaaPath, content);
+      await logToFile(`Wrote Ditaa content to: ${ditaaPath}`);
+      await logToFile(`Content length: ${content.length} chars`);
+
+      // Generate PNG with explicit output path
+      const pngPath = path.join(tempDir, "diagram.png");
+      await logToFile(`Output PNG path: ${pngPath}`);
+      
+      await logToFile("Running Ditaa command...");
+      await this.runDitaa(ditaaPath, pngPath);
+      await logToFile("Ditaa command completed");
+
+      // Check if PNG was generated
+      if (existsSync(pngPath)) {
+        await logToFile(`PNG file exists, size: ${(await readFile(pngPath)).length} bytes`);
+      } else {
+        await logToFile("PNG file does not exist!");
+        const dirContents = await readdir(tempDir);
+        await logToFile(`Directory contents: ${JSON.stringify(dirContents)}`);
+      }
+
+      // Display the generated image
+      await logToFile("Attempting to display image...");
+      await this.displayGeneratedImage(pngPath);
+      await logToFile("Image display completed");
+
+    } catch (error: any) {
+      await logToFile(`Error in Ditaa rendering: ${error.message}`);
+      await logToFile(`Error stack: ${error.stack || 'No stack'}`);
+      console.log(`Error rendering Ditaa: ${error.message}`);
+    }
+    
+    await logToFile("=== Ditaa rendering complete ===");
+  }
+
+  async cleanupAllTempDirs(): Promise<void> {
+    for (const tempDir of this.activeTempDirs) {
+      try {
+        if (existsSync(tempDir)) {
+          await rm(tempDir, { recursive: true, force: true });
+        }
+      } catch (error: any) {
+        // Log but don't fail cleanup
+        console.warn(`Failed to cleanup ${tempDir}: ${error.message}`);
+      }
+    }
+    this.activeTempDirs.clear();
+  }
+}
+
+async function main(): Promise<void> {
+  // Find git root and determine JSON file path
+  const gitRoot = findGitRoot();
+  let jsonPath: string;
+  if (process.argv.length > 2 && process.argv[2]) {
+    jsonPath = process.argv[2];
+  } else {
+    // Default to .display.json in git root
+    jsonPath = path.join(gitRoot, ".display.json");
+  }
+
+  // Create PID file to indicate live-display is running
+  const pidPath = await createPidFile(gitRoot);
+
+  console.log(`Watching: ${jsonPath}`);
+  console.log(`PID file: ${pidPath}`);
+  console.log("Press Ctrl+C to stop");
+
+  // Create JSON file if it doesn't exist
+  if (!existsSync(jsonPath)) {
+    console.log(`Creating display file: ${jsonPath}`);
+    const initialContent = {
+      items: []
+    };
+    try {
+      await writeFile(jsonPath, JSON.stringify(initialContent, null, 2));
+      console.log(`Created empty display file. Add items to see content.`);
+    } catch (error: any) {
+      await removePidFile(pidPath);
+      console.error(`Error creating display file: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  // Set up display handler
+  const handler = new DisplayHandler(jsonPath);
+
+  // Initialize tool availability checking
+  await handler.initialize();
+
+  // Display initial content
+  await handler.updateDisplay();
+
+  // Set up file watcher
+  const watcher = watch(jsonPath, async (eventType, _) => {
+    if (eventType === "change" || eventType === "rename") {
+      await handler.updateDisplay();
+    }
+  });
+
+  // Cleanup function
+  const cleanup = async () => {
+    watcher.close();
+    await handler.cleanupAllTempDirs();
+    await removePidFile(pidPath);
+    console.log("\nStopped watching");
+    process.exit(0);
+  };
+
+  // Handle Ctrl+C and other termination signals
+  process.on("SIGINT", cleanup);
+  process.on("SIGTERM", cleanup);
+  process.on("SIGHUP", cleanup);
+
+  // Keep the process running
+  await new Promise((resolve) => {
+    // This promise never resolves, keeping the process alive
+  });
+}
+
+// Run the main function
+main().catch(console.error);
+
+// vim: ft=typescript

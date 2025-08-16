@@ -18,3 +18,39 @@
 - `copyq tab NAME read ROW` - Read from specific tab
 - `copyq tab NAME add TEXT` - Add to specific tab
 - `copyq tab NAME count` - Count items in specific tab
+
+### Live Display
+- `live-display [JSON_FILE]` - Live visual display for diagrams and images
+  - Watches a JSON file for changes and displays visual content in terminal
+  - Supports images (PNG, JPG, SVG, etc.) and diagrams (PlantUML, Graphviz DOT, Gnuplot, Ditaa)
+  - Uses Kitty terminal's image display capabilities
+  - Auto-detects git root and defaults to `.display.json` if no file specified
+
+#### JSON Format:
+```json
+{
+  "items": [
+    {
+      "file": "./path/to/image.png",
+      "title": "Optional Title"
+    },
+    {
+      "type": "plantuml",
+      "content": "@startuml\nA -> B\n@enduml",
+      "title": "Inline Diagram"
+    }
+  ]
+}
+```
+
+#### Supported file types:
+- **Images**: .png, .jpg, .jpeg, .gif, .bmp, .webp, .svg
+- **PlantUML**: .puml, .plantuml
+- **Graphviz**: .dot, .gv  
+- **Gnuplot**: .gp, .gnuplot, .plt
+- **Ditaa**: .ditaa, .dta
+
+#### Usage examples:
+- `live-display` - Watch `.display.json` in git root
+- `live-display /path/to/file.json` - Watch specific JSON file
+- Press Ctrl+C to stop watching
