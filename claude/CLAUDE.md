@@ -55,8 +55,3 @@
 - **graphviz** - Directed and undirected graphs using DOT language
 - **gnuplot** - Mathematical plots and charts
 - **ditaa** - ASCII art to diagram conversion
-
-#### Usage examples:
-- `live-display` - Watch `.live-display.json` in git root
-- `live-display /path/to/file.json` - Watch specific JSON file
-- Press Ctrl+C to stop watching
