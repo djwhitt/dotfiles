@@ -50,6 +50,12 @@
 - **Gnuplot**: .gp, .gnuplot, .plt
 - **Ditaa**: .ditaa, .dta
 
+#### Supported inline diagram types:
+- **plantuml** - Sequence, class, activity, component, use case, state, Gantt, mindmap, etc.
+- **graphviz** - Directed and undirected graphs using DOT language
+- **gnuplot** - Mathematical plots and charts
+- **ditaa** - ASCII art to diagram conversion
+
 #### Usage examples:
 - `live-display` - Watch `.display.json` in git root
 - `live-display /path/to/file.json` - Watch specific JSON file
