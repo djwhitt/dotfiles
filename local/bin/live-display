@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { watch } from "fs";
+import { watchFile, unwatchFile } from "fs";
 import { readFile, writeFile, unlink, mkdtemp, rm, readdir, appendFile } from "fs/promises";
 import { existsSync } from "fs";
 import { tmpdir } from "os";
@@ -728,16 +728,19 @@ async function main(): Promise<void> {
   // Display initial content
   await handler.updateDisplay();
 
-  // Set up file watcher
-  const watcher = watch(jsonPath, async (eventType, _) => {
-    if (eventType === "change" || eventType === "rename") {
+  // Set up file watcher with polling for better reliability
+  // watchFile polls the file every interval (default 5007ms)
+  // This is more reliable than fs.watch for detecting file changes
+  watchFile(jsonPath, { interval: 1000 }, async (curr, prev) => {
+    // Check if file has been modified (mtime changed)
+    if (curr.mtime !== prev.mtime) {
       await handler.updateDisplay();
     }
   });
 
   // Cleanup function
   const cleanup = async () => {
-    watcher.close();
+    unwatchFile(jsonPath);
     await handler.cleanupAllTempDirs();
     await removePidFile(pidPath);
     console.log("\nStopped watching");
