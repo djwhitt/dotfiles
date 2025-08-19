@@ -31,7 +31,7 @@
 
 **Files Created:**
 - `.live-display.pid` - Process tracking (in git root)
-- `.live-display.log` - Debug logging (in current directory)
+- `.live-display.log` - Debug logging (in git root)
 
 **Usage Note:** Ask user to start `live-display` in a separate terminal instead of running it yourself
 
