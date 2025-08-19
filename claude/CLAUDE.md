@@ -20,11 +20,20 @@
 - `copyq tab NAME count` - Count items in specific tab
 
 ### Live Display
-- `live-display [JSON_FILE]` - Live visual display for diagrams and images
-  - Watches a JSON file for changes and displays visual content in terminal
-  - Supports images (PNG, JPG, SVG, etc.) and diagrams (PlantUML, Graphviz DOT, Gnuplot, Ditaa)
-  - Uses Kitty terminal's image display capabilities
-  - Auto-detects git root and defaults to `.live-display.json` if no file specified
+`live-display [JSON_FILE]` - Live visual display for diagrams and images
+
+**Key Features:**
+- Watches JSON file for changes and displays visual content in terminal
+- Supports images and diagrams (PlantUML, Graphviz DOT, Gnuplot, Ditaa)  
+- Uses Kitty terminal's image display capabilities
+- Auto-detects git root, defaults to `.live-display.json`
+- Auto-watches referenced files for changes
+
+**Files Created:**
+- `.live-display.pid` - Process tracking (in git root)
+- `.live-display.log` - Debug logging (in current directory)
+
+**Usage Note:** Ask user to start `live-display` in a separate terminal instead of running it yourself
 
 #### JSON Format:
 ```json
@@ -43,6 +52,11 @@
 }
 ```
 
+#### Item Requirements:
+- Each item must have either `file` OR both `type` and `content` (not both)
+- `title` is optional for all items
+- File paths resolve relative to git root if not absolute
+
 #### Supported file types:
 - **Images**: .png, .jpg, .jpeg, .gif, .bmp, .webp, .svg
 - **PlantUML**: .puml, .plantuml
@@ -52,6 +66,6 @@
 
 #### Supported inline diagram types:
 - **plantuml** - Sequence, class, activity, component, use case, state, Gantt, mindmap, etc.
-- **graphviz** - Directed and undirected graphs using DOT language
-- **gnuplot** - Mathematical plots and charts
+- **dot** - Directed and undirected graphs using DOT language
+- **gnuplot** - Mathematical plots and charts (PNG terminal auto-added if missing)
 - **ditaa** - ASCII art to diagram conversion
