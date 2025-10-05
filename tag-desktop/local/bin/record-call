@@ -14,6 +14,11 @@ RECORDINGS_DIR="$HOME/Vimwiki/media/recordings/calls"
 # Notification ID for updating notifications
 NOTIFY_ID=0
 
+# Transcription settings
+ENABLE_TRANSCRIPTION=true
+USE_OPENAI=true
+MODEL="gpt-4o-mini-transcribe"
+
 # Check dependencies
 check_dependencies() {
     local missing=()
@@ -21,6 +26,13 @@ check_dependencies() {
     command -v notify-send &>/dev/null || missing+=("libnotify (notify-send)")
     command -v ffmpeg &>/dev/null || missing+=("ffmpeg")
     command -v pactl &>/dev/null || missing+=("pulseaudio-utils (pactl)")
+
+    # Check transcription dependencies if enabled
+    if [ "$ENABLE_TRANSCRIPTION" = true ] && [ "$USE_OPENAI" = true ]; then
+        command -v curl &>/dev/null || missing+=("curl")
+        command -v jq &>/dev/null || missing+=("jq")
+        command -v openai-api-key &>/dev/null || missing+=("openai-api-key")
+    fi
 
     if [ ${#missing[@]} -gt 0 ]; then
         echo "Error: Missing required dependencies:" >&2
@@ -43,6 +55,46 @@ show_notification() {
     fi
 
     echo "$NOTIFY_ID"
+}
+
+# Transcribe audio using Whisper
+transcribe_audio() {
+    local audio_file="$1"
+    local transcript=""
+
+    if [[ "$USE_OPENAI" == true ]]; then
+        # Use OpenAI's transcription API
+        transcript=$(curl -s \
+            --request POST \
+            --url https://api.openai.com/v1/audio/transcriptions \
+            --header "Authorization: Bearer $(openai-api-key)" \
+            --header 'Content-Type: multipart/form-data' \
+            --form "file=@$audio_file" \
+            --form model="$MODEL" | jq -r .text)
+    else
+        # Use local whisper-cpp
+        local model="$HOME/Models/whisper/ggml-base.en.bin"
+        transcript=$(whisper-cpp -m "$model" -f "$audio_file" 2>/dev/null)
+    fi
+
+    # Check if transcription succeeded
+    if [ -z "$transcript" ]; then
+        return 1
+    fi
+
+    # Clean up the transcript
+    # Remove text between parentheses (like sound effects)
+    transcript="${transcript/\(*\)}"
+    # Remove text between square brackets
+    transcript="${transcript/\[*\]}"
+    # Remove leading newlines and whitespace
+    transcript="${transcript#$'\n'}"
+    transcript="${transcript#$'\n'}"
+    transcript="${transcript##+([[:space:]])}"
+    # Capitalize first letter
+    transcript="${transcript^}"
+
+    echo "$transcript"
 }
 
 # Get default audio devices
@@ -82,7 +134,7 @@ start_recording() {
     mkdir -p "$output_dir"
 
     # Output filename
-    audio_file="$output_dir/${timestamp}-call.wav"
+    audio_file="$output_dir/${timestamp}-call.mp3"
 
     # Get audio sources
     local sources
@@ -103,13 +155,15 @@ start_recording() {
     NOTIFY_ID=$(show_notification "Recording Started" "Recording call audio..." "audio-input-microphone")
 
     # Start ffmpeg recording with both sources
-    # Mix microphone and system audio into stereo channels
+    # Mix microphone and system audio into stereo channels, encode as MP3
     ffmpeg -f pulse -i "$mic_source" \
            -f pulse -i "$monitor_source" \
            -filter_complex "[0:a][1:a]amerge=inputs=2[aout]" \
            -map "[aout]" \
            -ar 16000 \
            -ac 2 \
+           -codec:a libmp3lame \
+           -b:a 128k \
            "$audio_file" \
            > /dev/null 2>&1 &
 
@@ -160,8 +214,36 @@ stop_recording() {
     if [ -f "$audio_file" ] && [ -s "$audio_file" ]; then
         local filesize
         filesize=$(du -h "$audio_file" | cut -f1)
-        show_notification "Recording Complete" "Saved: $(basename "$audio_file") ($filesize)" "audio-input-microphone" "$notify_id"
         echo "Recording saved to: $audio_file"
+
+        # Transcribe if enabled
+        if [ "$ENABLE_TRANSCRIPTION" = true ]; then
+            show_notification "Transcribing..." "Converting speech to text..." "audio-input-microphone" "$notify_id"
+
+            if transcript=$(transcribe_audio "$audio_file"); then
+                # Save transcript to .txt file
+                local transcript_file="${audio_file%.mp3}.txt"
+                local timestamp=$(date -r "$audio_file" "+%Y-%m-%d %H:%M:%S")
+
+                {
+                    echo "Call Recording Transcript"
+                    echo "Date: $timestamp"
+                    echo "Audio: $(basename "$audio_file")"
+                    echo ""
+                    echo "Transcript:"
+                    echo ""
+                    echo "$transcript"
+                } > "$transcript_file"
+
+                show_notification "Complete" "Recording and transcript saved ($filesize)" "audio-input-microphone" "$notify_id"
+                echo "Transcript saved to: $transcript_file"
+            else
+                echo "Warning: Transcription failed" >&2
+                show_notification "Recording Complete" "Saved ($filesize) - transcription failed" "audio-input-microphone" "$notify_id"
+            fi
+        else
+            show_notification "Recording Complete" "Saved: $(basename "$audio_file") ($filesize)" "audio-input-microphone" "$notify_id"
+        fi
     else
         show_notification "Error" "Recording file is empty or missing" "dialog-error" "$notify_id"
         exit 1
@@ -170,6 +252,21 @@ stop_recording() {
     # Clean up status file
     rm "$STATUS_FILE"
 }
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-transcribe)
+            ENABLE_TRANSCRIPTION=false
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            echo "Usage: $0 [--no-transcribe]" >&2
+            exit 1
+            ;;
+    esac
+done
 
 # Main script logic
 check_dependencies
