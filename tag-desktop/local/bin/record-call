@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+
+# Toggle-based call recording script
+# Records both microphone input and system audio output
+# Saves to ~/Vimwiki/media/recordings/calls/
+
+# Status file to track recording state
+STATUS_FILE="$HOME/.cache/record-call/status"
+mkdir -p "$(dirname "$STATUS_FILE")"
+
+# Base output directory
+RECORDINGS_DIR="$HOME/Vimwiki/media/recordings/calls"
+
+# Notification ID for updating notifications
+NOTIFY_ID=0
+
+# Check dependencies
+check_dependencies() {
+    local missing=()
+
+    command -v notify-send &>/dev/null || missing+=("libnotify (notify-send)")
+    command -v ffmpeg &>/dev/null || missing+=("ffmpeg")
+    command -v pactl &>/dev/null || missing+=("pulseaudio-utils (pactl)")
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        echo "Error: Missing required dependencies:" >&2
+        printf '  - %s\n' "${missing[@]}" >&2
+        exit 1
+    fi
+}
+
+# Show notification
+show_notification() {
+    local title="$1"
+    local message="$2"
+    local icon="$3"
+    local replace_id="$4"
+
+    if [[ -n "$replace_id" ]]; then
+        NOTIFY_ID=$(notify-send -a "Call Recording" -p -r "$replace_id" -i "$icon" "$title" "$message")
+    else
+        NOTIFY_ID=$(notify-send -a "Call Recording" -p -i "$icon" "$title" "$message")
+    fi
+
+    echo "$NOTIFY_ID"
+}
+
+# Get default audio devices
+get_audio_sources() {
+    local default_source default_sink monitor_source
+
+    # Get default microphone input
+    default_source=$(pactl get-default-source 2>/dev/null)
+    if [ -z "$default_source" ]; then
+        echo "Error: Could not detect default audio source" >&2
+        return 1
+    fi
+
+    # Get default audio output sink
+    default_sink=$(pactl get-default-sink 2>/dev/null)
+    if [ -z "$default_sink" ]; then
+        echo "Error: Could not detect default audio sink" >&2
+        return 1
+    fi
+
+    # Construct monitor source name
+    monitor_source="${default_sink}.monitor"
+
+    echo "$default_source"
+    echo "$monitor_source"
+}
+
+# Start recording
+start_recording() {
+    # Get current date for directory organization
+    local date_dir timestamp audio_file
+    date_dir="$(date +%Y-%m-%d)"
+    timestamp="$(date +%Y%m%d-%H%M%S)"
+
+    # Create output directory
+    local output_dir="$RECORDINGS_DIR/$date_dir"
+    mkdir -p "$output_dir"
+
+    # Output filename
+    audio_file="$output_dir/${timestamp}-call.wav"
+
+    # Get audio sources
+    local sources
+    if ! sources=$(get_audio_sources); then
+        show_notification "Recording Error" "Failed to detect audio devices" "dialog-error"
+        exit 1
+    fi
+
+    local mic_source monitor_source
+    mic_source=$(echo "$sources" | sed -n '1p')
+    monitor_source=$(echo "$sources" | sed -n '2p')
+
+    echo "Recording from:"
+    echo "  Microphone: $mic_source"
+    echo "  System audio: $monitor_source"
+    echo "  Output: $audio_file"
+
+    NOTIFY_ID=$(show_notification "Recording Started" "Recording call audio..." "audio-input-microphone")
+
+    # Start ffmpeg recording with both sources
+    # Mix microphone and system audio into stereo channels
+    ffmpeg -f pulse -i "$mic_source" \
+           -f pulse -i "$monitor_source" \
+           -filter_complex "[0:a][1:a]amerge=inputs=2[aout]" \
+           -map "[aout]" \
+           -ar 16000 \
+           -ac 2 \
+           "$audio_file" \
+           > /dev/null 2>&1 &
+
+    local ffmpeg_pid=$!
+
+    # Store recording state
+    echo "$ffmpeg_pid" > "$STATUS_FILE"
+    echo "$audio_file" >> "$STATUS_FILE"
+    echo "$NOTIFY_ID" >> "$STATUS_FILE"
+
+    echo "Recording started. Run this script again to stop."
+    echo "PID: $ffmpeg_pid"
+}
+
+# Stop recording
+stop_recording() {
+    echo "Stopping recording..."
+
+    if [ ! -f "$STATUS_FILE" ]; then
+        show_notification "Error" "No active recording found" "dialog-error"
+        exit 1
+    fi
+
+    # Read status data
+    mapfile -t STATUS_DATA < "$STATUS_FILE"
+
+    local pid="${STATUS_DATA[0]}"
+    local audio_file="${STATUS_DATA[1]}"
+    local notify_id="${STATUS_DATA[2]}"
+
+    # Check if process is still running
+    if ! ps -p "$pid" > /dev/null 2>&1; then
+        show_notification "Error" "Recording process not found" "dialog-error" "$notify_id"
+        rm "$STATUS_FILE"
+        exit 1
+    fi
+
+    # Stop ffmpeg gracefully with SIGINT
+    kill -2 "$pid"
+    show_notification "Stopping..." "Finalizing recording..." "audio-input-microphone" "$notify_id"
+
+    # Wait for ffmpeg to finish processing
+    while kill -0 "$pid" 2>/dev/null; do
+        sleep 0.5
+    done
+
+    # Check if file was created successfully
+    if [ -f "$audio_file" ] && [ -s "$audio_file" ]; then
+        local filesize
+        filesize=$(du -h "$audio_file" | cut -f1)
+        show_notification "Recording Complete" "Saved: $(basename "$audio_file") ($filesize)" "audio-input-microphone" "$notify_id"
+        echo "Recording saved to: $audio_file"
+    else
+        show_notification "Error" "Recording file is empty or missing" "dialog-error" "$notify_id"
+        exit 1
+    fi
+
+    # Clean up status file
+    rm "$STATUS_FILE"
+}
+
+# Main script logic
+check_dependencies
+
+if [ -f "$STATUS_FILE" ]; then
+    stop_recording
+else
+    start_recording
+fi
