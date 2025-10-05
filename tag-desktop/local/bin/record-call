@@ -221,21 +221,31 @@ stop_recording() {
             show_notification "Transcribing..." "Converting speech to text..." "audio-input-microphone" "$notify_id"
 
             if transcript=$(transcribe_audio "$audio_file"); then
-                # Save transcript to .txt file
-                local transcript_file="${audio_file%.mp3}.txt"
-                local timestamp=$(date -r "$audio_file" "+%Y-%m-%d %H:%M:%S")
+                # Generate summary title using GPT-5-mini
+                local summary=$(echo "$transcript" | llm -m gpt-5-mini "Summarize this call transcript in 3-8 words to create a title. Use only alphanumeric characters, hyphens, and underscores. No spaces." | tr -d '[:space:]' | tr -cd 'a-zA-Z0-9_-')
+
+                # Fallback if summary fails
+                if [ -z "$summary" ]; then
+                    summary="call-$(date -r "$audio_file" "+%Y%m%d-%H%M%S")"
+                fi
+
+                # Save transcript to .md file with frontmatter
+                local transcript_file="${audio_file%.mp3}.md"
+                local timestamp=$(date -r "$audio_file" "+%Y-%m-%dT%H:%M:%S")
 
                 {
-                    echo "Call Recording Transcript"
-                    echo "Date: $timestamp"
-                    echo "Audio: $(basename "$audio_file")"
+                    echo "---"
+                    echo "source_file: \"$(basename "$audio_file")\""
+                    echo "date: \"$timestamp\""
+                    echo "type: \"call\""
+                    echo "---"
                     echo ""
-                    echo "Transcript:"
+                    echo "# $summary"
                     echo ""
                     echo "$transcript"
                 } > "$transcript_file"
 
-                show_notification "Complete" "Recording and transcript saved ($filesize)" "audio-input-microphone" "$notify_id"
+                show_notification "Complete" "$summary ($filesize)" "audio-input-microphone" "$notify_id"
                 echo "Transcript saved to: $transcript_file"
             else
                 echo "Warning: Transcription failed" >&2

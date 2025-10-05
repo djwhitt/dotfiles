@@ -23,13 +23,9 @@ if ! command -v llm &> /dev/null; then
     exit 1
 fi
 
-# Base transcripts directory
-BASE_TRANSCRIPTS_DIR="$HOME/Brain/data/transcripts"
-mkdir -p "$BASE_TRANSCRIPTS_DIR"
-
-# Base recordings directory
-BASE_RECORDINGS_DIR="$HOME/Brain/media/recordings"
-mkdir -p "$BASE_RECORDINGS_DIR"
+# Base directory for voice notes (transcripts and recordings together)
+BASE_VOICE_NOTES_DIR="$HOME/Vimwiki/media/recordings/voice-notes"
+mkdir -p "$BASE_VOICE_NOTES_DIR"
 
 # Function to transcribe a file
 transcribe_file() {
@@ -58,7 +54,7 @@ transcribe_file() {
     fi
     
     # Create target directory for this date
-    local date_dir="$HOME/Brain/data/transcripts/$formatted_date"
+    local date_dir="$BASE_VOICE_NOTES_DIR/$formatted_date"
     mkdir -p "$date_dir"
     
     # Get transcription from OpenAI API
@@ -75,8 +71,8 @@ transcribe_file() {
         return 1
     fi
     
-    # Generate a descriptive filename based on content using llm
-    local title=$(echo "$transcription" | llm "Summarize this transcription in 3-8 words to create a filename. Use only alphanumeric characters, hyphens, and underscores. No spaces. Don't include file extensions." | tr -d '[:space:]' | tr -cd 'a-zA-Z0-9_-')
+    # Generate a descriptive filename based on content using llm with gpt-5-mini
+    local title=$(echo "$transcription" | llm -m gpt-5-mini "Summarize this transcription in 3-8 words to create a filename. Use only alphanumeric characters, hyphens, and underscores. No spaces. Don't include file extensions." | tr -d '[:space:]' | tr -cd 'a-zA-Z0-9_-')
     
     # Fallback to timestamp if title generation fails
     if [ -z "$title" ]; then
@@ -91,6 +87,7 @@ transcribe_file() {
         echo "---"
         echo "source_file: \"$filename\""
         echo "date: \"$timestamp\""
+        echo "type: \"voice-note\""
         echo "---"
         echo
         echo "# $title"
@@ -100,10 +97,8 @@ transcribe_file() {
     
     echo "Transcription saved to $output_file"
     
-    # Move the original recording to the recordings directory
-    local recordings_date_dir="$BASE_RECORDINGS_DIR/$formatted_date"
-    mkdir -p "$recordings_date_dir"
-    local recording_dest="$recordings_date_dir/$filename"
+    # Move the original recording to the same date directory as the transcript
+    local recording_dest="$date_dir/$filename"
     
     if mv "$file" "$recording_dest"; then
         echo "Moved original recording to $recording_dest"
@@ -141,18 +136,19 @@ echo "Transcription complete. Processed $count files."
 # Git Annex steps
 ##############################################################################
 
-pushd "$HOME/Brain" || exit
+pushd "$HOME/Vimwiki" || exit
 
-git annex add "$BASE_TRANSCRIPTS_DIR" "$BASE_RECORDINGS_DIR"
+git annex add "$BASE_VOICE_NOTES_DIR"
 
 # Commit changes
-echo "Committing new archive file..."
-git commit -m "Add recordings and transcripts"
+echo "Committing voice note recordings and transcripts..."
+git commit -m "Add voice note recordings and transcripts"
 
 # Attempt to copy to each remote; non-critical failures will show a warning
-echo "Copying to annex remotes..."
-git annex copy . --to s3-us-east-1 || eecho "Warning: failed to copy to s3-us-east-1."
-git annex copy . --to rsync-dot-net || eecho "Warning: failed to copy to rsync-dot-net."
+# Note: Uncomment when git-annex remotes are configured for Vimwiki
+# echo "Copying to annex remotes..."
+# git annex copy . --to s3-us-east-1 || echo "Warning: failed to copy to s3-us-east-1."
+# git annex copy . --to rsync-dot-net || echo "Warning: failed to copy to rsync-dot-net."
 
 # Sync local repository with remotes
 echo "Syncing Git Annex..."
