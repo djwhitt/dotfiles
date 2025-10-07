@@ -58,15 +58,59 @@ transcribe_file() {
     mkdir -p "$date_dir"
     
     # Get transcription from OpenAI API
-    local transcription=$(curl -s \
-      --request POST \
-      --url https://api.openai.com/v1/audio/transcriptions \
-      --header "Authorization: Bearer $(openai-api-key)" \
-      --header 'Content-Type: multipart/form-data' \
-      --form "file=@$file" \
-      --form model=gpt-4o-transcribe | jq -r .text)
-    
-    if [ -z "$transcription" ]; then
+    local filesize_bytes=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null)
+    local max_size=$((25 * 1024 * 1024))  # 25MB in bytes
+    local transcription=""
+
+    if [[ $filesize_bytes -gt $max_size ]]; then
+        # File is over 25MB - need to split it
+        echo "  File is over 25MB, splitting into chunks for transcription..."
+
+        local temp_dir=$(mktemp -d)
+        local chunk_pattern="${temp_dir}/chunk%03d.mp3"
+
+        # Split into 20-minute (1200 second) chunks to stay under 25MB limit
+        ffmpeg -i "$file" \
+            -f segment \
+            -segment_time 1200 \
+            -c copy \
+            -reset_timestamps 1 \
+            "$chunk_pattern" 2>/dev/null
+
+        # Transcribe each chunk and combine
+        local combined_transcript=""
+        for chunk_file in "$temp_dir"/chunk*.mp3; do
+            if [ -f "$chunk_file" ]; then
+                local chunk_transcript=$(curl -s \
+                    --request POST \
+                    --url https://api.openai.com/v1/audio/transcriptions \
+                    --header "Authorization: Bearer $(openai-api-key)" \
+                    --header 'Content-Type: multipart/form-data' \
+                    --form "file=@$chunk_file" \
+                    --form model=gpt-4o-transcribe | jq -r .text)
+
+                if [ -n "$chunk_transcript" ] && [ "$chunk_transcript" != "null" ]; then
+                    combined_transcript="${combined_transcript}${chunk_transcript} "
+                fi
+            fi
+        done
+
+        # Clean up temporary files
+        rm -rf "$temp_dir"
+
+        transcription="$combined_transcript"
+    else
+        # Use OpenAI's transcription API for files under 25MB
+        transcription=$(curl -s \
+          --request POST \
+          --url https://api.openai.com/v1/audio/transcriptions \
+          --header "Authorization: Bearer $(openai-api-key)" \
+          --header 'Content-Type: multipart/form-data' \
+          --form "file=@$file" \
+          --form model=gpt-4o-transcribe | jq -r .text)
+    fi
+
+    if [ -z "$transcription" ] || [ "$transcription" = "null" ]; then
         echo "Error: Failed to transcribe $filename"
         return 1
     fi

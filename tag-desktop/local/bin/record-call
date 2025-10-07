@@ -61,9 +61,48 @@ show_notification() {
 transcribe_audio() {
     local audio_file="$1"
     local transcript=""
+    local filesize_bytes=$(stat -c%s "$audio_file" 2>/dev/null || stat -f%z "$audio_file" 2>/dev/null)
+    local max_size=$((25 * 1024 * 1024))  # 25MB in bytes
 
-    if [[ "$USE_OPENAI" == true ]]; then
-        # Use OpenAI's transcription API
+    if [[ "$USE_OPENAI" == true ]] && [[ $filesize_bytes -gt $max_size ]]; then
+        # File is over 25MB - need to split it
+        echo "File is over 25MB, splitting into chunks for transcription..." >&2
+
+        local temp_dir=$(mktemp -d)
+        local chunk_pattern="${temp_dir}/chunk%03d.mp3"
+
+        # Split into 20-minute (1200 second) chunks to stay under 25MB limit
+        ffmpeg -i "$audio_file" \
+            -f segment \
+            -segment_time 1200 \
+            -c copy \
+            -reset_timestamps 1 \
+            "$chunk_pattern" 2>/dev/null
+
+        # Transcribe each chunk and combine
+        local combined_transcript=""
+        for chunk_file in "$temp_dir"/chunk*.mp3; do
+            if [ -f "$chunk_file" ]; then
+                local chunk_transcript=$(curl -s \
+                    --request POST \
+                    --url https://api.openai.com/v1/audio/transcriptions \
+                    --header "Authorization: Bearer $(openai-api-key)" \
+                    --header 'Content-Type: multipart/form-data' \
+                    --form "file=@$chunk_file" \
+                    --form model="$MODEL" | jq -r .text)
+
+                if [ -n "$chunk_transcript" ] && [ "$chunk_transcript" != "null" ]; then
+                    combined_transcript="${combined_transcript}${chunk_transcript} "
+                fi
+            fi
+        done
+
+        # Clean up temporary files
+        rm -rf "$temp_dir"
+
+        transcript="$combined_transcript"
+    elif [[ "$USE_OPENAI" == true ]]; then
+        # Use OpenAI's transcription API for files under 25MB
         transcript=$(curl -s \
             --request POST \
             --url https://api.openai.com/v1/audio/transcriptions \
@@ -78,7 +117,7 @@ transcribe_audio() {
     fi
 
     # Check if transcription succeeded
-    if [ -z "$transcript" ]; then
+    if [ -z "$transcript" ] || [ "$transcript" = "null" ]; then
         return 1
     fi
 
@@ -168,11 +207,13 @@ start_recording() {
            > /dev/null 2>&1 &
 
     local ffmpeg_pid=$!
+    local start_timestamp=$(date +%s)
 
     # Store recording state
     echo "$ffmpeg_pid" > "$STATUS_FILE"
     echo "$audio_file" >> "$STATUS_FILE"
     echo "$NOTIFY_ID" >> "$STATUS_FILE"
+    echo "$start_timestamp" >> "$STATUS_FILE"
 
     echo "Recording started. Run this script again to stop."
     echo "PID: $ffmpeg_pid"
@@ -193,6 +234,7 @@ stop_recording() {
     local pid="${STATUS_DATA[0]}"
     local audio_file="${STATUS_DATA[1]}"
     local notify_id="${STATUS_DATA[2]}"
+    local start_timestamp="${STATUS_DATA[3]}"
 
     # Check if process is still running
     if ! ps -p "$pid" > /dev/null 2>&1; then
@@ -233,10 +275,29 @@ stop_recording() {
                 local transcript_file="${audio_file%.mp3}.md"
                 local timestamp=$(date -r "$audio_file" "+%Y-%m-%dT%H:%M:%S")
 
+                # Calculate start time and duration
+                local start_time=$(date -d "@${start_timestamp}" "+%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -r "${start_timestamp}" "+%Y-%m-%dT%H:%M:%S")
+                local duration_seconds=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$audio_file" 2>/dev/null | cut -d. -f1)
+
+                # Format duration as human readable (e.g., "1h 23m 15s")
+                local hours=$((duration_seconds / 3600))
+                local minutes=$(((duration_seconds % 3600) / 60))
+                local seconds=$((duration_seconds % 60))
+                local duration=""
+                if [ $hours -gt 0 ]; then
+                    duration="${hours}h ${minutes}m ${seconds}s"
+                elif [ $minutes -gt 0 ]; then
+                    duration="${minutes}m ${seconds}s"
+                else
+                    duration="${seconds}s"
+                fi
+
                 {
                     echo "---"
                     echo "source_file: \"$(basename "$audio_file")\""
                     echo "date: \"$timestamp\""
+                    echo "start_time: \"$start_time\""
+                    echo "duration: \"$duration\""
                     echo "type: \"call\""
                     echo "---"
                     echo ""
