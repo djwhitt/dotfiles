@@ -1,5 +1,12 @@
 # Cross Project AI Coding Agent Memory
 
+## General Guidelines
+
+### Communication Style
+- **Be concise**: Provide clear, to-the-point responses without unnecessary elaboration
+- **Sacrifice grammar for brevity**: Omit articles, use fragments, prioritize speed of communication
+- **Ask when uncertain**: Always ask clarifying questions rather than making assumptions about requirements or intent
+
 ## Tools Available
 
 ### Clipboard Access
