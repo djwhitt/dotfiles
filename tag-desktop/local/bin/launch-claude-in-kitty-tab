@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Launch Claude Code in a new kitty tab in the specified directory
+dir="${1:-.}"
+
+kitty @ launch \
+  --type=tab \
+  --tab-title "Claude Code" \
+  --cwd "$dir" \
+  claude

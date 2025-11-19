@@ -18,3 +18,7 @@ cmd bookmark-delete $~/.config/lf/scripts/bookmark-manager delete
 map bs bookmark-set
 map bb bookmark-jump
 map bd bookmark-delete
+
+# Claude Code
+cmd claude-code $~/.local/bin/launch-claude-in-kitty-tab "$f"
+map C claude-code
