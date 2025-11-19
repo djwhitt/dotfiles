@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.ssh"
+export KITTY_NVIM=true
+
+nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
+
+# Optional argument: --focus-after "title:Something"
+focus_after=""
+if [[ "${1:-}" == "--focus-after" && $# -ge 2 ]]; then
+  focus_after="$2"
+  shift 2
+fi
+
+tab_match="title:Neovim"
+
+# 1. If the tab already exists, maybe start nvim in it
+if kitty @ focus-tab --match "$tab_match" 2>/dev/null; then
+  if ! pgrep nvim >/dev/null 2>&1; then
+    rm -f "${nvimsocket}"
+    kitty @ launch \
+      --match "$tab_match" \
+      nvim --listen "${nvimsocket}"
+  fi
+else
+  # 2. Tab doesn't exist: ensure we don't re-use a stale nvim socket
+  pgrep nvim >/dev/null 2>&1 || rm -f "${nvimsocket}"
+
+  # 3. Create the tab + run Neovim in it
+  kitty @ launch \
+    --type=tab \
+    --tab-title "Neovim" \
+    nvim --listen "${nvimsocket}"
+fi
+
+# 4. Single final focus decision
+if [[ -n "$focus_after" ]]; then
+  kitty @ focus-tab --match "$focus_after" || true
+else
+  kitty @ focus-tab --match "$tab_match" || true
+fi
+
+

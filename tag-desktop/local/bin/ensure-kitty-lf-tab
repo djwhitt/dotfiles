@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Optional argument: --focus-after "title:Something"
+focus_after=""
+if [[ "${1:-}" == "--focus-after" && $# -ge 2 ]]; then
+  focus_after="$2"
+  shift 2
+fi
+
+tab_match="title:lf"
+
+# 1. If the tab already exists, maybe start lf in it
+if kitty @ focus-tab --match "$tab_match" 2>/dev/null; then
+  if ! pgrep lf >/dev/null 2>&1; then
+    kitty @ launch \
+      --match "$tab_match" \
+      --env EDITOR=e \
+      --env VISUAL=e \
+      lf
+  fi
+else
+  # 2. Create the tab + run lf in it
+  kitty @ launch \
+    --type=tab \
+    --tab-title "lf" \
+    --env EDITOR=e \
+    --env VISUAL=e \
+    lf
+fi
+
+# 3. Single final focus decision
+if [[ -n "$focus_after" ]]; then
+  kitty @ focus-tab --match "$focus_after" || true
+else
+  kitty @ focus-tab --match "$tab_match" || true
+fi
