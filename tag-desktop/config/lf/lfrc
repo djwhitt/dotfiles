@@ -8,3 +8,59 @@ cmd trash $IFS="$(printf '\n\t')"; mv $fx ~/.trash
 map D trash
 
 map am $$HOME/.local/bin/archive-media "$f"
+
+# Bookmark commands
+cmd bookmark-set ${{
+    # Prompt for bookmark name
+    printf "Bookmark name: "
+    read -r name
+    if [ -n "$name" ]; then
+        # Create bookmarks file if it doesn't exist
+        mkdir -p ~/.config/lf
+        touch ~/.config/lf/bookmarks
+        # Add or update bookmark
+        grep -v "^${name}=" ~/.config/lf/bookmarks > ~/.config/lf/bookmarks.tmp 2>/dev/null || true
+        echo "${name}=${PWD}" >> ~/.config/lf/bookmarks.tmp
+        mv ~/.config/lf/bookmarks.tmp ~/.config/lf/bookmarks
+        lf -remote "send $id echo Bookmark '${name}' saved"
+    fi
+}}
+
+cmd bookmark-jump ${{
+    # Check if bookmarks file exists and has content
+    if [ ! -f ~/.config/lf/bookmarks ] || [ ! -s ~/.config/lf/bookmarks ]; then
+        lf -remote "send $id echo No bookmarks found"
+        exit 0
+    fi
+    # Use fzf to select bookmark
+    bookmark=$(grep -v "^#" ~/.config/lf/bookmarks | grep -v "^$" | fzf --prompt="Jump to bookmark: " --height=40% --reverse)
+    if [ -n "$bookmark" ]; then
+        dir=$(echo "$bookmark" | cut -d'=' -f2-)
+        if [ -d "$dir" ]; then
+            lf -remote "send $id cd \"$dir\""
+        else
+            lf -remote "send $id echo Directory not found: $dir"
+        fi
+    fi
+}}
+
+cmd bookmark-delete ${{
+    # Check if bookmarks file exists and has content
+    if [ ! -f ~/.config/lf/bookmarks ] || [ ! -s ~/.config/lf/bookmarks ]; then
+        lf -remote "send $id echo No bookmarks found"
+        exit 0
+    fi
+    # Use fzf to select bookmark to delete
+    bookmark=$(grep -v "^#" ~/.config/lf/bookmarks | grep -v "^$" | fzf --prompt="Delete bookmark: " --height=40% --reverse)
+    if [ -n "$bookmark" ]; then
+        name=$(echo "$bookmark" | cut -d'=' -f1)
+        grep -v "^${name}=" ~/.config/lf/bookmarks > ~/.config/lf/bookmarks.tmp
+        mv ~/.config/lf/bookmarks.tmp ~/.config/lf/bookmarks
+        lf -remote "send $id echo Bookmark '${name}' deleted"
+    fi
+}}
+
+# Bookmark keybindings
+map bs bookmark-set
+map bb bookmark-jump
+map bd bookmark-delete
