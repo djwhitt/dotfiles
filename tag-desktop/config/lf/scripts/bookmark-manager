@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# lf bookmark manager script
+
+BOOKMARKS_FILE="${HOME}/.config/lf/bookmarks"
+
+bookmark_set() {
+    # Prompt for bookmark name
+    printf "Bookmark name: "
+    read -r name
+    if [ -n "$name" ]; then
+        # Create bookmarks file if it doesn't exist
+        mkdir -p "$(dirname "$BOOKMARKS_FILE")"
+        touch "$BOOKMARKS_FILE"
+        # Add or update bookmark
+        grep -v "^${name}=" "$BOOKMARKS_FILE" > "${BOOKMARKS_FILE}.tmp" 2>/dev/null || true
+        echo "${name}=${PWD}" >> "${BOOKMARKS_FILE}.tmp"
+        mv "${BOOKMARKS_FILE}.tmp" "$BOOKMARKS_FILE"
+        lf -remote "send $id echo Bookmark '${name}' saved"
+    fi
+}
+
+bookmark_jump() {
+    # Check if bookmarks file exists and has content
+    if [ ! -f "$BOOKMARKS_FILE" ] || [ ! -s "$BOOKMARKS_FILE" ]; then
+        lf -remote "send $id echo No bookmarks found"
+        exit 0
+    fi
+    # Use fzf to select bookmark
+    bookmark=$(grep -v "^#" "$BOOKMARKS_FILE" | grep -v "^$" | fzf --prompt="Jump to bookmark: " --height=40% --reverse)
+    if [ -n "$bookmark" ]; then
+        dir=$(echo "$bookmark" | cut -d'=' -f2-)
+        if [ -d "$dir" ]; then
+            lf -remote "send $id cd \"$dir\""
+        else
+            lf -remote "send $id echo Directory not found: $dir"
+        fi
+    fi
+}
+
+bookmark_delete() {
+    # Check if bookmarks file exists and has content
+    if [ ! -f "$BOOKMARKS_FILE" ] || [ ! -s "$BOOKMARKS_FILE" ]; then
+        lf -remote "send $id echo No bookmarks found"
+        exit 0
+    fi
+    # Use fzf to select bookmark to delete
+    bookmark=$(grep -v "^#" "$BOOKMARKS_FILE" | grep -v "^$" | fzf --prompt="Delete bookmark: " --height=40% --reverse)
+    if [ -n "$bookmark" ]; then
+        name=$(echo "$bookmark" | cut -d'=' -f1)
+        grep -v "^${name}=" "$BOOKMARKS_FILE" > "${BOOKMARKS_FILE}.tmp"
+        mv "${BOOKMARKS_FILE}.tmp" "$BOOKMARKS_FILE"
+        lf -remote "send $id echo Bookmark '${name}' deleted"
+    fi
+}
+
+# Main command dispatcher
+case "$1" in
+    set)
+        bookmark_set
+        ;;
+    jump)
+        bookmark_jump
+        ;;
+    delete)
+        bookmark_delete
+        ;;
+    *)
+        echo "Usage: $0 {set|jump|delete}"
+        exit 1
+        ;;
+esac
