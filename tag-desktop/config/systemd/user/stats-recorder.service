@@ -1,0 +1,13 @@
+[Unit]
+Description=Record metrics to XTDB v2
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/stats-recorder
+TimeoutStartSec=120
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

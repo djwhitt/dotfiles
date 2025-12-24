@@ -1,0 +1,76 @@
+#!/usr/bin/env bun
+
+// stats-recorder - Collect metrics and record to XTDB v2
+//
+// Uses stable IDs per metric so XTDB automatically versions historical values.
+// Query current values normally, or use FOR SYSTEM_TIME ALL for history.
+
+import { hostname } from "os";
+import { existsSync } from "fs";
+
+// Database connection
+const sql = Bun.sql({
+  hostname: "192.168.1.11",
+  port: 15432,
+  username: "xtdb",
+  database: "xtdb",
+});
+
+const host = hostname();
+
+// Directories to monitor for file counts
+const FILE_COUNT_DIRS = [
+  `${process.env.HOME}/Scratch`,
+  `${process.env.HOME}/Downloads`,
+];
+
+async function countFiles(dirPath: string): Promise<number> {
+  const glob = new Bun.Glob("**/*");
+  let count = 0;
+  for await (const _ of glob.scan({ cwd: dirPath, onlyFiles: true })) {
+    count++;
+  }
+  return count;
+}
+
+async function recordMetric(
+  collector: string,
+  metricName: string,
+  value: number,
+  path: string
+): Promise<void> {
+  const id = `${collector}:${path}:${host}`;
+
+  await sql`INSERT INTO metrics (_id, hostname, collector, metric_name, value, path)
+            VALUES (${id}, ${host}, ${collector}, ${metricName}, ${value}, ${path})`;
+
+  console.log(`Recorded: ${metricName}=${value} for ${path}`);
+}
+
+async function collectFileCountMetrics(): Promise<void> {
+  for (const dirPath of FILE_COUNT_DIRS) {
+    if (!existsSync(dirPath)) {
+      console.log(`Skipping ${dirPath} (does not exist)`);
+      continue;
+    }
+
+    const count = await countFiles(dirPath);
+    await recordMetric("file-count", "file_count", count, dirPath);
+  }
+}
+
+async function main(): Promise<void> {
+  console.log(`Stats recorder starting on ${host}...`);
+
+  try {
+    await collectFileCountMetrics();
+    console.log("Done.");
+  } catch (error) {
+    console.error("Error recording metrics:", error);
+    process.exit(1);
+  } finally {
+    await sql.close();
+  }
+}
+
+main();
