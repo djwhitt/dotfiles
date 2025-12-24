@@ -7,14 +7,10 @@
 
 import { hostname } from "os";
 import { existsSync } from "fs";
+import { SQL } from "bun";
 
 // Database connection
-const sql = Bun.sql({
-  hostname: "192.168.1.11",
-  port: 15432,
-  username: "xtdb",
-  database: "xtdb",
-});
+const sql = new SQL("postgres://xtdb@192.168.1.11:15432/xtdb");
 
 const host = hostname();
 
@@ -41,8 +37,10 @@ async function recordMetric(
 ): Promise<void> {
   const id = `${collector}:${path}:${host}`;
 
-  await sql`INSERT INTO metrics (_id, hostname, collector, metric_name, value, path)
-            VALUES (${id}, ${host}, ${collector}, ${metricName}, ${value}, ${path})`;
+  // XTDB requires explicit types - use unsafe() since values are internal (not user input)
+  const escape = (s: string) => s.replace(/'/g, "''");
+  await sql.unsafe(`INSERT INTO metrics (_id, hostname, collector, metric_name, value, path)
+            VALUES ('${escape(id)}', '${escape(host)}', '${escape(collector)}', '${escape(metricName)}', ${value}, '${escape(path)}')`);
 
   console.log(`Recorded: ${metricName}=${value} for ${path}`);
 }
