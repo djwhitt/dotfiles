@@ -1,0 +1,150 @@
+// ~/.config/niri/config.kdl
+
+// Startup applications
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "nm-applet"
+spawn-at-startup "blueman-applet"
+spawn-at-startup "gammastep"
+
+// Idle and lock
+spawn-at-startup "sh" "-c" "swayidle -w timeout 300 'swaylock -f' timeout 600 'niri msg action power-off-monitors' before-sleep 'swaylock -f'"
+
+// Environment for Electron/Chrome apps
+environment {
+    NIXOS_OZONE_WL "1"
+    DISPLAY ":0"
+}
+
+// Input configuration
+input {
+    focus-follows-mouse
+
+    keyboard {
+        xkb {
+            layout "us"
+        }
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+        accel-speed 0.2
+    }
+
+    mouse {
+        accel-speed 0.0
+    }
+}
+
+// Output configuration
+output "eDP-1" {
+    scale 2.0
+    position x=0 y=0
+}
+
+output "DP-10" {
+    position x=1440 y=0
+}
+
+// Layout settings
+layout {
+    gaps 8
+
+    center-focused-column "never"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        width 2
+        active-color "#7fc8ff"
+        inactive-color "#505050"
+    }
+
+    border {
+        off
+    }
+}
+
+// Key bindings
+binds {
+    // App launchers
+    Mod+Return { spawn "kitty"; }
+    Mod+D { spawn "fuzzel"; }
+    Mod+B { spawn "brave"; }
+
+    // Window management
+    Mod+Q { close-window; }
+
+    // Focus
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+
+    // Move windows
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+    Mod+Shift+L { move-column-right; }
+
+    // Workspaces
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+
+    // Column width
+    Mod+R { switch-preset-column-width; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+
+    // Floating
+    Mod+V { toggle-window-floating; }
+
+    // Consume/expel (merge/split columns)
+    Mod+Comma { consume-window-into-column; }
+    Mod+Period { expel-window-from-column; }
+
+    // Screenshots
+    Print { screenshot; }
+    Mod+Print { screenshot-window; }
+    Mod+Shift+Print { screenshot-screen; }
+
+    // Media/brightness keys
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
+
+    // Lock screen
+    Mod+Escape { spawn "swaylock"; }
+
+    // Exit niri
+    Mod+Shift+E { quit; }
+}
+
+// Window rules
+window-rule {
+    match app-id="brave-browser" title="^Picture in Picture$"
+    open-floating true
+}
+
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+}
