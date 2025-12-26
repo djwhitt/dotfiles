@@ -9,8 +9,8 @@
 
     "niri/workspaces": {
         "format": "{index}",
-        "on-scroll-up": "niri msg action focus-workspace-up",
-        "on-scroll-down": "niri msg action focus-workspace-down"
+        "on-scroll-up": "throttle-workspace up",
+        "on-scroll-down": "throttle-workspace down"
     },
 
     "clock": {

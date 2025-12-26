@@ -1,0 +1,14 @@
+#!/bin/sh
+# throttle-workspace <up|down> - throttles workspace switching
+
+lockfile="${XDG_RUNTIME_DIR}/workspace-throttle"
+cooldown=300
+
+if [ -f "$lockfile" ]; then
+    last=$(cat "$lockfile")
+    now=$(date +%s%3N)
+    [ $((now - last)) -lt $cooldown ] && exit 0
+fi
+
+date +%s%3N > "$lockfile"
+niri msg action "focus-workspace-$1"
