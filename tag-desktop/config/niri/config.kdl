@@ -113,10 +113,6 @@ binds {
     Mod+Shift+4 { move-column-to-workspace 4; }
     Mod+Shift+5 { move-column-to-workspace 5; }
 
-    // Named workspaces
-    Mod+9 { focus-workspace "comms"; }
-    Mod+Shift+9 { move-column-to-workspace "comms"; }
-
     // Workspace cycling
     Mod+BracketLeft { focus-workspace-up; }
     Mod+BracketRight { focus-workspace-down; }
