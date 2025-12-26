@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Todoist
-Exec=todoist %u
+Exec=todoist-electron %u
 Terminal=false
 Type=Application
 Icon=todoist
