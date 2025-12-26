@@ -122,6 +122,10 @@ binds {
     Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
 
+    // Workspace mouse buttons (back/forward)
+    MouseBack { focus-workspace-up; }
+    MouseForward { focus-workspace-down; }
+
     // Move workspace
     Mod+Ctrl+K { move-workspace-up; }
     Mod+Ctrl+J { move-workspace-down; }
@@ -178,6 +182,11 @@ window-rule {
 window-rule {
     match app-id="Slack"
     open-on-workspace "comms"
+    open-maximized true
+}
+
+window-rule {
+    match app-id="Todoist"
     open-maximized true
 }
 
