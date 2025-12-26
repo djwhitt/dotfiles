@@ -85,6 +85,8 @@ binds {
     Mod+B { spawn "brave"; }
 
     // Window management
+    Mod+Tab { toggle-overview; }
+    Mod+Shift+Slash { show-hotkey-overlay; }
     Mod+Q { close-window; }
 
     // Focus
@@ -119,6 +121,10 @@ binds {
     // Workspace scroll
     Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+
+    // Move workspace
+    Mod+Ctrl+K { move-workspace-up; }
+    Mod+Ctrl+J { move-workspace-down; }
 
     // Column width
     Mod+R { switch-preset-column-width; }
