@@ -8,13 +8,11 @@
     "modules-right": ["pulseaudio", "network", "battery", "tray"],
 
     "niri/workspaces": {
-        "format": "{index}",
-        "on-scroll-up": "throttle-workspace up",
-        "on-scroll-down": "throttle-workspace down"
+        "format": "{index}"
     },
 
     "clock": {
-        "format": "{:%a %b %d  %H:%M}",
+        "format": "{:%a %b %d  %I:%M %p}",
         "tooltip-format": "<tt>{calendar}</tt>"
     },
 

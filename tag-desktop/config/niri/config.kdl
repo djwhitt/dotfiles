@@ -118,6 +118,10 @@ binds {
     Mod+9 { focus-workspace "comms"; }
     Mod+Shift+9 { move-column-to-workspace "comms"; }
 
+    // Workspace cycling
+    Mod+BracketLeft { focus-workspace-up; }
+    Mod+BracketRight { focus-workspace-down; }
+
     // Workspace scroll
     Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
