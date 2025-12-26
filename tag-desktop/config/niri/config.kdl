@@ -47,6 +47,11 @@ output "DP-10" {
     position x=1440 y=0
 }
 
+// Named workspaces
+workspace "comms" {
+    open-on-output "DP-10"
+}
+
 // Layout settings
 layout {
     gaps 8
@@ -107,6 +112,10 @@ binds {
     Mod+Shift+4 { move-column-to-workspace 4; }
     Mod+Shift+5 { move-column-to-workspace 5; }
 
+    // Named workspaces
+    Mod+9 { focus-workspace "comms"; }
+    Mod+Shift+9 { move-column-to-workspace "comms"; }
+
     // Column width
     Mod+R { switch-preset-column-width; }
     Mod+F { maximize-column; }
@@ -147,6 +156,18 @@ window-rule {
 window-rule {
     match app-id="brave-browser"
     exclude title="^Picture in Picture$"
+    open-maximized true
+}
+
+window-rule {
+    match app-id="discord"
+    open-on-workspace "comms"
+    open-maximized true
+}
+
+window-rule {
+    match app-id="Slack"
+    open-on-workspace "comms"
     open-maximized true
 }
 
