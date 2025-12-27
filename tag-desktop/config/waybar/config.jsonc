@@ -5,10 +5,20 @@
 
     "modules-left": ["niri/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "network", "battery", "tray"],
+    "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray"],
 
     "niri/workspaces": {
         "format": "{index}"
+    },
+
+    "cpu": {
+        "format": "󰍛 {usage}%  ",
+        "tooltip": true
+    },
+
+    "memory": {
+        "format": "󰘚 {percentage}%  ",
+        "tooltip-format": "{used:0.1f}G / {total:0.1f}G"
     },
 
     "clock": {
@@ -22,7 +32,8 @@
         "format-icons": {
             "default": ["󰕿", "󰖀", "󰕾"]
         },
-        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click": "pwvucontrol",
+        "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
         "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
     },
