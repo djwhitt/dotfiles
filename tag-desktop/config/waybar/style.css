@@ -28,6 +28,7 @@ window#waybar {
 #clock,
 #cpu,
 #memory,
+#temperature,
 #battery,
 #pulseaudio,
 #network,
@@ -36,12 +37,14 @@ window#waybar {
 }
 
 #cpu.warning,
-#memory.warning {
+#memory.warning,
+#temperature.warning {
     color: #f9e2af;
 }
 
 #cpu.critical,
-#memory.critical {
+#memory.critical,
+#temperature.critical {
     color: #f38ba8;
 }
 
