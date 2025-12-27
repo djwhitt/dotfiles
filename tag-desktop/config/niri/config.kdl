@@ -7,13 +7,19 @@ spawn-at-startup "nm-applet"
 spawn-at-startup "blueman-applet"
 spawn-at-startup "gammastep"
 
-// Idle and lock
-spawn-at-startup "sh" "-c" "swayidle -w timeout 300 'swaylock -f' timeout 600 'niri msg action power-off-monitors' before-sleep 'swaylock -f'"
+// Idle and lock (hypridle config at ~/.config/hypr/hypridle.conf)
+spawn-at-startup "hypridle"
 
 // Environment for Electron/Chrome apps
 environment {
     NIXOS_OZONE_WL "1"
     DISPLAY ":0"
+}
+
+// Cursor configuration (scales with output scale factor)
+cursor {
+    xcursor-size 24
+    xcursor-theme "Adwaita"
 }
 
 // Input configuration
@@ -154,7 +160,7 @@ binds {
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
 
     // Lock screen
-    Mod+Escape { spawn "swaylock"; }
+    Mod+Escape { spawn "hyprlock"; }
 
     // Exit niri
     Mod+Shift+E { quit; }
