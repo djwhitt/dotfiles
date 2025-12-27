@@ -122,8 +122,8 @@ binds {
     Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
 
     // Workspace mouse buttons (back/forward)
-    MouseBack { focus-workspace-up; }
-    MouseForward { focus-workspace-down; }
+    MouseBack { focus-workspace-down; }
+    MouseForward { focus-workspace-up; }
 
     // Move workspace
     Mod+Ctrl+K { move-workspace-up; }
