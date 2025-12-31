@@ -71,5 +71,6 @@ Tasks use Malli for validation and interact with NocoDB API.
 
 - Look for dead code and copy-pasta opportunities when making changes
 - Scripts use Fish shell conventions when in `config/fish/`
+- Bash scripts should use `#!/usr/bin/env bash` shebang for portability
 - Bash scripts should include proper error handling
 - Kitty scripts follow the `ensure-kitty-*-tab` pattern for tab management

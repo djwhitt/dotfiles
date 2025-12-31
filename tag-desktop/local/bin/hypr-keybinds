@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Show Hyprland keybindings in fuzzel
 
 hyprctl binds -j | jq -r '

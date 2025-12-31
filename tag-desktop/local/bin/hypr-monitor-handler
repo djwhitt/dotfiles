@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Restore workspaces to their designated monitors when a monitor is connected
+
+socat -U - "UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" | while read -r line; do
+  case "$line" in
+    monitoradded*)
+      sleep 1
+      hyprctl dispatch moveworkspacetomonitor 9 DP-10
+      hyprctl dispatch moveworkspacetomonitor 10 DP-10
+      ;;
+  esac
+done
