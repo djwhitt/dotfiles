@@ -5,8 +5,12 @@ socat -U - "UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.soc
   case "$line" in
     monitoradded*)
       sleep 1
-      hyprctl dispatch moveworkspacetomonitor 9 DP-10
-      hyprctl dispatch moveworkspacetomonitor 10 DP-10
+      # Find external monitor (any monitor that isn't the internal eDP-1)
+      external=$(hyprctl monitors -j | jq -r '.[] | select(.name != "eDP-1") | .name' | head -1)
+      if [[ -n "$external" ]]; then
+        hyprctl dispatch moveworkspacetomonitor 9 "$external"
+        hyprctl dispatch moveworkspacetomonitor 10 "$external"
+      fi
       ;;
   esac
 done
