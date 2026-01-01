@@ -29,6 +29,14 @@ bb archive-document        # Archive document in NocoDB
 just weekly-newsletter-to-kindle
 ```
 
+## Related Repositories
+
+### ~/Work/infra
+Infrastructure repository with NixOS system configs (including framework13 laptop), AWS CDK stacks, and Ansible playbooks. See its CLAUDE.md for details.
+
+### ~/.dotfiles-private
+Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. See its CLAUDE.md for details.
+
 ## Directory Structure
 
 - `config/` - Universal configs (fish, nvim, git, atuin)
