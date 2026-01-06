@@ -1,0 +1,509 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Bun TUI Project Generator
+# Creates a new Bun + SolidJS + OpenTUI project
+
+VERSION="1.0.0"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+usage() {
+    cat << EOF
+Usage: create-bun-tui <project-name> [options]
+
+Creates a new Bun + SolidJS + OpenTUI project.
+
+Options:
+  --dir <path>       Target directory (default: current dir)
+  --with-db          Include SQLite + Drizzle ORM layer
+  --with-devenv      Include devenv.nix setup
+  --no-interactive   Fail if required options missing
+  --help             Show this help message
+  --version          Show version
+
+Examples:
+  create-bun-tui my-app
+  create-bun-tui my-app --with-db
+  create-bun-tui my-app --dir ~/Projects --with-devenv
+EOF
+}
+
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# Default values
+PROJECT_NAME=""
+TARGET_DIR="."
+WITH_DB=false
+WITH_DEVENV=false
+NO_INTERACTIVE=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dir)
+            TARGET_DIR="$2"
+            shift 2
+            ;;
+        --with-db)
+            WITH_DB=true
+            shift
+            ;;
+        --with-devenv)
+            WITH_DEVENV=true
+            shift
+            ;;
+        --no-interactive)
+            NO_INTERACTIVE=true
+            shift
+            ;;
+        --help)
+            usage
+            exit 0
+            ;;
+        --version)
+            echo "create-bun-tui v$VERSION"
+            exit 0
+            ;;
+        -*)
+            log_error "Unknown option: $1"
+            usage
+            exit 1
+            ;;
+        *)
+            if [[ -z "$PROJECT_NAME" ]]; then
+                PROJECT_NAME="$1"
+            else
+                log_error "Unexpected argument: $1"
+                usage
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Interactive prompts for missing required values
+if [[ -z "$PROJECT_NAME" ]]; then
+    if [[ "$NO_INTERACTIVE" == true ]]; then
+        log_error "Project name is required"
+        exit 1
+    fi
+    read -rp "Project name: " PROJECT_NAME
+    if [[ -z "$PROJECT_NAME" ]]; then
+        log_error "Project name cannot be empty"
+        exit 1
+    fi
+fi
+
+# Interactive prompts for optional features
+if [[ "$NO_INTERACTIVE" == false ]]; then
+    if [[ "$WITH_DB" == false ]]; then
+        read -rp "Include database layer (SQLite + Drizzle)? [y/N] " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            WITH_DB=true
+        fi
+    fi
+
+    if [[ "$WITH_DEVENV" == false ]]; then
+        read -rp "Include devenv.nix setup? [y/N] " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            WITH_DEVENV=true
+        fi
+    fi
+fi
+
+# Resolve paths
+PROJECT_DIR="$TARGET_DIR/$PROJECT_NAME"
+PROJECT_DIR=$(realpath -m "$PROJECT_DIR")
+
+if [[ -e "$PROJECT_DIR" ]]; then
+    log_error "Directory already exists: $PROJECT_DIR"
+    exit 1
+fi
+
+log_info "Creating project: $PROJECT_NAME"
+log_info "Location: $PROJECT_DIR"
+[[ "$WITH_DB" == true ]] && log_info "Including: Database layer (SQLite + Drizzle)"
+[[ "$WITH_DEVENV" == true ]] && log_info "Including: devenv.nix setup"
+
+# Create directory structure
+mkdir -p "$PROJECT_DIR/src/components"
+
+# Create package.json
+if [[ "$WITH_DB" == true ]]; then
+    cat > "$PROJECT_DIR/package.json" << 'EOF'
+{
+  "name": "PROJECT_NAME_PLACEHOLDER",
+  "scripts": {
+    "ui": "bun run src/main.tsx",
+    "test": "bun test ./src/",
+    "test:update": "bun test ./src/ --update-snapshots",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.1.67",
+    "@opentui/solid": "^0.1.67",
+    "drizzle-orm": "^0.45.1",
+    "solid-js": "^1.9.5"
+  },
+  "devDependencies": {
+    "bun-types": "^1.3.4",
+    "drizzle-kit": "^0.31.8"
+  }
+}
+EOF
+else
+    cat > "$PROJECT_DIR/package.json" << 'EOF'
+{
+  "name": "PROJECT_NAME_PLACEHOLDER",
+  "scripts": {
+    "ui": "bun run src/main.tsx",
+    "test": "bun test ./src/",
+    "test:update": "bun test ./src/ --update-snapshots"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.1.67",
+    "@opentui/solid": "^0.1.67",
+    "solid-js": "^1.9.5"
+  },
+  "devDependencies": {
+    "bun-types": "^1.3.4"
+  }
+}
+EOF
+fi
+sed -i "s/PROJECT_NAME_PLACEHOLDER/$PROJECT_NAME/g" "$PROJECT_DIR/package.json"
+
+# Create tsconfig.json
+cat > "$PROJECT_DIR/tsconfig.json" << 'EOF'
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "jsxImportSource": "@opentui/solid",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["bun-types"]
+  },
+  "include": ["*.ts", "*.tsx", "src/**/*.ts", "src/**/*.tsx"]
+}
+EOF
+
+# Create bunfig.toml
+cat > "$PROJECT_DIR/bunfig.toml" << 'EOF'
+preload = ["@opentui/solid/preload"]
+
+[test]
+preload = ["@opentui/solid/preload"]
+EOF
+
+# Create .gitignore
+cat > "$PROJECT_DIR/.gitignore" << 'EOF'
+node_modules/
+.DS_Store
+*.log
+data/
+drizzle/
+.env
+.devenv/
+.direnv/
+EOF
+
+# Create src/main.tsx
+cat > "$PROJECT_DIR/src/main.tsx" << 'EOF'
+#!/usr/bin/env bun
+
+import { render } from "@opentui/solid";
+import { App } from "./App";
+
+render(() => <App />, { useAlternateScreen: true });
+EOF
+
+# Create src/App.tsx
+cat > "$PROJECT_DIR/src/App.tsx" << 'EOF'
+import { useKeyboard, useTerminalDimensions, useRenderer } from "@opentui/solid";
+import { createSignal } from "solid-js";
+
+export function App() {
+  const renderer = useRenderer();
+  const dimensions = useTerminalDimensions();
+  const [count, setCount] = createSignal(0);
+
+  useKeyboard((key) => {
+    switch (key.name) {
+      case "q":
+        renderer.stop();
+        process.exit(0);
+        break;
+      case "up":
+      case "k":
+        setCount((c) => c + 1);
+        break;
+      case "down":
+      case "j":
+        setCount((c) => c - 1);
+        break;
+    }
+  });
+
+  return (
+    <box
+      flexDirection="column"
+      style={{ width: dimensions().width, height: dimensions().height }}
+    >
+      <box style={{ height: 1, backgroundColor: "#1a1a2a", paddingLeft: 1 }}>
+        <text bold>Welcome to your TUI app</text>
+      </box>
+      <box flexGrow={1} justifyContent="center" alignItems="center">
+        <text>Count: {count()}</text>
+      </box>
+      <box style={{ height: 1, backgroundColor: "#1a1a2a", paddingLeft: 1 }}>
+        <text dim>j/k: adjust count | q: quit</text>
+      </box>
+    </box>
+  );
+}
+EOF
+
+# Create src/types.ts
+cat > "$PROJECT_DIR/src/types.ts" << 'EOF'
+// Shared types for the application
+
+export type Result<T, E = string> =
+  | { ok: true; data: T }
+  | { ok: false; error: E };
+EOF
+
+# Create src/shortcuts.ts
+cat > "$PROJECT_DIR/src/shortcuts.ts" << 'EOF'
+// Keyboard shortcut definitions
+
+export type Action =
+  | "moveUp"
+  | "moveDown"
+  | "quit"
+  | "help";
+
+interface KeyEvent {
+  name: string;
+  ctrl?: boolean;
+  shift?: boolean;
+}
+
+export function matchShortcut(key: KeyEvent): Action | null {
+  if (key.name === "q") return "quit";
+  if (key.name === "k" || key.name === "up") return "moveUp";
+  if (key.name === "j" || key.name === "down") return "moveDown";
+  if (key.name === "?") return "help";
+  return null;
+}
+EOF
+
+# Create src/components/index.ts
+cat > "$PROJECT_DIR/src/components/index.ts" << 'EOF'
+// Barrel export for components
+// Add component exports here as you create them
+// export { StatusBar } from "./StatusBar";
+EOF
+
+# Create README.md
+cat > "$PROJECT_DIR/README.md" << EOF
+# $PROJECT_NAME
+
+A terminal UI application built with Bun, SolidJS, and OpenTUI.
+
+## Getting Started
+
+\`\`\`bash
+# Install dependencies
+bun install
+
+# Run the app
+bun run ui
+
+# Run tests
+bun run test
+\`\`\`
+
+## Keyboard Shortcuts
+
+- \`j\` / \`k\` or arrow keys: Navigate
+- \`q\`: Quit
+
+## Project Structure
+
+\`\`\`
+src/
+├── components/     # UI components
+├── App.tsx         # Main application component
+├── main.tsx        # Entry point
+├── types.ts        # Shared types
+└── shortcuts.ts    # Keyboard handling
+\`\`\`
+EOF
+
+# Optional: Database layer
+if [[ "$WITH_DB" == true ]]; then
+    mkdir -p "$PROJECT_DIR/src/services/$PROJECT_NAME"
+    mkdir -p "$PROJECT_DIR/data"
+
+    # Create drizzle.config.ts
+    cat > "$PROJECT_DIR/drizzle.config.ts" << EOF
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "sqlite",
+  schema: "./src/services/$PROJECT_NAME/schema.ts",
+  out: "./drizzle",
+  dbCredentials: {
+    url: "./data/$PROJECT_NAME.db",
+  },
+});
+EOF
+
+    # Create schema.ts
+    cat > "$PROJECT_DIR/src/services/$PROJECT_NAME/schema.ts" << 'EOF'
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+
+export const items = sqliteTable("items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export type Item = typeof items.$inferSelect;
+export type NewItem = typeof items.$inferInsert;
+EOF
+
+    # Create repository.ts
+    cat > "$PROJECT_DIR/src/services/$PROJECT_NAME/repository.ts" << 'EOF'
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { Database } from "bun:sqlite";
+import * as schema from "./schema";
+import type { Result } from "../../types";
+import type { Item, NewItem } from "./schema";
+
+export interface Repository {
+  getAll(): Promise<Result<Item[]>>;
+  create(item: NewItem): Promise<Result<Item>>;
+}
+
+export function createRepository(dbPath: string): Repository {
+  const sqlite = new Database(dbPath);
+  const db = drizzle(sqlite, { schema });
+
+  return {
+    async getAll(): Promise<Result<Item[]>> {
+      try {
+        const items = await db.select().from(schema.items);
+        return { ok: true, data: items };
+      } catch (error) {
+        return { ok: false, error: (error as Error).message };
+      }
+    },
+
+    async create(item: NewItem): Promise<Result<Item>> {
+      try {
+        const [created] = await db
+          .insert(schema.items)
+          .values(item)
+          .returning();
+        return { ok: true, data: created };
+      } catch (error) {
+        return { ok: false, error: (error as Error).message };
+      }
+    },
+  };
+}
+EOF
+
+    # Create types.ts for service
+    cat > "$PROJECT_DIR/src/services/$PROJECT_NAME/types.ts" << 'EOF'
+export type { Item, NewItem } from "./schema";
+export type { Repository } from "./repository";
+EOF
+
+    # Create index.ts for service
+    cat > "$PROJECT_DIR/src/services/$PROJECT_NAME/index.ts" << 'EOF'
+export { createRepository } from "./repository";
+export type { Repository, Item, NewItem } from "./types";
+EOF
+
+    log_success "Created database layer"
+fi
+
+# Optional: devenv setup
+if [[ "$WITH_DEVENV" == true ]]; then
+    # Create devenv.yaml
+    cat > "$PROJECT_DIR/devenv.yaml" << 'EOF'
+inputs:
+  nixpkgs:
+    url: github:cachix/devenv-nixpkgs/rolling
+EOF
+
+    # Create devenv.nix
+    cat > "$PROJECT_DIR/devenv.nix" << 'EOF'
+{ pkgs, ... }:
+
+{
+  packages = with pkgs; [
+    git
+  ];
+
+  languages.javascript.bun.enable = true;
+  languages.javascript.bun.install.enable = true;
+
+  enterShell = ''
+    echo "Development environment ready"
+    bun --version
+  '';
+}
+EOF
+
+    # Create .envrc
+    cat > "$PROJECT_DIR/.envrc" << 'EOF'
+use devenv
+EOF
+
+    log_success "Created devenv setup"
+fi
+
+log_success "Created project structure"
+
+# Initialize git repo
+cd "$PROJECT_DIR"
+git init -q
+log_success "Initialized git repository"
+
+# Install dependencies
+log_info "Installing dependencies..."
+if command -v bun &> /dev/null; then
+    bun install
+    log_success "Dependencies installed"
+else
+    log_warn "bun not found in PATH. Run 'bun install' manually."
+fi
+
+echo ""
+log_success "Project created successfully!"
+echo ""
+echo "Next steps:"
+echo "  cd $PROJECT_DIR"
+[[ "$WITH_DEVENV" == true ]] && echo "  direnv allow  # if using devenv"
+echo "  bun run ui   # start the app"
+echo ""
