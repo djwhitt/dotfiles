@@ -3,12 +3,14 @@
     "position": "top",
     "height": 30,
 
-    "modules-left": ["niri/workspaces"],
+    "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
     "modules-right": ["cpu", "memory", "temperature", "pulseaudio", "network", "battery", "tray"],
 
-    "niri/workspaces": {
-        "format": "{index}"
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "on-scroll-up": "hyprctl dispatch workspace e-1",
+        "on-scroll-down": "hyprctl dispatch workspace e+1"
     },
 
     "cpu": {
