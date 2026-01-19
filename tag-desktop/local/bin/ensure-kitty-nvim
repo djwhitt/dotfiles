@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Used by avante.nvim
-ANTHROPIC_API_KEY="$(anthropic-api-key)"
-export ANTHROPIC_API_KEY
-
-export SSH_AUTH_SOCK=/run/user/1000/gnupg/S.gpg-agent.ssh
-
-# Used by conditionals in Neovim config
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.ssh"
 export KITTY_NVIM=true
 
 window_class="kitty-nvim"
 nvimsocket="${XDG_RUNTIME_DIR}/nvimsocket"
 
-if ! find-and-focus $window_class; then 
-  pgrep nvim > /dev/null || rm -f "${nvimsocket}"
-  kitty --class $window_class --detach nvim --listen "${nvimsocket}"
-  while ! find-and-focus $window_class; do sleep 0.05; done
+# Check if window with class kitty-nvim exists
+if hyprctl clients -j | jq -e '.[] | select(.class == "'"$window_class"'")' > /dev/null 2>&1; then
+  # Window exists - focus it
+  hyprctl dispatch focuswindow "class:$window_class"
+else
+  # Window doesn't exist - clean up stale socket and launch
+  pgrep nvim >/dev/null 2>&1 || rm -f "${nvimsocket}"
+
+  kitty --class "$window_class" --detach \
+    -o env=SSH_AUTH_SOCK="${SSH_AUTH_SOCK}" \
+    -o env=KITTY_NVIM=true \
+    nvim --listen "${nvimsocket}"
 fi
