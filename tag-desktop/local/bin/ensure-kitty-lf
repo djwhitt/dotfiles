@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-
-export VISUAL="$HOME/.local/bin/e"
+set -euo pipefail
 
 window_class="kitty-lf"
 
-if ! find-and-focus $window_class; then 
-  kitty --class $window_class --title lf --detach lf
-  while ! find-and-focus $window_class; do sleep 0.05; done
+# Check if window with class kitty-lf exists
+if hyprctl clients -j | jq -e '.[] | select(.class == "'"$window_class"'")' > /dev/null 2>&1; then
+  # Window exists - focus it
+  hyprctl dispatch focuswindow "class:$window_class"
+else
+  # Window doesn't exist - launch it
+  kitty --class "$window_class" --title "lf" -o env=EDITOR=e -o env=VISUAL=e lf &
+  disown
 fi
