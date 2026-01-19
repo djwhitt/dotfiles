@@ -51,16 +51,15 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 |-----|-----------------|-------|
 | Fish shell | `config/fish/` | Primary shell, modular conf.d/ setup |
 | Neovim | `config/nvim/lua/` | Lua-based config |
-| Kitty | `tag-desktop/config/kitty/` | Terminal with custom tab management |
+| Kitty | `tag-desktop/config/kitty/` | Terminal with hyprctl window management |
 | LF | `tag-desktop/config/lf/` | File manager with custom scripts |
 | Atuin | `config/atuin/` | Shell history manager |
 
 ## Notable Scripts
 
-### Kitty Tab Management (`tag-desktop/local/bin/`)
-- `ensure-kitty-nvim-tab` - Opens Neovim in dedicated Kitty tab
-- `ensure-kitty-lf-tab` - Opens LF file manager in tab
-- `ensure-kitty-taskwarrior-tab` - Opens Taskwarrior in tab
+### Kitty Window Management (`tag-desktop/local/bin/`)
+- `ensure-kitty-nvim` - Opens Neovim in dedicated Kitty window on workspace 3
+- `ensure-kitty-lf` - Opens LF file manager in dedicated Kitty window
 
 ### Media Processing
 - `record-call` - Call recording with transcription/GPT processing
@@ -81,4 +80,4 @@ Tasks use Malli for validation and interact with NocoDB API.
 - Scripts use Fish shell conventions when in `config/fish/`
 - Bash scripts should use `#!/usr/bin/env bash` shebang for portability
 - Bash scripts should include proper error handling
-- Kitty scripts follow the `ensure-kitty-*-tab` pattern for tab management
+- Kitty scripts follow the `ensure-kitty-*` pattern for window management
