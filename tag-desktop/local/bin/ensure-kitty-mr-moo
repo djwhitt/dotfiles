@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+window_class="mr-moo"
+
+# Check if window with class mr-moo exists
+if hyprctl clients -j | jq -e '.[] | select(.class == "'"$window_class"'")' > /dev/null 2>&1; then
+  # Window exists - focus it
+  hyprctl dispatch focuswindow "class:$window_class"
+else
+  # Window doesn't exist - launch it
+  kitty --class "$window_class" --title "Mr Moo" --directory "$HOME/Work/mr-moo" bun run ui &
+  disown
+fi
