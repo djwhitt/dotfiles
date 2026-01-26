@@ -280,6 +280,13 @@ class DisplayHandler {
     }
   }
 
+  private resolveFilePath(filePath: string): string {
+    if (path.isAbsolute(filePath)) {
+      return filePath;
+    }
+    return path.join(this.gitRoot, filePath);
+  }
+
   scheduleUpdate(): void {
     if (this.updateTimeout) {
       clearTimeout(this.updateTimeout);
@@ -300,12 +307,7 @@ class DisplayHandler {
       const referencedFiles = new Set<string>();
       for (const item of data.items) {
         if (item.file) {
-          // Resolve relative paths relative to git root
-          let filePath = path.resolve(item.file);
-          if (!path.isAbsolute(item.file)) {
-            filePath = path.join(this.gitRoot, item.file);
-          }
-          referencedFiles.add(filePath);
+          referencedFiles.add(this.resolveFilePath(item.file));
         }
       }
 
@@ -328,7 +330,6 @@ class DisplayHandler {
       }
 
     } catch (error: any) {
-
       if (error.code === "ENOENT") {
         console.log(`Waiting for ${this.jsonPath} to be created...`);
       } else if (error instanceof SyntaxError) {
@@ -354,11 +355,7 @@ class DisplayHandler {
       displayType = getTypeFromExtension(item.file);
       isFile = true;
 
-      // Resolve relative paths relative to git root
-      let filePath = path.resolve(item.file);
-      if (!path.isAbsolute(item.file)) {
-        filePath = path.join(this.gitRoot, item.file);
-      }
+      const filePath = this.resolveFilePath(item.file);
 
       if (!existsSync(filePath)) {
         console.log(`File not found: ${filePath}`);
@@ -389,7 +386,7 @@ class DisplayHandler {
     // Route to appropriate display handler
     if (displayType === "image") {
       if (isFile) {
-        await this.displayImageFromPath(content);
+        await this.displayImage(content);
       } else {
         console.log(`Inline image content not supported`);
       }
@@ -400,44 +397,19 @@ class DisplayHandler {
     }
   }
 
-  private async displayImageFromPath(imagePath: string): Promise<void> {
-    // Build kitty icat command
-    const cmd = ["kitty", "+kitten", "icat", imagePath];
-
-    try {
-      // Use spawn for better control over the kitty process
-      const proc = Bun.spawn(cmd, {
-        stdout: "inherit",
-        stderr: "pipe",  // Pipe stderr to suppress ImageMagick warnings
-        stdin: "inherit",
-      });
-
-      // Wait for process to complete
-      await proc.exited;
-
-      // Only show errors if exit code is non-zero
-      if (proc.exitCode !== 0) {
-        const stderr = await new Response(proc.stderr).text();
-        if (stderr && !stderr.includes("ImageMagick")) {
-          console.error(`Error displaying image: ${stderr}`);
-        }
-      }
-    } catch (error: any) {
-      console.log(`Error displaying image: ${error.message}`);
-    }
-  }
-
-  private async displayGeneratedImage(imagePath: string): Promise<void> {
+  private async displayImage(imagePath: string, throwOnError = false): Promise<void> {
     await logToFile(`Displaying image: ${imagePath}`, this.logFilePath);
 
     if (!existsSync(imagePath)) {
-      await logToFile(`Image file does not exist: ${imagePath}`, this.logFilePath);
-      throw new Error(`Generated image not found: ${imagePath}`);
+      const message = `Image file not found: ${imagePath}`;
+      await logToFile(message, this.logFilePath);
+      if (throwOnError) {
+        throw new Error(message);
+      }
+      console.log(message);
+      return;
     }
 
-    await logToFile(`Image file exists, proceeding with kitty icat`, this.logFilePath);
-
-    // Reuse existing kitty icat logic
     const proc = Bun.spawn(["kitty", "+kitten", "icat", imagePath], {
       stdout: "inherit",
       stderr: "pipe",
@@ -449,9 +421,13 @@ class DisplayHandler {
 
     if (proc.exitCode !== 0) {
       const stderr = await new Response(proc.stderr).text();
-      await logToFile(`kitty icat stderr: ${stderr}`, this.logFilePath);
+      // Ignore ImageMagick warnings which are not actual errors
       if (stderr && !stderr.includes("ImageMagick")) {
-        throw new Error(`Image display failed: ${stderr}`);
+        await logToFile(`kitty icat stderr: ${stderr}`, this.logFilePath);
+        if (throwOnError) {
+          throw new Error(`Image display failed: ${stderr}`);
+        }
+        console.error(`Error displaying image: ${stderr}`);
       }
     } else {
       await logToFile("Image display completed successfully", this.logFilePath);
@@ -461,66 +437,37 @@ class DisplayHandler {
   private async displayDiagramFromContent(toolName: string, content: string): Promise<void> {
     const tool = this.diagramTools[toolName];
 
-    await logToFile(`Starting ${tool.name} rendering`, this.logFilePath);
-
     if (!tool.available) {
-      await logToFile(`${tool.name} is not available on this system`, this.logFilePath);
       console.log(`${tool.name} is not available on this system`);
       return;
     }
 
-    await logToFile(`${tool.name} is available, proceeding with rendering`, this.logFilePath);
+    await logToFile(`Rendering ${tool.name} diagram`, this.logFilePath);
 
     try {
       // Create temp directory
-      let tempBase = tmpdir();
-      if (!existsSync(tempBase)) {
-        tempBase = "/tmp";
-      }
+      const tempBase = existsSync(tmpdir()) ? tmpdir() : "/tmp";
       const tempDir = await mkdtemp(path.join(tempBase, tool.tempPrefix));
-      await logToFile(`Created temp directory: ${tempDir}`, this.logFilePath);
       this.activeTempDirs.add(tempDir);
 
-      // Prepare output path
-      const outputPath = path.join(tempDir, `output.png`);
+      // Prepare paths
+      const outputPath = path.join(tempDir, "output.png");
+      const inputPath = path.join(tempDir, `input${tool.inputExtension}`);
 
-      // Prepare content (some tools need modification)
+      // Prepare and write content (some tools need modification)
       const preparedContent = tool.prepareContent
         ? tool.prepareContent(content, outputPath)
         : content;
-
-      // Create input file
-      const inputPath = path.join(tempDir, `input${tool.inputExtension}`);
       await writeFile(inputPath, preparedContent);
-      await logToFile(`Wrote ${tool.name} content to: ${inputPath}`, this.logFilePath);
-      await logToFile(`Content length: ${preparedContent.length} chars`, this.logFilePath);
 
-      // Run the tool
-      await logToFile(`Running ${tool.name} command...`, this.logFilePath);
+      // Run the tool and display the result
       const actualOutputPath = await tool.run(inputPath, outputPath, tempDir);
-      await logToFile(`${tool.name} command completed`, this.logFilePath);
-
-      // Check if output was generated
-      if (existsSync(actualOutputPath)) {
-        await logToFile(`PNG file exists, size: ${(await readFile(actualOutputPath)).length} bytes`, this.logFilePath);
-      } else {
-        await logToFile("PNG file does not exist!", this.logFilePath);
-        const dirContents = await readdir(tempDir);
-        await logToFile(`Directory contents: ${JSON.stringify(dirContents)}`, this.logFilePath);
-      }
-
-      // Display the generated image
-      await logToFile("Attempting to display image...", this.logFilePath);
-      await this.displayGeneratedImage(actualOutputPath);
-      await logToFile("Image display completed", this.logFilePath);
+      await this.displayImage(actualOutputPath, true);
 
     } catch (error: any) {
       await logToFile(`Error in ${tool.name} rendering: ${error.message}`, this.logFilePath);
-      await logToFile(`Error stack: ${error.stack || 'No stack'}`, this.logFilePath);
       console.log(`Error rendering ${tool.name}: ${error.message}`);
     }
-
-    await logToFile(`${tool.name} rendering complete`, this.logFilePath);
   }
 
   async cleanupAllTempDirs(): Promise<void> {
@@ -588,13 +535,7 @@ async function main(): Promise<void> {
 
   // Find git root and determine JSON file path
   const gitRoot = findGitRoot();
-  let jsonPath: string;
-  if (process.argv.length > 2 && process.argv[2]) {
-    jsonPath = process.argv[2];
-  } else {
-    // Default to .live-display.json in git root
-    jsonPath = path.join(gitRoot, ".live-display.json");
-  }
+  const jsonPath = process.argv[2] || path.join(gitRoot, ".live-display.json");
 
   // Create PID file to indicate live-display is running
   const pidPath = await createPidFile(gitRoot);
