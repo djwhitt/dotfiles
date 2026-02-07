@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cd ~/Work/mr-moo || exit 1
+exec bun run moo-tasks "$@"
