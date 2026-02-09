@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 
+MOO_CWD=$(pwd)
+export MOO_CWD
+
+echo "$MOO_CWD"
+
 cd ~/Work/mr-moo || exit 1
-exec bun run moo-tasks "$@"
+exec bun run moo "$@"
