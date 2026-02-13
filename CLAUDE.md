@@ -58,7 +58,7 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 ## Notable Scripts
 
 ### Kitty Window Management (`tag-desktop/local/bin/`)
-- `ensure-kitty-nvim` - Opens Neovim in dedicated Kitty window on workspace 3
+- `ensure-kitty-nvim` - Opens Neovim in dedicated Kitty window on workspace 2
 - `ensure-kitty-lf` - Opens LF file manager in dedicated Kitty window
 
 ### Media Processing
