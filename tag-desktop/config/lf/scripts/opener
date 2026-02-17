@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+case "$(file -Lb --mime-type -- "$1")" in
+    text/*|application/json|application/javascript|application/xml|application/x-shellscript|application/toml|application/x-ndjson)
+        e "$1"
+        ;;
+    *)
+        xdg-open "$1" &
+        ;;
+esac

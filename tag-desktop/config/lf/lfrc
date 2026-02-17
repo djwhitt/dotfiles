@@ -1,6 +1,8 @@
 set cleaner ~/.config/lf/scripts/cleaner
 set previewer ~/.config/lf/scripts/previewer
 
+cmd open $~/.config/lf/scripts/opener "$f"
+
 $mkdir -p ~/.trash
 
 cmd trash $IFS="$(printf '\n\t')"; mv $fx ~/.trash
