@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { watchFile, unwatchFile } from "fs";
+import { watch, type FSWatcher } from "fs";
 import { readFile, writeFile, unlink, mkdtemp, rm, readdir, appendFile } from "fs/promises";
 import { existsSync } from "fs";
 import { tmpdir } from "os";
@@ -80,6 +80,24 @@ function findGitRoot(startPath: string = process.cwd()): string {
 
 async function createPidFile(gitRoot: string): Promise<string> {
   const pidPath = path.join(gitRoot, ".live-display.pid");
+
+  // Check for stale PID file from a previous run
+  if (existsSync(pidPath)) {
+    try {
+      const oldPid = parseInt(await readFile(pidPath, "utf-8"), 10);
+      if (!isNaN(oldPid)) {
+        try {
+          process.kill(oldPid, 0); // Throws if process doesn't exist
+          console.warn(`Warning: another live-display process (PID ${oldPid}) appears to be running.`);
+        } catch {
+          // Process not running — stale PID file, safe to overwrite
+        }
+      }
+    } catch {
+      // Can't read PID file — overwrite it
+    }
+  }
+
   await writeFile(pidPath, process.pid.toString());
   return pidPath;
 }
@@ -170,8 +188,11 @@ class DisplayHandler {
   private logFilePath: string;
   private diagramTools: Record<string, DiagramTool> = {};
   private activeTempDirs = new Set<string>();
-  private watchedFiles = new Set<string>();
+  private previousTempDirs = new Set<string>();
+  private fileWatchers = new Map<string, FSWatcher>();
   private updateTimeout: ReturnType<typeof setTimeout> | null = null;
+  private updating = false;
+  private pendingUpdate = false;
   private readonly DEBOUNCE_MS = 100;
 
   constructor(jsonPath: string) {
@@ -179,6 +200,8 @@ class DisplayHandler {
     this.gitRoot = findGitRoot();
     this.logFilePath = path.join(this.gitRoot, '.live-display.log');
     this.initializeDiagramTools();
+    // Truncate log file on startup
+    Bun.write(this.logFilePath, `[${new Date().toISOString()}] live-display started (PID ${process.pid})\n`);
   }
 
   private initializeDiagramTools(): void {
@@ -216,8 +239,8 @@ class DisplayHandler {
         inputExtension: '.gp',
         prepareContent: (content, outputPath) => {
           // Check if script already has terminal settings (only match uncommented lines)
-          const hasTerminal = /^\s*set\s+terminal/im.test(content);
-          const hasOutput = /^\s*set\s+output/im.test(content);
+          const hasTerminal = /^\s*set\s+term(inal)?[\s]/im.test(content);
+          const hasOutput = /^\s*set\s+out(put)?[\s]/im.test(content);
 
           if (!hasTerminal || !hasOutput) {
             // Prepend PNG terminal settings if not present
@@ -295,9 +318,19 @@ class DisplayHandler {
   }
 
   async updateDisplay(): Promise<void> {
+    if (this.updating) {
+      this.pendingUpdate = true;
+      return;
+    }
+    this.updating = true;
+
     try {
-      // Clean up temp files from previous render
-      await this.cleanupAllTempDirs();
+      // Clean up temp dirs from the render *before* the previous one
+      await this.cleanupPreviousTempDirs();
+
+      // Move current active dirs to previous (still readable by kitty icat)
+      this.previousTempDirs = this.activeTempDirs;
+      this.activeTempDirs = new Set<string>();
 
       const content = await readFile(this.jsonPath, "utf-8");
       const parsed: unknown = JSON.parse(content);
@@ -337,6 +370,12 @@ class DisplayHandler {
       } else {
         console.log(`Error: ${error.message}`);
       }
+    } finally {
+      this.updating = false;
+      if (this.pendingUpdate) {
+        this.pendingUpdate = false;
+        this.scheduleUpdate();
+      }
     }
   }
 
@@ -374,19 +413,21 @@ class DisplayHandler {
           return;
         }
       }
-    } else if (item.type && item.content) {
-      // Inline content rendering
-      displayType = item.type;
-      content = item.content;
     } else {
-      console.log(`Invalid item: must have either 'file' or both 'type' and 'content'`);
-      return;
+      // Inline content rendering (validated by validateDisplayData)
+      displayType = item.type!;
+      content = item.content!;
     }
 
     // Route to appropriate display handler
     if (displayType === "image") {
       if (isFile) {
-        await this.displayImage(content);
+        try {
+          await this.displayImage(content);
+        } catch (error: any) {
+          await logToFile(`Error displaying image: ${error.message}`, this.logFilePath);
+          console.log(`Error displaying image: ${error.message}`);
+        }
       } else {
         console.log(`Inline image content not supported`);
       }
@@ -397,17 +438,11 @@ class DisplayHandler {
     }
   }
 
-  private async displayImage(imagePath: string, throwOnError = false): Promise<void> {
+  private async displayImage(imagePath: string): Promise<void> {
     await logToFile(`Displaying image: ${imagePath}`, this.logFilePath);
 
     if (!existsSync(imagePath)) {
-      const message = `Image file not found: ${imagePath}`;
-      await logToFile(message, this.logFilePath);
-      if (throwOnError) {
-        throw new Error(message);
-      }
-      console.log(message);
-      return;
+      throw new Error(`Image file not found: ${imagePath}`);
     }
 
     const proc = Bun.spawn(["kitty", "+kitten", "icat", imagePath], {
@@ -424,10 +459,7 @@ class DisplayHandler {
       // Ignore ImageMagick warnings which are not actual errors
       if (stderr && !stderr.includes("ImageMagick")) {
         await logToFile(`kitty icat stderr: ${stderr}`, this.logFilePath);
-        if (throwOnError) {
-          throw new Error(`Image display failed: ${stderr}`);
-        }
-        console.error(`Error displaying image: ${stderr}`);
+        throw new Error(`Image display failed: ${stderr}`);
       }
     } else {
       await logToFile("Image display completed successfully", this.logFilePath);
@@ -446,8 +478,7 @@ class DisplayHandler {
 
     try {
       // Create temp directory
-      const tempBase = existsSync(tmpdir()) ? tmpdir() : "/tmp";
-      const tempDir = await mkdtemp(path.join(tempBase, tool.tempPrefix));
+      const tempDir = await mkdtemp(path.join(tmpdir(), tool.tempPrefix));
       this.activeTempDirs.add(tempDir);
 
       // Prepare paths
@@ -462,7 +493,7 @@ class DisplayHandler {
 
       // Run the tool and display the result
       const actualOutputPath = await tool.run(inputPath, outputPath, tempDir);
-      await this.displayImage(actualOutputPath, true);
+      await this.displayImage(actualOutputPath);
 
     } catch (error: any) {
       await logToFile(`Error in ${tool.name} rendering: ${error.message}`, this.logFilePath);
@@ -470,8 +501,8 @@ class DisplayHandler {
     }
   }
 
-  async cleanupAllTempDirs(): Promise<void> {
-    for (const tempDir of this.activeTempDirs) {
+  private async cleanupTempDirSet(dirs: Set<string>): Promise<void> {
+    for (const tempDir of dirs) {
       try {
         if (existsSync(tempDir)) {
           await rm(tempDir, { recursive: true, force: true });
@@ -481,41 +512,48 @@ class DisplayHandler {
         console.warn(`Failed to cleanup ${tempDir}: ${error.message}`);
       }
     }
-    this.activeTempDirs.clear();
+    dirs.clear();
+  }
+
+  private async cleanupPreviousTempDirs(): Promise<void> {
+    await this.cleanupTempDirSet(this.previousTempDirs);
+  }
+
+  async cleanupAllTempDirs(): Promise<void> {
+    await this.cleanupTempDirSet(this.previousTempDirs);
+    await this.cleanupTempDirSet(this.activeTempDirs);
   }
 
   private async updateFileWatchers(referencedFiles: Set<string>): Promise<void> {
     // Remove watchers for files no longer referenced
-    for (const watchedFile of this.watchedFiles) {
+    for (const [watchedFile, watcher] of this.fileWatchers) {
       if (!referencedFiles.has(watchedFile)) {
-        unwatchFile(watchedFile);
-        this.watchedFiles.delete(watchedFile);
+        watcher.close();
+        this.fileWatchers.delete(watchedFile);
         await logToFile(`Stopped watching: ${watchedFile}`, this.logFilePath);
       }
     }
 
     // Add watchers for new files
     for (const file of referencedFiles) {
-      if (!this.watchedFiles.has(file) && existsSync(file)) {
-        watchFile(file, { interval: 1000 }, async (curr, prev) => {
-          // Check if file has been modified (mtime changed)
-          if (curr.mtime !== prev.mtime) {
+      if (!this.fileWatchers.has(file) && existsSync(file)) {
+        const watcher = watch(file, async (eventType) => {
+          if (eventType === "change") {
             await logToFile(`Detected change in: ${file}`, this.logFilePath);
             this.scheduleUpdate();
           }
         });
-        this.watchedFiles.add(file);
+        this.fileWatchers.set(file, watcher);
         await logToFile(`Now watching: ${file}`, this.logFilePath);
       }
     }
   }
 
   cleanupFileWatchers(): void {
-    // Remove all file watchers
-    for (const watchedFile of this.watchedFiles) {
-      unwatchFile(watchedFile);
+    for (const [, watcher] of this.fileWatchers) {
+      watcher.close();
     }
-    this.watchedFiles.clear();
+    this.fileWatchers.clear();
   }
 }
 
@@ -569,25 +607,25 @@ async function main(): Promise<void> {
   // Display initial content
   await handler.updateDisplay();
 
-  // Set up file watcher with polling for better reliability
-  // watchFile polls the file every interval (default 5007ms)
-  // This is more reliable than fs.watch for detecting file changes
-  watchFile(jsonPath, { interval: 1000 }, async (curr, prev) => {
-    // Check if file has been modified (mtime changed)
-    if (curr.mtime !== prev.mtime) {
+  // Watch JSON file for changes using inotify-based fs.watch
+  const jsonWatcher = watch(jsonPath, (eventType) => {
+    if (eventType === "change") {
       handler.scheduleUpdate();
     }
   });
 
   // Cleanup function
   const cleanup = async () => {
-    unwatchFile(jsonPath);
+    jsonWatcher.close();
     handler.cleanupFileWatchers();
     await handler.cleanupAllTempDirs();
     await removePidFile(pidPath);
     console.log("\nStopped watching");
     process.exit(0);
   };
+
+  // Re-render on terminal resize
+  process.on("SIGWINCH", () => handler.scheduleUpdate());
 
   // Handle Ctrl+C and other termination signals
   process.on("SIGINT", cleanup);
