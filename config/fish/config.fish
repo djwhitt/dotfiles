@@ -1,3 +1,5 @@
+set -gx BAT_THEME TwoDark
+
 alias tl="tmuxp load"
 alias ls="ls --hyperlink=auto --color=auto"
 alias j="just"
