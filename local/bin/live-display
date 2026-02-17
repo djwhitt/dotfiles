@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
-import { watch, type FSWatcher } from "fs";
-import { readFile, writeFile, unlink, mkdtemp, rm, readdir, appendFile } from "fs/promises";
-import { existsSync } from "fs";
+import { existsSync, watch, type FSWatcher } from "fs";
+import { appendFile, mkdtemp, readFile, readdir, rm, unlink, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import path from "path";
 
@@ -44,16 +43,6 @@ interface DiagramTool {
   run: (inputPath: string, outputPath: string, tempDir: string) => Promise<string>;
 }
 
-async function logToFile(message: string, logFilePath: string): Promise<void> {
-  const timestamp = new Date().toISOString();
-  const logMessage = `[${timestamp}] ${message}\n`;
-  try {
-    await appendFile(logFilePath, logMessage);
-  } catch {
-    // Ignore logging errors
-  }
-}
-
 function getTypeFromExtension(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   const type = EXTENSION_TYPE_MAP[ext];
@@ -78,23 +67,27 @@ function findGitRoot(startPath: string = process.cwd()): string {
   return process.cwd();
 }
 
+function isProcessRunning(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function createPidFile(gitRoot: string): Promise<string> {
   const pidPath = path.join(gitRoot, ".live-display.pid");
 
-  // Check for stale PID file from a previous run
   if (existsSync(pidPath)) {
     try {
       const oldPid = parseInt(await readFile(pidPath, "utf-8"), 10);
-      if (!isNaN(oldPid)) {
-        try {
-          process.kill(oldPid, 0); // Throws if process doesn't exist
-          console.warn(`Warning: another live-display process (PID ${oldPid}) appears to be running.`);
-        } catch {
-          // Process not running — stale PID file, safe to overwrite
-        }
+      // process.kill with signal 0 tests whether the process exists
+      if (!isNaN(oldPid) && isProcessRunning(oldPid)) {
+        console.warn(`Warning: another live-display process (PID ${oldPid}) appears to be running.`);
       }
     } catch {
-      // Can't read PID file — overwrite it
+      // Can't read PID file -- overwrite it
     }
   }
 
@@ -104,9 +97,7 @@ async function createPidFile(gitRoot: string): Promise<string> {
 
 async function removePidFile(pidPath: string): Promise<void> {
   try {
-    if (existsSync(pidPath)) {
-      await unlink(pidPath);
-    }
+    await unlink(pidPath);
   } catch {
     // Ignore errors when removing PID file
   }
@@ -200,8 +191,16 @@ class DisplayHandler {
     this.gitRoot = findGitRoot();
     this.logFilePath = path.join(this.gitRoot, '.live-display.log');
     this.initializeDiagramTools();
-    // Truncate log file on startup
     Bun.write(this.logFilePath, `[${new Date().toISOString()}] live-display started (PID ${process.pid})\n`);
+  }
+
+  private async log(message: string): Promise<void> {
+    const timestamp = new Date().toISOString();
+    try {
+      await appendFile(this.logFilePath, `[${timestamp}] ${message}\n`);
+    } catch {
+      // Ignore logging errors
+    }
   }
 
   private initializeDiagramTools(): void {
@@ -266,11 +265,7 @@ class DisplayHandler {
     };
   }
 
-  async initialize(): Promise<void> {
-    await this.checkToolAvailability();
-  }
-
-  private async checkToolAvailability(): Promise<void> {
+  async checkToolAvailability(): Promise<void> {
     const checks: [string, string[]][] = [
       ['plantuml', ['plantuml', '-version']],
       ['dot', ['dot', '-V']],
@@ -290,15 +285,12 @@ class DisplayHandler {
   }
 
   private async runCommand(command: string[], toolName: string): Promise<void> {
-    await logToFile(`Running: ${command.join(' ')}`, this.logFilePath);
+    await this.log(`Running: ${command.join(' ')}`);
     const proc = Bun.spawn(command, { stdout: 'pipe', stderr: 'pipe' });
-
     await proc.exited;
-    await logToFile(`${toolName} exit code: ${proc.exitCode}`, this.logFilePath);
 
     if (proc.exitCode !== 0) {
       const stderr = await new Response(proc.stderr).text();
-      await logToFile(`${toolName} stderr: ${stderr}`, this.logFilePath);
       throw new Error(`${toolName} failed: ${stderr}`);
     }
   }
@@ -325,41 +317,30 @@ class DisplayHandler {
     this.updating = true;
 
     try {
-      // Clean up temp dirs from the render *before* the previous one
-      await this.cleanupPreviousTempDirs();
+      await this.cleanupTempDirSet(this.previousTempDirs);
 
-      // Move current active dirs to previous (still readable by kitty icat)
+      // Rotate: previous dirs are now safe to delete, active become previous
       this.previousTempDirs = this.activeTempDirs;
       this.activeTempDirs = new Set<string>();
 
       const content = await readFile(this.jsonPath, "utf-8");
-      const parsed: unknown = JSON.parse(content);
-      const data = validateDisplayData(parsed);
+      const data = validateDisplayData(JSON.parse(content));
 
-      // Extract all referenced files
       const referencedFiles = new Set<string>();
       for (const item of data.items) {
         if (item.file) {
           referencedFiles.add(this.resolveFilePath(item.file));
         }
       }
-
-      // Update file watchers
       await this.updateFileWatchers(referencedFiles);
 
-      // Clear terminal
       console.clear();
 
-      // Display all items
       for (let i = 0; i < data.items.length; i++) {
-        const item = data.items[i];
-
-        // Add separator between items (except for first item)
         if (i > 0) {
           console.log("\n" + "-".repeat(50) + "\n");
         }
-
-        await this.displayItem(item);
+        await this.displayItem(data.items[i]);
       }
 
     } catch (error: any) {
@@ -380,70 +361,57 @@ class DisplayHandler {
   }
 
   private async displayItem(item: DisplayItem): Promise<void> {
-    // Display title if provided
     if (item.title) {
       console.log(`\n${item.title}\n`);
     }
 
-    let displayType: string;
-    let content: string;
-    let isFile = false;
-
-    if (item.file) {
-      // File-based rendering: determine type from extension and read content
-      displayType = getTypeFromExtension(item.file);
-      isFile = true;
-
-      const filePath = this.resolveFilePath(item.file);
-
-      if (!existsSync(filePath)) {
-        console.log(`File not found: ${filePath}`);
-        return;
-      }
-
-      if (displayType === 'image') {
-        // For images, we use the file path directly
-        content = filePath;
+    // Inline content
+    if (!item.file) {
+      const type = item.type!;
+      if (type === "image") {
+        console.log("Inline image content not supported");
+      } else if (this.diagramTools[type]) {
+        await this.renderDiagram(type, item.content!);
       } else {
-        // For diagrams, read the file content
-        try {
-          content = await readFile(filePath, 'utf-8');
-        } catch (error: any) {
-          console.log(`Error reading file ${filePath}: ${error.message}`);
-          return;
-        }
+        console.log(`Unsupported display type: ${type}`);
       }
-    } else {
-      // Inline content rendering (validated by validateDisplayData)
-      displayType = item.type!;
-      content = item.content!;
+      return;
     }
 
-    // Route to appropriate display handler
-    if (displayType === "image") {
-      if (isFile) {
-        try {
-          await this.displayImage(content);
-        } catch (error: any) {
-          await logToFile(`Error displaying image: ${error.message}`, this.logFilePath);
-          console.log(`Error displaying image: ${error.message}`);
-        }
-      } else {
-        console.log(`Inline image content not supported`);
-      }
-    } else if (this.diagramTools[displayType]) {
-      await this.displayDiagramFromContent(displayType, content);
-    } else {
-      console.log(`Unsupported display type: ${displayType}`);
+    // File-based content
+    const filePath = this.resolveFilePath(item.file);
+    const type = getTypeFromExtension(item.file);
+
+    if (!existsSync(filePath)) {
+      console.log(`File not found: ${filePath}`);
+      return;
     }
+
+    if (type === "image") {
+      try {
+        await this.displayImage(filePath);
+      } catch (error: any) {
+        await this.log(`Error displaying image: ${error.message}`);
+        console.log(`Error displaying image: ${error.message}`);
+      }
+      return;
+    }
+
+    if (this.diagramTools[type]) {
+      try {
+        const content = await readFile(filePath, "utf-8");
+        await this.renderDiagram(type, content);
+      } catch (error: any) {
+        console.log(`Error reading file ${filePath}: ${error.message}`);
+      }
+      return;
+    }
+
+    console.log(`Unsupported display type: ${type}`);
   }
 
   private async displayImage(imagePath: string): Promise<void> {
-    await logToFile(`Displaying image: ${imagePath}`, this.logFilePath);
-
-    if (!existsSync(imagePath)) {
-      throw new Error(`Image file not found: ${imagePath}`);
-    }
+    await this.log(`Displaying image: ${imagePath}`);
 
     const proc = Bun.spawn(["kitty", "+kitten", "icat", imagePath], {
       stdout: "inherit",
@@ -452,51 +420,43 @@ class DisplayHandler {
     });
 
     await proc.exited;
-    await logToFile(`kitty icat exit code: ${proc.exitCode}`, this.logFilePath);
 
     if (proc.exitCode !== 0) {
       const stderr = await new Response(proc.stderr).text();
-      // Ignore ImageMagick warnings which are not actual errors
       if (stderr && !stderr.includes("ImageMagick")) {
-        await logToFile(`kitty icat stderr: ${stderr}`, this.logFilePath);
+        await this.log(`kitty icat stderr: ${stderr}`);
         throw new Error(`Image display failed: ${stderr}`);
       }
-    } else {
-      await logToFile("Image display completed successfully", this.logFilePath);
     }
   }
 
-  private async displayDiagramFromContent(toolName: string, content: string): Promise<void> {
-    const tool = this.diagramTools[toolName];
+  private async renderDiagram(type: string, content: string): Promise<void> {
+    const tool = this.diagramTools[type];
 
     if (!tool.available) {
       console.log(`${tool.name} is not available on this system`);
       return;
     }
 
-    await logToFile(`Rendering ${tool.name} diagram`, this.logFilePath);
+    await this.log(`Rendering ${tool.name} diagram`);
 
     try {
-      // Create temp directory
       const tempDir = await mkdtemp(path.join(tmpdir(), tool.tempPrefix));
       this.activeTempDirs.add(tempDir);
 
-      // Prepare paths
       const outputPath = path.join(tempDir, "output.png");
       const inputPath = path.join(tempDir, `input${tool.inputExtension}`);
 
-      // Prepare and write content (some tools need modification)
       const preparedContent = tool.prepareContent
         ? tool.prepareContent(content, outputPath)
         : content;
       await writeFile(inputPath, preparedContent);
 
-      // Run the tool and display the result
       const actualOutputPath = await tool.run(inputPath, outputPath, tempDir);
       await this.displayImage(actualOutputPath);
 
     } catch (error: any) {
-      await logToFile(`Error in ${tool.name} rendering: ${error.message}`, this.logFilePath);
+      await this.log(`Error in ${tool.name} rendering: ${error.message}`);
       console.log(`Error rendering ${tool.name}: ${error.message}`);
     }
   }
@@ -504,19 +464,12 @@ class DisplayHandler {
   private async cleanupTempDirSet(dirs: Set<string>): Promise<void> {
     for (const tempDir of dirs) {
       try {
-        if (existsSync(tempDir)) {
-          await rm(tempDir, { recursive: true, force: true });
-        }
-      } catch (error: any) {
-        // Log but don't fail cleanup
-        console.warn(`Failed to cleanup ${tempDir}: ${error.message}`);
+        await rm(tempDir, { recursive: true, force: true });
+      } catch {
+        // Ignore cleanup errors
       }
     }
     dirs.clear();
-  }
-
-  private async cleanupPreviousTempDirs(): Promise<void> {
-    await this.cleanupTempDirSet(this.previousTempDirs);
   }
 
   async cleanupAllTempDirs(): Promise<void> {
@@ -530,7 +483,7 @@ class DisplayHandler {
       if (!referencedFiles.has(watchedFile)) {
         watcher.close();
         this.fileWatchers.delete(watchedFile);
-        await logToFile(`Stopped watching: ${watchedFile}`, this.logFilePath);
+        await this.log(`Stopped watching: ${watchedFile}`);
       }
     }
 
@@ -539,18 +492,18 @@ class DisplayHandler {
       if (!this.fileWatchers.has(file) && existsSync(file)) {
         const watcher = watch(file, async (eventType) => {
           if (eventType === "change") {
-            await logToFile(`Detected change in: ${file}`, this.logFilePath);
+            await this.log(`Detected change in: ${file}`);
             this.scheduleUpdate();
           }
         });
         this.fileWatchers.set(file, watcher);
-        await logToFile(`Now watching: ${file}`, this.logFilePath);
+        await this.log(`Now watching: ${file}`);
       }
     }
   }
 
   cleanupFileWatchers(): void {
-    for (const [, watcher] of this.fileWatchers) {
+    for (const watcher of this.fileWatchers.values()) {
       watcher.close();
     }
     this.fileWatchers.clear();
@@ -558,39 +511,31 @@ class DisplayHandler {
 }
 
 async function main(): Promise<void> {
-  // Handle --help option
   if (process.argv.includes('--help') || process.argv.includes('-h')) {
     console.log(HELP_TEXT);
     process.exit(0);
   }
 
-  // Check for Kitty terminal
   if (!process.env.KITTY_WINDOW_ID) {
     console.error("Error: live-display requires Kitty terminal");
     console.error("Please run this command inside a Kitty terminal window.");
     process.exit(1);
   }
 
-  // Find git root and determine JSON file path
   const gitRoot = findGitRoot();
   const jsonPath = process.argv[2] || path.join(gitRoot, ".live-display.json");
 
-  // Create PID file to indicate live-display is running
   const pidPath = await createPidFile(gitRoot);
 
   console.log(`Watching: ${jsonPath}`);
   console.log(`PID file: ${pidPath}`);
   console.log("Press Ctrl+C to stop");
 
-  // Create JSON file if it doesn't exist
   if (!existsSync(jsonPath)) {
     console.log(`Creating display file: ${jsonPath}`);
-    const initialContent = {
-      items: []
-    };
     try {
-      await writeFile(jsonPath, JSON.stringify(initialContent, null, 2));
-      console.log(`Created empty display file. Add items to see content.`);
+      await writeFile(jsonPath, JSON.stringify({ items: [] }, null, 2));
+      console.log("Created empty display file. Add items to see content.");
     } catch (error: any) {
       await removePidFile(pidPath);
       console.error(`Error creating display file: ${error.message}`);
@@ -598,23 +543,16 @@ async function main(): Promise<void> {
     }
   }
 
-  // Set up display handler
   const handler = new DisplayHandler(jsonPath);
-
-  // Initialize tool availability checking
-  await handler.initialize();
-
-  // Display initial content
+  await handler.checkToolAvailability();
   await handler.updateDisplay();
 
-  // Watch JSON file for changes using inotify-based fs.watch
   const jsonWatcher = watch(jsonPath, (eventType) => {
     if (eventType === "change") {
       handler.scheduleUpdate();
     }
   });
 
-  // Cleanup function
   const cleanup = async () => {
     jsonWatcher.close();
     handler.cleanupFileWatchers();
@@ -624,21 +562,14 @@ async function main(): Promise<void> {
     process.exit(0);
   };
 
-  // Re-render on terminal resize
   process.on("SIGWINCH", () => handler.scheduleUpdate());
-
-  // Handle Ctrl+C and other termination signals
   process.on("SIGINT", cleanup);
   process.on("SIGTERM", cleanup);
   process.on("SIGHUP", cleanup);
 
-  // Keep the process running
-  await new Promise(() => {
-    // This promise never resolves, keeping the process alive
-  });
+  // Never resolves -- keeps the process alive
+  await new Promise(() => {});
 }
-
-// Run the main function
 main().catch(console.error);
 
 // vim: ft=typescript
