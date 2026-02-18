@@ -11,6 +11,10 @@ Watches a JSON file and displays diagrams/images in Kitty terminal.
 Arguments:
   JSON_FILE    Path to JSON file (default: .live-display.json in git root)
 
+Options:
+  --once       Render once and exit
+  -h, --help   Show this help text
+
 Supported diagram types: plantuml, dot, gnuplot, ditaa
 Supported image types: png, jpg, jpeg, gif, bmp, webp, svg
 `;
@@ -684,9 +688,29 @@ class DisplayHandler {
 }
 
 async function main(): Promise<void> {
-  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  const args = process.argv.slice(2);
+  const onceMode = args.includes('--once');
+  const showHelp = args.includes('--help') || args.includes('-h');
+
+  if (showHelp) {
     console.log(HELP_TEXT);
     process.exit(0);
+  }
+
+  const unknownFlags = args.filter(
+    arg => arg.startsWith('-') && arg !== '--once' && arg !== '--help' && arg !== '-h'
+  );
+  if (unknownFlags.length > 0) {
+    console.error(`Error: unknown option(s): ${unknownFlags.join(', ')}`);
+    console.error("Use --help to view available options.");
+    process.exit(1);
+  }
+
+  const positionalArgs = args.filter(arg => !arg.startsWith('-'));
+  if (positionalArgs.length > 1) {
+    console.error("Error: too many arguments. Expected at most one JSON file path.");
+    console.error("Use --help to view usage.");
+    process.exit(1);
   }
 
   if (!process.env.KITTY_WINDOW_ID) {
@@ -696,7 +720,7 @@ async function main(): Promise<void> {
   }
 
   const gitRoot = findGitRoot();
-  const jsonPath = process.argv[2] || path.join(gitRoot, ".live-display.json");
+  const jsonPath = positionalArgs[0] || path.join(gitRoot, ".live-display.json");
 
   let pidPath: string;
   try {
@@ -726,6 +750,12 @@ async function main(): Promise<void> {
   const handler = new DisplayHandler(jsonPath);
   await handler.checkToolAvailability();
   await handler.updateDisplay();
+
+  if (onceMode) {
+    await handler.cleanupAllTempDirs();
+    await removePidFile(pidPath);
+    return;
+  }
 
   let jsonWatcher: FSWatcher | null = null;
   let cleaningUp = false;
