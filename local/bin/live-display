@@ -95,25 +95,56 @@ function isProcessRunning(pid: number): boolean {
 
 async function createPidFile(gitRoot: string): Promise<string> {
   const pidPath = path.join(gitRoot, ".live-display.pid");
+  const currentPid = process.pid.toString();
 
-  if (existsSync(pidPath)) {
-    try {
-      const oldPid = parseInt(await readFile(pidPath, "utf-8"), 10);
-      // process.kill with signal 0 tests whether the process exists
-      if (!isNaN(oldPid) && isProcessRunning(oldPid)) {
-        console.warn(`Warning: another live-display process (PID ${oldPid}) appears to be running.`);
-      }
-    } catch {
-      // Can't read PID file -- overwrite it
+  const claimPidFile = async (): Promise<void> => {
+    await writeFile(pidPath, currentPid, { flag: "wx" });
+  };
+
+  try {
+    await claimPidFile();
+    return pidPath;
+  } catch (error: any) {
+    if (error.code !== "EEXIST") {
+      throw error;
     }
   }
 
-  await writeFile(pidPath, process.pid.toString());
-  return pidPath;
+  let oldPid: number | null = null;
+  try {
+    oldPid = parseInt((await readFile(pidPath, "utf-8")).trim(), 10);
+  } catch {
+    // Ignore PID read errors and try to reclaim below
+  }
+
+  if (oldPid !== null && !isNaN(oldPid) && isProcessRunning(oldPid)) {
+    throw new Error(`another live-display process is already running (PID ${oldPid})`);
+  }
+
+  try {
+    await unlink(pidPath);
+  } catch {
+    // Ignore unlink errors and retry claim
+  }
+
+  try {
+    await claimPidFile();
+    return pidPath;
+  } catch (error: any) {
+    if (error.code === "EEXIST") {
+      const latestPid = parseInt((await readFile(pidPath, "utf-8")).trim(), 10);
+      throw new Error(`unable to claim PID file; active live-display PID is ${latestPid}`);
+    }
+    throw error;
+  }
 }
 
 async function removePidFile(pidPath: string): Promise<void> {
   try {
+    const pidContent = (await readFile(pidPath, "utf-8")).trim();
+    if (pidContent !== process.pid.toString()) {
+      return;
+    }
     await unlink(pidPath);
   } catch {
     // Ignore errors when removing PID file
@@ -638,7 +669,14 @@ async function main(): Promise<void> {
   const gitRoot = findGitRoot();
   const jsonPath = process.argv[2] || path.join(gitRoot, ".live-display.json");
 
-  const pidPath = await createPidFile(gitRoot);
+  let pidPath: string;
+  try {
+    pidPath = await createPidFile(gitRoot);
+  } catch (error: any) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+    return;
+  }
 
   console.log(`Watching: ${jsonPath}`);
   console.log(`PID file: ${pidPath}`);
@@ -660,7 +698,8 @@ async function main(): Promise<void> {
   await handler.checkToolAvailability();
   await handler.updateDisplay();
 
-  let jsonWatcher: FSWatcher;
+  let jsonWatcher: FSWatcher | null = null;
+  let cleaningUp = false;
   const attachJsonWatcher = () => {
     jsonWatcher = watch(jsonPath, (eventType) => {
       if (eventType === 'rename') {
@@ -679,19 +718,38 @@ async function main(): Promise<void> {
   };
   attachJsonWatcher();
 
-  const cleanup = async () => {
-    jsonWatcher.close();
+  const cleanup = async (exitCode: number = 0) => {
+    if (cleaningUp) {
+      return;
+    }
+    cleaningUp = true;
+
+    if (jsonWatcher) {
+      jsonWatcher.close();
+    }
     handler.cleanupFileWatchers();
     await handler.cleanupAllTempDirs();
     await removePidFile(pidPath);
-    console.log("\nStopped watching");
-    process.exit(0);
+
+    if (exitCode === 0) {
+      console.log("\nStopped watching");
+    }
+    process.exit(exitCode);
   };
 
   process.on("SIGWINCH", () => handler.scheduleUpdate());
-  process.on("SIGINT", cleanup);
-  process.on("SIGTERM", cleanup);
-  process.on("SIGHUP", cleanup);
+  process.on("SIGINT", () => { void cleanup(0); });
+  process.on("SIGTERM", () => { void cleanup(0); });
+  process.on("SIGHUP", () => { void cleanup(0); });
+  process.on("uncaughtException", (error) => {
+    console.error(`Uncaught exception: ${error.message}`);
+    void cleanup(1);
+  });
+  process.on("unhandledRejection", (error) => {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`Unhandled rejection: ${message}`);
+    void cleanup(1);
+  });
 
   // Never resolves -- keeps the process alive
   await new Promise(() => {});
