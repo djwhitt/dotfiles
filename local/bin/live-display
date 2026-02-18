@@ -13,6 +13,7 @@ Arguments:
 
 Options:
   --once       Render once and exit
+  --no-clear   Do not clear screen before refresh
   -h, --help   Show this help text
 
 Supported diagram types: plantuml, dot, gnuplot, ditaa
@@ -168,6 +169,10 @@ interface DisplayData {
 
 type DisplayOutcome = 'rendered' | 'skipped' | 'failed';
 
+interface DisplayOptions {
+  clearScreen: boolean;
+}
+
 function validateDisplayData(data: unknown): DisplayData {
   if (!data || typeof data !== "object") {
     throw new Error("Invalid JSON: expected an object");
@@ -235,15 +240,18 @@ class DisplayHandler {
   private activeTempDirs = new Set<string>();
   private previousTempDirs = new Set<string>();
   private fileWatchers = new Map<string, FSWatcher>();
+  private missingFileWatchers = new Map<string, FSWatcher>();
   private updateTimeout: ReturnType<typeof setTimeout> | null = null;
   private updating = false;
   private pendingUpdate = false;
+  private clearScreen: boolean;
   private readonly DEBOUNCE_MS = 100;
 
-  constructor(jsonPath: string) {
+  constructor(jsonPath: string, options: DisplayOptions) {
     this.jsonPath = path.resolve(jsonPath);
     this.gitRoot = findGitRoot();
     this.logFilePath = path.join(this.gitRoot, '.live-display.log');
+    this.clearScreen = options.clearScreen;
     this.initializeDiagramTools();
     Bun.write(this.logFilePath, `[${new Date().toISOString()}] live-display started (PID ${process.pid})\n`);
   }
@@ -357,14 +365,30 @@ class DisplayHandler {
     }
   }
 
+  printToolAvailability(): void {
+    const status = Object.entries(this.diagramTools)
+      .map(([name, tool]) => `${name}=${tool.available ? 'ok' : 'missing'}`)
+      .join(' ');
+    console.log(`Diagram tools: ${status}`);
+  }
+
   private async runCommand(command: string[], toolName: string, cwd?: string): Promise<void> {
     await this.log(`Running: ${command.join(' ')}`);
     const proc = Bun.spawn(command, { stdout: 'pipe', stderr: 'pipe', cwd });
     await proc.exited;
 
     if (proc.exitCode !== 0) {
-      const stderr = await new Response(proc.stderr).text();
-      throw new Error(`${toolName} failed: ${stderr}`);
+      const stderr = (await new Response(proc.stderr).text()).trim();
+      const stdout = (await new Response(proc.stdout).text()).trim();
+      if (stderr) {
+        await this.log(`${toolName} stderr: ${stderr}`);
+      }
+      if (stdout) {
+        await this.log(`${toolName} stdout: ${stdout}`);
+      }
+
+      const details = stderr || stdout || 'no output';
+      throw new Error(`${toolName} failed with exit code ${proc.exitCode}: ${details}`);
     }
   }
 
@@ -407,7 +431,9 @@ class DisplayHandler {
       }
       await this.updateFileWatchers(referencedFiles);
 
-      console.clear();
+      if (this.clearScreen) {
+        console.clear();
+      }
 
       const summary = {
         rendered: 0,
@@ -646,6 +672,8 @@ class DisplayHandler {
           if (existsSync(file)) {
             await attachFileWatcher(file);
             await this.log(`Reattached watcher: ${file}`);
+          } else {
+            await attachMissingFileWatcher(file);
           }
 
           this.scheduleUpdate();
@@ -662,6 +690,40 @@ class DisplayHandler {
       await this.log(`Now watching: ${file}`);
     };
 
+    const attachMissingFileWatcher = async (file: string): Promise<void> => {
+      if (this.missingFileWatchers.has(file)) {
+        return;
+      }
+
+      const dir = path.dirname(file);
+      const baseName = path.basename(file);
+
+      if (!existsSync(dir)) {
+        return;
+      }
+
+      const watcher = watch(dir, async (eventType, filename) => {
+        if (eventType !== 'rename' && eventType !== 'change') {
+          return;
+        }
+
+        if (filename && filename.toString() !== baseName) {
+          return;
+        }
+
+        if (existsSync(file)) {
+          watcher.close();
+          this.missingFileWatchers.delete(file);
+          await attachFileWatcher(file);
+          await this.log(`Detected new file and attached watcher: ${file}`);
+          this.scheduleUpdate();
+        }
+      });
+
+      this.missingFileWatchers.set(file, watcher);
+      await this.log(`Watching parent directory for missing file: ${file}`);
+    };
+
     // Remove watchers for files no longer referenced
     for (const [watchedFile, watcher] of this.fileWatchers) {
       if (!referencedFiles.has(watchedFile)) {
@@ -671,10 +733,22 @@ class DisplayHandler {
       }
     }
 
+    for (const [missingFile, watcher] of this.missingFileWatchers) {
+      if (!referencedFiles.has(missingFile) || existsSync(missingFile)) {
+        watcher.close();
+        this.missingFileWatchers.delete(missingFile);
+        await this.log(`Stopped watching missing file parent: ${missingFile}`);
+      }
+    }
+
     // Add watchers for new files
     for (const file of referencedFiles) {
-      if (!this.fileWatchers.has(file) && existsSync(file)) {
-        await attachFileWatcher(file);
+      if (existsSync(file)) {
+        if (!this.fileWatchers.has(file)) {
+          await attachFileWatcher(file);
+        }
+      } else if (!this.missingFileWatchers.has(file)) {
+        await attachMissingFileWatcher(file);
       }
     }
   }
@@ -684,12 +758,18 @@ class DisplayHandler {
       watcher.close();
     }
     this.fileWatchers.clear();
+
+    for (const watcher of this.missingFileWatchers.values()) {
+      watcher.close();
+    }
+    this.missingFileWatchers.clear();
   }
 }
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const onceMode = args.includes('--once');
+  const noClear = args.includes('--no-clear');
   const showHelp = args.includes('--help') || args.includes('-h');
 
   if (showHelp) {
@@ -698,7 +778,11 @@ async function main(): Promise<void> {
   }
 
   const unknownFlags = args.filter(
-    arg => arg.startsWith('-') && arg !== '--once' && arg !== '--help' && arg !== '-h'
+    arg => arg.startsWith('-')
+      && arg !== '--once'
+      && arg !== '--no-clear'
+      && arg !== '--help'
+      && arg !== '-h'
   );
   if (unknownFlags.length > 0) {
     console.error(`Error: unknown option(s): ${unknownFlags.join(', ')}`);
@@ -747,8 +831,9 @@ async function main(): Promise<void> {
     }
   }
 
-  const handler = new DisplayHandler(jsonPath);
+  const handler = new DisplayHandler(jsonPath, { clearScreen: !noClear });
   await handler.checkToolAvailability();
+  handler.printToolAvailability();
   await handler.updateDisplay();
 
   if (onceMode) {
