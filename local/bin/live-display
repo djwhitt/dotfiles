@@ -416,7 +416,13 @@ class DisplayHandler {
 
     // File-based content
     const filePath = this.resolveFilePath(item.file);
-    const type = getTypeFromExtension(item.file);
+    let type: string;
+    try {
+      type = getTypeFromExtension(item.file);
+    } catch (error: any) {
+      console.log(`Unsupported file type for ${item.file}: ${error.message}`);
+      return;
+    }
 
     if (!existsSync(filePath)) {
       console.log(`File not found: ${filePath}`);
@@ -565,6 +571,33 @@ class DisplayHandler {
   }
 
   private async updateFileWatchers(referencedFiles: Set<string>): Promise<void> {
+    const attachFileWatcher = async (file: string): Promise<void> => {
+      let watcher: FSWatcher;
+      watcher = watch(file, async (eventType) => {
+        if (eventType === 'rename') {
+          await this.log(`Detected file replacement for: ${file}`);
+          watcher.close();
+          this.fileWatchers.delete(file);
+
+          if (existsSync(file)) {
+            await attachFileWatcher(file);
+            await this.log(`Reattached watcher: ${file}`);
+          }
+
+          this.scheduleUpdate();
+          return;
+        }
+
+        if (eventType === 'change') {
+          await this.log(`Detected change in: ${file}`);
+          this.scheduleUpdate();
+        }
+      });
+
+      this.fileWatchers.set(file, watcher);
+      await this.log(`Now watching: ${file}`);
+    };
+
     // Remove watchers for files no longer referenced
     for (const [watchedFile, watcher] of this.fileWatchers) {
       if (!referencedFiles.has(watchedFile)) {
@@ -577,14 +610,7 @@ class DisplayHandler {
     // Add watchers for new files
     for (const file of referencedFiles) {
       if (!this.fileWatchers.has(file) && existsSync(file)) {
-        const watcher = watch(file, async (eventType) => {
-          if (eventType === "change") {
-            await this.log(`Detected change in: ${file}`);
-            this.scheduleUpdate();
-          }
-        });
-        this.fileWatchers.set(file, watcher);
-        await this.log(`Now watching: ${file}`);
+        await attachFileWatcher(file);
       }
     }
   }
@@ -634,11 +660,24 @@ async function main(): Promise<void> {
   await handler.checkToolAvailability();
   await handler.updateDisplay();
 
-  const jsonWatcher = watch(jsonPath, (eventType) => {
-    if (eventType === "change") {
-      handler.scheduleUpdate();
-    }
-  });
+  let jsonWatcher: FSWatcher;
+  const attachJsonWatcher = () => {
+    jsonWatcher = watch(jsonPath, (eventType) => {
+      if (eventType === 'rename') {
+        jsonWatcher.close();
+        if (existsSync(jsonPath)) {
+          attachJsonWatcher();
+        }
+        handler.scheduleUpdate();
+        return;
+      }
+
+      if (eventType === 'change') {
+        handler.scheduleUpdate();
+      }
+    });
+  };
+  attachJsonWatcher();
 
   const cleanup = async () => {
     jsonWatcher.close();
