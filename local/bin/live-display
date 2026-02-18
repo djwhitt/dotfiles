@@ -162,6 +162,8 @@ interface DisplayData {
   items: DisplayItem[];
 }
 
+type DisplayOutcome = 'rendered' | 'skipped' | 'failed';
+
 function validateDisplayData(data: unknown): DisplayData {
   if (!data || typeof data !== "object") {
     throw new Error("Invalid JSON: expected an object");
@@ -403,11 +405,32 @@ class DisplayHandler {
 
       console.clear();
 
+      const summary = {
+        rendered: 0,
+        skipped: 0,
+        failed: 0,
+      };
+
       for (let i = 0; i < data.items.length; i++) {
         if (i > 0) {
           console.log("\n" + "-".repeat(50) + "\n");
         }
-        await this.displayItem(data.items[i]);
+        try {
+          const outcome = await this.displayItem(data.items[i]);
+          summary[outcome] += 1;
+        } catch (error: any) {
+          summary.failed += 1;
+          await this.log(`Unexpected item error: ${error.message}`);
+          console.log(`Unexpected item error: ${error.message}`);
+        }
+      }
+
+      console.log(
+        `\nRefresh complete: ${summary.rendered} rendered, ${summary.skipped} skipped, ${summary.failed} failed`
+      );
+
+      if (data.items.length === 0) {
+        console.log("No items configured. Add entries to .live-display.json to render content.");
       }
 
     } catch (error: any) {
@@ -427,7 +450,7 @@ class DisplayHandler {
     }
   }
 
-  private async displayItem(item: DisplayItem): Promise<void> {
+  private async displayItem(item: DisplayItem): Promise<DisplayOutcome> {
     if (item.title) {
       console.log(`\n${item.title}\n`);
     }
@@ -437,12 +460,13 @@ class DisplayHandler {
       const type = item.type!;
       if (type === "image") {
         console.log("Inline image content not supported");
+        return 'skipped';
       } else if (this.diagramTools[type]) {
-        await this.renderDiagram(type, item.content!);
+        return this.renderDiagram(type, item.content!);
       } else {
         console.log(`Unsupported display type: ${type}`);
+        return 'skipped';
       }
-      return;
     }
 
     // File-based content
@@ -452,30 +476,31 @@ class DisplayHandler {
       type = getTypeFromExtension(item.file);
     } catch (error: any) {
       console.log(`Unsupported file type for ${item.file}: ${error.message}`);
-      return;
+      return 'skipped';
     }
 
     if (!existsSync(filePath)) {
       console.log(`File not found: ${filePath}`);
-      return;
+      return 'skipped';
     }
 
     if (type === "image") {
       try {
         await this.displayImage(filePath);
+        return 'rendered';
       } catch (error: any) {
         await this.log(`Error displaying image: ${error.message}`);
         console.log(`Error displaying image: ${error.message}`);
+        return 'failed';
       }
-      return;
     }
 
     if (this.diagramTools[type]) {
-      await this.renderDiagramFile(type, filePath);
-      return;
+      return this.renderDiagramFile(type, filePath);
     }
 
     console.log(`Unsupported display type: ${type}`);
+    return 'skipped';
   }
 
   private async displayImage(imagePath: string): Promise<void> {
@@ -498,12 +523,12 @@ class DisplayHandler {
     }
   }
 
-  private async renderDiagram(type: string, content: string): Promise<void> {
+  private async renderDiagram(type: string, content: string): Promise<DisplayOutcome> {
     const tool = this.diagramTools[type];
 
     if (!tool.available) {
       console.log(`${tool.name} is not available on this system`);
-      return;
+      return 'skipped';
     }
 
     await this.log(`Rendering ${tool.name} diagram`);
@@ -522,19 +547,21 @@ class DisplayHandler {
 
       const actualOutputPath = await tool.run(inputPath, outputPath, tempDir);
       await this.displayImage(actualOutputPath);
+      return 'rendered';
 
     } catch (error: any) {
       await this.log(`Error in ${tool.name} rendering: ${error.message}`);
       console.log(`Error rendering ${tool.name}: ${error.message}`);
+      return 'failed';
     }
   }
 
-  private async renderDiagramFile(type: string, filePath: string): Promise<void> {
+  private async renderDiagramFile(type: string, filePath: string): Promise<DisplayOutcome> {
     const tool = this.diagramTools[type];
 
     if (!tool.available) {
       console.log(`${tool.name} is not available on this system`);
-      return;
+      return 'skipped';
     }
 
     await this.log(`Rendering ${tool.name} diagram from file: ${filePath}`);
@@ -578,10 +605,12 @@ class DisplayHandler {
       }
 
       await this.displayImage(actualOutputPath);
+      return 'rendered';
 
     } catch (error: any) {
       await this.log(`Error in ${tool.name} file rendering: ${error.message}`);
       console.log(`Error rendering ${tool.name}: ${error.message}`);
+      return 'failed';
     }
   }
 
