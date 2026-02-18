@@ -43,6 +43,23 @@ interface DiagramTool {
   run: (inputPath: string, outputPath: string, tempDir: string) => Promise<string>;
 }
 
+function extractGnuplotOutputPath(content: string): string | null {
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue;
+    }
+
+    const match = trimmed.match(/^set\s+out(?:put)?\s+(["'])(.*?)\1/i);
+    if (match) {
+      return match[2];
+    }
+  }
+
+  return null;
+}
+
 function getTypeFromExtension(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   const type = EXTENSION_TYPE_MAP[ext];
@@ -247,9 +264,28 @@ class DisplayHandler {
           }
           return content;
         },
-        run: async (inputPath, outputPath) => {
+        run: async (inputPath, outputPath, tempDir) => {
           await this.runCommand(['gnuplot', inputPath], 'Gnuplot');
-          return outputPath;
+
+          if (existsSync(outputPath)) {
+            return outputPath;
+          }
+
+          const inputContent = await readFile(inputPath, 'utf-8');
+          const configuredOutput = extractGnuplotOutputPath(inputContent);
+          if (configuredOutput) {
+            const candidate = path.isAbsolute(configuredOutput)
+              ? configuredOutput
+              : path.join(tempDir, configuredOutput);
+
+            if (existsSync(candidate)) {
+              return candidate;
+            }
+
+            throw new Error(`Gnuplot did not produce expected output file: ${candidate}`);
+          }
+
+          throw new Error(`Gnuplot did not produce an output file: ${outputPath}`);
         },
       },
       ditaa: {
