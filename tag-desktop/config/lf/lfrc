@@ -9,7 +9,7 @@ cmd trash $IFS="$(printf '\n\t')"; mv $fx ~/.trash
 
 map D trash
 
-map am $$HOME/.local/bin/archive-media "$f"
+map ai $$HOME/.local/bin/a "$f"
 
 # Bookmark commands
 cmd bookmark-set $~/.config/lf/scripts/bookmark-manager set

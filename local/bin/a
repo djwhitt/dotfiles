@@ -1,15 +1,13 @@
 #!/usr/bin/env bb
 
 (require '[babashka.fs :as fs])
-(require '[babashka.process :refer [shell process exec]])
+(require '[babashka.process :refer [shell]])
 (require '[clojure.string :as str])
-(require '[clojure.tools.cli :refer [parse-opts]])
 
 (import '[java.text SimpleDateFormat])
 (import '[java.util Date])
 
-(def home-dir (fs/home))
-(def annex-dir (str home-dir "/Annex"))
+(def annex-dir (str (fs/home) "/Annex"))
 (def inbox-dir (str annex-dir "/inbox"))
 
 (defn sha256sum [file]
@@ -19,23 +17,54 @@
       first))
 
 (defn date []
-  (let [date (Date.)
-        df (SimpleDateFormat. "yyyyMMdd")]
-    (.format df date)))
-      
+  (.format (SimpleDateFormat. "yyyyMMdd") (Date.)))
+
+(defn eecho [& args]
+  (binding [*out* *err*]
+    (apply println args)))
+
+(defn usage []
+  (eecho "Usage: a <file>")
+  (System/exit 1))
+
 (defn -main [& [file]]
+  (when-not file (usage))
+  (when-not (fs/regular-file? file)
+    (eecho (str "Error: '" file "' does not exist or is not a regular file."))
+    (System/exit 1))
+
+  (fs/create-dirs inbox-dir)
+
   (let [basename (fs/file-name file)
+        last-dot (.lastIndexOf basename ".")
+        stem (if (pos? last-dot) (subs basename 0 last-dot) basename)
+        ext  (if (pos? last-dot) (subs basename last-dot) "")
         d (date)
-        h (sha256sum file)]
-    (shell "mv" file (str inbox-dir "/" d "-sha256-" h "-" basename))
-    (shell (str "bash -c 'cd " inbox-dir " && git annex add .'"))
-    (shell (str "bash -c 'cd " annex-dir " && git commit -m \"archive-doc: " basename "\"'"))
-    (shell (str "bash -c 'cd " annex-dir " && git annex copy . --to s3'"))
-    (shell (str "bash -c 'cd " annex-dir " && git annex copy . --to rsync-dot-net'"))
-    (shell (str "bash -c 'cd " annex-dir " && git push'"))))
-  
+        h (sha256sum file)
+        archive-name (str d "-" stem "-" h ext)
+        archive-path (str inbox-dir "/" archive-name)]
+
+    (when (seq (fs/glob inbox-dir (str "*-" h ".*")))
+      (eecho (str "A file with hash '" h "' is already archived. Skipping."))
+      (System/exit 0))
+
+    (eecho (str "Archiving '" file "' to '" archive-path "'..."))
+    (shell "mv" file archive-path)
+
+    (shell {:dir inbox-dir} "git" "annex" "add" ".")
+    (shell {:dir annex-dir} "git" "commit" "-m" (str "archive: " basename))
+
+    (try (shell {:dir annex-dir} "git" "annex" "copy" archive-name "--to" "s3")
+         (catch Exception _ (eecho "Warning: failed to copy to s3.")))
+    (try (shell {:dir annex-dir} "git" "annex" "copy" archive-name "--to" "rsync-dot-net")
+         (catch Exception _ (eecho "Warning: failed to copy to rsync-dot-net.")))
+
+    (shell {:dir annex-dir} "git" "annex" "sync")
+    (shell {:dir annex-dir} "git" "push")
+
+    (eecho (str "Done. File archived as '" archive-name "'."))))
+
 (when (= *file* (System/getProperty "babashka.file"))
-  (prn (fs/home))
   (apply -main *command-line-args*))
 
 ;; vim:ft=clojure:
