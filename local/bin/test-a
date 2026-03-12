@@ -1,0 +1,17 @@
+#!/usr/bin/env bb
+
+(require '[babashka.classpath :as cp])
+(require '[babashka.fs :as fs])
+(require '[clojure.test :as t])
+
+(let [script-file (or (System/getProperty "babashka.file") *file*)
+      local-dir (fs/parent (fs/parent script-file))]
+  (cp/add-classpath (str (fs/path local-dir "src" "clj")))
+  (cp/add-classpath (str (fs/path local-dir "test"))))
+
+(require '[djwhitt.archive-test])
+
+(let [{:keys [fail error]} (t/run-tests 'djwhitt.archive-test)]
+  (System/exit (if (zero? (+ fail error)) 0 1)))
+
+;; vim:ft=clojure:
