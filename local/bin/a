@@ -9,60 +9,147 @@
 
 (def annex-dir (str (fs/home) "/Annex"))
 (def inbox-dir (str annex-dir "/inbox"))
-
-(defn sha256sum [file]
-  (-> (shell {:out :string} "sha256sum" file)
-      :out
-      (str/split #" ")
-      first))
-
-(defn date []
-  (.format (SimpleDateFormat. "yyyyMMdd") (Date.)))
+(def remotes ["s3" "rsync-dot-net"])
 
 (defn eecho [& args]
   (binding [*out* *err*]
     (apply println args)))
 
+(defn die
+  ([message] (die message 1))
+  ([message exit-code]
+   (eecho message)
+   (System/exit exit-code)))
+
 (defn usage []
-  (eecho "Usage: a <file>")
-  (System/exit 1))
+  (die "Usage: a [--dry-run] <file>"))
 
-(defn -main [& [file]]
-  (when-not file (usage))
-  (when-not (fs/regular-file? file)
-    (eecho (str "Error: '" file "' does not exist or is not a regular file."))
-    (System/exit 1))
+(defn date []
+  (.format (SimpleDateFormat. "yyyyMMdd") (Date.)))
 
-  (fs/create-dirs inbox-dir)
+(defn format-cmd [args]
+  (str/join " " (map pr-str args)))
 
-  (let [basename (fs/file-name file)
-        last-dot (.lastIndexOf basename ".")
-        stem (if (pos? last-dot) (subs basename 0 last-dot) basename)
-        ext  (if (pos? last-dot) (subs basename last-dot) "")
-        d (date)
-        h (sha256sum file)
-        archive-name (str d "-" stem "-" h ext)
-        archive-path (str inbox-dir "/" archive-name)]
+(defn cmd! [{:keys [dir out err] :or {out :string err :string}} & args]
+  (let [result (apply shell (merge {:continue true :out out :err err}
+                                   (when dir {:dir dir}))
+                      args)]
+    (when-not (zero? (:exit result))
+      (let [stdout (not-empty (:out result))
+            stderr (not-empty (:err result))]
+        (throw (ex-info
+                (str "Command failed"
+                     (when dir (str " in '" dir "'"))
+                     ": "
+                     (format-cmd args)
+                     (when stdout (str "\nstdout:\n" stdout))
+                     (when stderr (str "\nstderr:\n" stderr)))
+                {:args args :dir dir :result result}))))
+    result))
 
-    (when (seq (fs/glob inbox-dir (str "*-" h ".*")))
-      (eecho (str "A file with hash '" h "' is already archived. Skipping."))
-      (System/exit 0))
+(defn mutating-cmd! [{:keys [dry-run] :as opts} & args]
+  (if dry-run
+    (eecho (str "[dry-run] would run"
+                (when-let [dir (:dir opts)] (str " in '" dir "'"))
+                ": "
+                (format-cmd args)))
+    (apply cmd! (dissoc opts :dry-run) args)))
 
-    (eecho (str "Archiving '" file "' to '" archive-path "'..."))
-    (shell "mv" file archive-path)
+(defn sha256sum [file]
+  (-> (cmd! {} "sha256sum" file)
+      :out
+      (str/split #" ")
+      first))
 
-    (shell {:dir inbox-dir} "git" "annex" "add" ".")
-    (shell {:dir annex-dir} "git" "commit" "-m" (str "archive: " basename))
+(defn parse-args [args]
+  (loop [remaining args
+         opts {:dry-run false :file nil}]
+    (if-let [arg (first remaining)]
+      (cond
+        (= arg "--dry-run")
+        (recur (rest remaining) (assoc opts :dry-run true))
 
-    (try (shell {:dir annex-dir} "git" "annex" "copy" archive-name "--to" "s3")
-         (catch Exception _ (eecho "Warning: failed to copy to s3.")))
-    (try (shell {:dir annex-dir} "git" "annex" "copy" archive-name "--to" "rsync-dot-net")
-         (catch Exception _ (eecho "Warning: failed to copy to rsync-dot-net.")))
+        (str/starts-with? arg "-")
+        (die (str "Unknown option: " arg))
 
-    (shell {:dir annex-dir} "git" "annex" "sync")
-    (shell {:dir annex-dir} "git" "push")
+        (:file opts)
+        (die "Usage error: expected exactly one file argument.")
 
-    (eecho (str "Done. File archived as '" archive-name "'."))))
+        :else
+        (recur (rest remaining) (assoc opts :file arg)))
+      opts)))
+
+(defn ensure-annex-repo! []
+  (when-not (fs/directory? annex-dir)
+    (die (str "Error: annex directory '" annex-dir "' does not exist.")))
+
+  (cmd! {:dir annex-dir} "git" "rev-parse" "--is-inside-work-tree")
+  (cmd! {:dir annex-dir} "git" "annex" "info")
+
+  (doseq [remote remotes]
+    (cmd! {:dir annex-dir} "git" "remote" "get-url" remote)))
+
+(defn ensure-inbox-dir! [dry-run]
+  (when-not (fs/directory? inbox-dir)
+    (if dry-run
+      (eecho (str "[dry-run] would create directory '" inbox-dir "'"))
+      (fs/create-dirs inbox-dir))))
+
+(defn duplicate-paths [hash]
+  (if (fs/directory? inbox-dir)
+    (concat (fs/glob inbox-dir (str "*-" hash))
+            (fs/glob inbox-dir (str "*-" hash ".*")))
+    []))
+
+(defn -main [& args]
+  (let [{:keys [dry-run file]} (parse-args args)]
+    (when-not file (usage))
+    (when-not (fs/regular-file? file)
+      (die (str "Error: '" file "' does not exist or is not a regular file.")))
+
+    (try
+      (ensure-annex-repo!)
+      (ensure-inbox-dir! dry-run)
+
+      (let [basename (str (fs/file-name file))
+            last-dot (.lastIndexOf basename ".")
+            stem (if (pos? last-dot) (subs basename 0 last-dot) basename)
+            ext (if (pos? last-dot) (subs basename last-dot) "")
+            d (date)
+            h (sha256sum file)
+            archive-name (str d "-" stem "-" h ext)
+            archive-path (str inbox-dir "/" archive-name)]
+
+        (when-let [existing (first (duplicate-paths h))]
+          (eecho (str "A file with hash '" h "' is already archived at '" existing "'. Skipping."))
+          (System/exit 0))
+
+        (eecho (str (if dry-run "[dry-run] Would archive '" "Archiving '")
+                    file
+                    "' to '"
+                    archive-path
+                    "'..."))
+        (eecho (str "SHA256: " h))
+
+        (mutating-cmd! {:dry-run dry-run} "mv" file archive-path)
+        (mutating-cmd! {:dir inbox-dir :dry-run dry-run} "git" "annex" "add" archive-name)
+        (mutating-cmd! {:dir annex-dir :dry-run dry-run} "git" "commit" "-m" (str "archive: " basename))
+
+        (doseq [remote remotes]
+          (try
+            (mutating-cmd! {:dir annex-dir :dry-run dry-run} "git" "annex" "copy" archive-name "--to" remote)
+            (catch Exception _
+              (eecho (str "Warning: failed to copy to " remote ".")))))
+
+        (mutating-cmd! {:dir annex-dir :dry-run dry-run} "git" "annex" "sync")
+        (mutating-cmd! {:dir annex-dir :dry-run dry-run} "git" "push")
+
+        (eecho (str (if dry-run "[dry-run] Done. File would be archived as '"
+                        "Done. File archived as '")
+                    archive-name
+                    "'.")))
+      (catch Exception e
+        (die (.getMessage e))))))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (apply -main *command-line-args*))
