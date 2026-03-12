@@ -20,11 +20,6 @@ The rcrc file (`host-framework13/rcrc`) controls deployment:
 rcup -v              # Install/update symlinks
 lsrc                 # List what will be linked
 
-# Babashka tasks (run from tag-desktop/)
-bb ping                    # Healthcheck
-bb upload-nocodb-file      # Upload file to NocoDB
-bb archive-document        # Archive document in NocoDB
-
 # Just tasks (user.justfile in tag-desktop/)
 just weekly-newsletter-to-kindle
 ```
@@ -64,9 +59,6 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 ### Media Processing
 - `record-call` - Call recording with transcription/GPT processing
 - `archive-media` - Archive files to Git Annex with SHA256
-
-### Babashka Tasks (`tag-desktop/local/src/clj/djwhitt/tasks.clj`)
-Tasks use Malli for validation and interact with NocoDB API.
 
 ## Git Conventions
 
