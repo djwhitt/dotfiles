@@ -1,4 +1,5 @@
 (ns djwhitt.archive
+  ;; Test namespace: djwhitt.archive-test
   (:require [babashka.fs :as fs]
             [babashka.process :refer [shell]]
             [clojure.string :as str])

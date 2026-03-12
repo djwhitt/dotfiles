@@ -1,5 +1,7 @@
 #!/usr/bin/env bb
 
+;; Tests: bb local/bin/test-a
+
 (require '[babashka.classpath :as cp])
 (require '[babashka.fs :as fs])
 
