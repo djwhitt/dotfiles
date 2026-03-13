@@ -24,6 +24,14 @@
     (is (= "slurp" (:extractor result)))
     (is (= "# heading" (:content result)))))
 
+(deftest mime-type-follows-symlinks-test
+  (let [path "/tmp/report.pdf"]
+    (is (= "application/pdf"
+           (extract/mime-type (fn [args]
+                                (is (= ["file" "-L" "--mime-type" "-b" path] args))
+                                {:out "application/pdf\n"})
+                              path)))))
+
 (deftest unsupported-file-test
   (let [path (temp-file ".png" "not really a png")
         result (extract/extract-text {:mime-type-fn (constantly "image/png")} path)]

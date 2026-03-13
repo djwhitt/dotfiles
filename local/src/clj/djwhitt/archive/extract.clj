@@ -49,7 +49,7 @@
   ([file] (mime-type run-command! file))
   ([run! file]
    (try
-     (-> (run! ["file" "--mime-type" "-b" file])
+     (-> (run! ["file" "-L" "--mime-type" "-b" file])
          :out
          str/trim
          not-empty)
