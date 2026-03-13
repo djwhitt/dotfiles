@@ -2,7 +2,9 @@
   ;; Test namespace: djwhitt.archive-test
   (:require [babashka.fs :as fs]
             [babashka.process :refer [shell]]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [djwhitt.archive.extract :as extract]
+            [djwhitt.archive.index :as index])
   (:import [java.text SimpleDateFormat]
            [java.util Date]))
 
@@ -12,10 +14,13 @@
   (let [annex-dir (str (fs/home) "/Annex")]
     {:annex-dir annex-dir
      :inbox-dir (str annex-dir "/inbox")
+     :index-db-path (index/default-db-path)
      :remotes default-remotes}))
 
 (defn usage-message []
-  "Usage: a [--dry-run] <file>")
+  (str "Usage:\n"
+       "  a [--dry-run] <file>\n"
+       "  a reindex [--dry-run]"))
 
 (defn date-string
   ([] (date-string (Date.)))
@@ -27,14 +32,24 @@
 
 (defn parse-args [args]
   (loop [remaining args
-         opts {:dry-run false :file nil}]
+         opts {:command :archive
+               :dry-run false
+               :file nil}]
     (if-let [arg (first remaining)]
       (cond
         (= arg "--dry-run")
         (recur (rest remaining) (assoc opts :dry-run true))
 
+        (and (= arg "reindex")
+             (= :archive (:command opts))
+             (nil? (:file opts)))
+        (recur (rest remaining) (assoc opts :command :reindex))
+
         (str/starts-with? arg "-")
         {:error (str "Unknown option: " arg)}
+
+        (= :reindex (:command opts))
+        {:error "Usage error: reindex does not accept positional arguments."}
 
         (:file opts)
         {:error "Usage error: expected exactly one file argument."}
@@ -43,9 +58,10 @@
         (recur (rest remaining) (assoc opts :file arg)))
       opts)))
 
-(defn validate-opts [{:keys [error file] :as opts}]
+(defn validate-opts [{:keys [error command file] :as opts}]
   (cond
     error opts
+    (= :reindex command) opts
     file opts
     :else {:error (usage-message)}))
 
@@ -66,6 +82,42 @@
      :sha256 sha256
      :archive-name archive-name
      :archive-path (str inbox-dir "/" archive-name)}))
+
+(defn original-basename [archive-name sha256]
+  (let [{:keys [ext]} (file-parts archive-name)
+        prefix-len 9
+        modern-suffix (str "-" sha256 ext)
+        modern-stem-end (- (count archive-name) (count modern-suffix))
+        legacy-prefix (str (subs archive-name 0 (min prefix-len (count archive-name)))
+                           "sha256-"
+                           sha256
+                           "-")]
+    (cond
+      (and (re-matches #"\d{8}-.*" archive-name)
+           (> modern-stem-end prefix-len)
+           (str/ends-with? archive-name modern-suffix))
+      (str (subs archive-name prefix-len modern-stem-end) ext)
+
+      (str/starts-with? archive-name legacy-prefix)
+      (subs archive-name (count legacy-prefix))
+
+      :else
+      archive-name)))
+
+(defn archive-entry-from-path [effects archive-path]
+  (let [archive-path (str archive-path)
+        archive-name (str (fs/file-name archive-path))
+        sha256 ((:sha256sum effects) archive-path)]
+    {:sha256 sha256
+     :archive-name archive-name
+     :archive-path archive-path
+     :basename (original-basename archive-name sha256)}))
+
+(defn archived-files [effects inbox-dir]
+  (->> ((:glob effects) inbox-dir "*")
+       (map str)
+       sort
+       (filter #((:regular-file? effects) %))))
 
 (defn commit-message [{:keys [basename]}]
   (str "archive: " basename))
@@ -139,7 +191,9 @@
    :glob (fn [dir pattern] (fs/glob dir pattern))
    :date-string date-string
    :run! cmd!
-   :sha256sum (fn [file] (sha256sum cmd! file))})
+   :sha256sum (fn [file] (sha256sum cmd! file))
+   :extract-text extract/extract-text
+   :upsert-document! index/upsert-document!})
 
 (defn ensure-annex-repo! [{:keys [directory? run!]} {:keys [annex-dir remotes]}]
   (when-not (directory? annex-dir)
@@ -171,6 +225,38 @@
     (do
       (run! opts args)
       res)))
+
+(defn index-archive! [{:keys [extract-text upsert-document!]} {:keys [index-db-path] :as _config}
+                      {:keys [archive-path archive-name basename sha256] :as _archive}
+                      {:keys [dry-run] :as res}]
+  (if dry-run
+    (add-message res (str "[dry-run] would index '" archive-path "' into '" index-db-path "'"))
+    (try
+      (let [{:keys [status mime-type extractor content error truncated?]}
+            (extract-text archive-path)
+            status-name (name (or status :unknown))]
+        (upsert-document! index-db-path
+                          {:sha256 sha256
+                           :archive-name archive-name
+                           :archive-path archive-path
+                           :basename basename
+                           :mime-type mime-type
+                           :extractor extractor
+                           :content content
+                           :extraction-status status
+                           :extraction-error error})
+        (cond-> (add-message res (str "Indexed '" archive-name "' in '" index-db-path
+                                      "' (status: " status-name ")."))
+          truncated?
+          (add-warning (str "Warning: indexed text was truncated for '" archive-name "'."))))
+      (catch Exception e
+        (add-warning res (str "Warning: failed to index '" archive-path "': " (.getMessage e)))))))
+
+(defn reindex-file! [effects config file {:keys [dry-run] :as res}]
+  (try
+    (index-archive! effects config (archive-entry-from-path effects file) res)
+    (catch Exception e
+      (add-warning res (str "Warning: failed to prepare indexing for '" file "': " (.getMessage e))))))
 
 (defn copy-to-remotes! [effects {:keys [annex-dir remotes]} {:keys [archive-name] :as archive} {:keys [dry-run] :as res}]
   (reduce
@@ -228,6 +314,7 @@
                                           ["git" "annex" "add" (:archive-name archive)])
                 res (run-mutating-command! effects res {:dir annex-dir}
                                           ["git" "commit" "-m" (commit-message archive)])
+                res (index-archive! effects config archive res)
                 res (copy-to-remotes! effects config archive res)
                 res (run-mutating-command! effects res {:dir annex-dir} ["git" "annex" "sync"])
                 res (run-mutating-command! effects res {:dir annex-dir} ["git" "push"])]
@@ -239,6 +326,45 @@
       (catch Exception e
         (error-result (.getMessage e))))))
 
+(defn run-reindex! [effects {:keys [inbox-dir index-db-path] :as config} {:keys [dry-run] :as opts}]
+  (cond
+    (:error opts)
+    (error-result (:error opts))
+
+    (not ((:directory? effects) inbox-dir))
+    (error-result (str "Error: inbox directory '" inbox-dir "' does not exist."))
+
+    :else
+    (try
+      (let [files (archived-files effects inbox-dir)
+            count-files (count files)
+            res (-> (ok-result {:dry-run dry-run
+                                :count count-files
+                                :index-db-path index-db-path})
+                    (add-message (str (if dry-run "[dry-run] Would reindex " "Reindexing ")
+                                      count-files
+                                      " archived file"
+                                      (when (not= 1 count-files) "s")
+                                      " from '"
+                                      inbox-dir
+                                      "' into '"
+                                      index-db-path
+                                      "'.")))]
+        (if (zero? count-files)
+          (add-message res "Nothing to do.")
+          (let [res (reduce (fn [current file]
+                              (reindex-file! effects config file current))
+                            res
+                            files)]
+            (add-message res
+                         (str (if dry-run "[dry-run] Done. " "Done. ")
+                              count-files
+                              " archived file"
+                              (when (not= 1 count-files) "s")
+                              (if dry-run " would be reindexed." " reindexed."))))))
+      (catch Exception e
+        (error-result (.getMessage e))))))
+
 (defn emit-result! [{:keys [messages warnings]}]
   (binding [*out* *err*]
     (doseq [message messages]
@@ -246,10 +372,15 @@
     (doseq [warning warnings]
       (println warning))))
 
+(defn run! [opts]
+  (case (:command opts)
+    :reindex (run-reindex! (real-effects) (default-config) opts)
+    (run-archive! (real-effects) (default-config) opts)))
+
 (defn -main [& args]
   (let [opts (-> args
                  parse-args
                  validate-opts)
-        res (run-archive! (real-effects) (default-config) opts)]
+        res (run! opts)]
     (emit-result! res)
     (:exit-code res)))

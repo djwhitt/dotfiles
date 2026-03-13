@@ -6,7 +6,8 @@
 (require '[babashka.fs :as fs])
 
 (let [script-file (or (System/getProperty "babashka.file") *file*)
-      src-dir (str (fs/path (fs/parent (fs/parent script-file)) "src" "clj"))]
+      script-path (fs/real-path script-file)
+      src-dir (str (fs/path (fs/parent (fs/parent script-path)) "src" "clj"))]
   (cp/add-classpath src-dir))
 
 (require '[djwhitt.archive :as archive])

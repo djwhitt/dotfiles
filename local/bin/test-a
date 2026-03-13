@@ -5,13 +5,18 @@
 (require '[clojure.test :as t])
 
 (let [script-file (or (System/getProperty "babashka.file") *file*)
-      local-dir (fs/parent (fs/parent script-file))]
+      script-path (fs/real-path script-file)
+      local-dir (fs/parent (fs/parent script-path))]
   (cp/add-classpath (str (fs/path local-dir "src" "clj")))
   (cp/add-classpath (str (fs/path local-dir "test"))))
 
 (require '[djwhitt.archive-test])
+(require '[djwhitt.archive.index-test])
+(require '[djwhitt.archive.extract-test])
 
-(let [{:keys [fail error]} (t/run-tests 'djwhitt.archive-test)]
+(let [{:keys [fail error]} (t/run-tests 'djwhitt.archive-test
+                                        'djwhitt.archive.index-test
+                                        'djwhitt.archive.extract-test)]
   (System/exit (if (zero? (+ fail error)) 0 1)))
 
 ;; vim:ft=clojure:
