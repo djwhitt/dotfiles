@@ -20,7 +20,8 @@
 (defn usage-message []
   (str "Usage:\n"
        "  a [--dry-run] <file>\n"
-       "  a reindex [--dry-run]"))
+       "  a reindex [--dry-run]\n"
+       "  a search <query>"))
 
 (defn date-string
   ([] (date-string (Date.)))
@@ -34,7 +35,8 @@
   (loop [remaining args
          opts {:command :archive
                :dry-run false
-               :file nil}]
+               :file nil
+               :query nil}]
     (if-let [arg (first remaining)]
       (cond
         (= arg "--dry-run")
@@ -42,14 +44,26 @@
 
         (and (= arg "reindex")
              (= :archive (:command opts))
-             (nil? (:file opts)))
+             (nil? (:file opts))
+             (nil? (:query opts)))
         (recur (rest remaining) (assoc opts :command :reindex))
+
+        (and (= arg "search")
+             (= :archive (:command opts))
+             (nil? (:file opts))
+             (nil? (:query opts)))
+        (recur (rest remaining) (assoc opts :command :search))
 
         (str/starts-with? arg "-")
         {:error (str "Unknown option: " arg)}
 
         (= :reindex (:command opts))
         {:error "Usage error: reindex does not accept positional arguments."}
+
+        (= :search (:command opts))
+        (if (:query opts)
+          {:error "Usage error: expected exactly one query argument."}
+          (recur (rest remaining) (assoc opts :query arg)))
 
         (:file opts)
         {:error "Usage error: expected exactly one file argument."}
@@ -58,10 +72,12 @@
         (recur (rest remaining) (assoc opts :file arg)))
       opts)))
 
-(defn validate-opts [{:keys [error command file] :as opts}]
+(defn validate-opts [{:keys [error command file query dry-run] :as opts}]
   (cond
     error opts
+    (and (= :search command) dry-run) {:error "Usage error: --dry-run is not supported with search."}
     (= :reindex command) opts
+    (= :search command) (if query opts {:error (usage-message)})
     file opts
     :else {:error (usage-message)}))
 
@@ -193,7 +209,8 @@
    :run! cmd!
    :sha256sum (fn [file] (sha256sum cmd! file))
    :extract-text extract/extract-text
-   :upsert-document! index/upsert-document!})
+   :upsert-document! index/upsert-document!
+   :search-index index/search})
 
 (defn ensure-annex-repo! [{:keys [directory? run!]} {:keys [annex-dir remotes]}]
   (when-not (directory? annex-dir)
@@ -257,6 +274,12 @@
     (index-archive! effects config (archive-entry-from-path effects file) res)
     (catch Exception e
       (add-warning res (str "Warning: failed to prepare indexing for '" file "': " (.getMessage e))))))
+
+(defn format-search-result [{:keys [basename archive_path snippet]}]
+  (str basename "\n"
+       "  " archive_path
+       (when (not (str/blank? snippet))
+         (str "\n  " snippet))))
 
 (defn copy-to-remotes! [effects {:keys [annex-dir remotes]} {:keys [archive-name] :as archive} {:keys [dry-run] :as res}]
   (reduce
@@ -365,6 +388,30 @@
       (catch Exception e
         (error-result (.getMessage e))))))
 
+(defn run-search! [{:keys [search-index]} {:keys [index-db-path]} {:keys [query] :as opts}]
+  (cond
+    (:error opts)
+    (error-result (:error opts))
+
+    (str/blank? query)
+    (error-result (usage-message))
+
+    :else
+    (try
+      (let [results (search-index index-db-path query 20)
+            count-results (count results)
+            res (ok-result {:query query
+                            :count count-results
+                            :index-db-path index-db-path})]
+        (if (zero? count-results)
+          (add-message res (str "No matches for '" query "'."))
+          (reduce (fn [current row]
+                    (add-message current (format-search-result row)))
+                  res
+                  results)))
+      (catch Exception e
+        (error-result (.getMessage e))))))
+
 (defn emit-result! [{:keys [messages warnings]}]
   (binding [*out* *err*]
     (doseq [message messages]
@@ -375,6 +422,7 @@
 (defn run! [opts]
   (case (:command opts)
     :reindex (run-reindex! (real-effects) (default-config) opts)
+    :search (run-search! (real-effects) (default-config) opts)
     (run-archive! (real-effects) (default-config) opts)))
 
 (defn -main [& args]

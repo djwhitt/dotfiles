@@ -24,7 +24,8 @@
                                :content "indexed content"
                                :error nil
                                :truncated? false})
-    :upsert-document! (fn [_ _] nil)}))
+    :upsert-document! (fn [_ _] nil)
+    :search-index (fn [_ _ _] [])}))
 
 (def config
   {:annex-dir "/annex"
@@ -34,16 +35,20 @@
 
 (deftest parse-args-test
   (testing "parses archive dry-run and file"
-    (is (= {:command :archive :dry-run true :file "/tmp/file.txt"}
+    (is (= {:command :archive :dry-run true :file "/tmp/file.txt" :query nil}
            (archive/parse-args ["--dry-run" "/tmp/file.txt"]))))
 
   (testing "parses reindex subcommand"
-    (is (= {:command :reindex :dry-run false :file nil}
+    (is (= {:command :reindex :dry-run false :file nil :query nil}
            (archive/parse-args ["reindex"]))))
 
   (testing "parses dry-run reindex subcommand"
-    (is (= {:command :reindex :dry-run true :file nil}
+    (is (= {:command :reindex :dry-run true :file nil :query nil}
            (archive/parse-args ["reindex" "--dry-run"]))))
+
+  (testing "parses search subcommand"
+    (is (= {:command :search :dry-run false :file nil :query "revenue"}
+           (archive/parse-args ["search" "revenue"]))))
 
   (testing "rejects unknown options"
     (is (= {:error "Unknown option: --wat"}
@@ -55,16 +60,28 @@
 
   (testing "rejects extra positional args for reindex"
     (is (= {:error "Usage error: reindex does not accept positional arguments."}
-           (archive/parse-args ["reindex" "extra"])))))
+           (archive/parse-args ["reindex" "extra"]))))
+
+  (testing "rejects extra positional args for search"
+    (is (= {:error "Usage error: expected exactly one query argument."}
+           (archive/parse-args ["search" "one" "two"])))))
 
 (deftest validate-opts-test
   (testing "adds usage error when archive file is missing"
     (is (= {:error (archive/usage-message)}
-           (archive/validate-opts {:command :archive :dry-run false}))))
+           (archive/validate-opts {:command :archive :dry-run false :query nil}))))
 
   (testing "allows reindex with no file"
-    (is (= {:command :reindex :dry-run false :file nil}
-           (archive/validate-opts {:command :reindex :dry-run false :file nil}))))
+    (is (= {:command :reindex :dry-run false :file nil :query nil}
+           (archive/validate-opts {:command :reindex :dry-run false :file nil :query nil}))))
+
+  (testing "allows search with a query"
+    (is (= {:command :search :dry-run false :file nil :query "revenue"}
+           (archive/validate-opts {:command :search :dry-run false :file nil :query "revenue"}))))
+
+  (testing "rejects dry-run with search"
+    (is (= {:error "Usage error: --dry-run is not supported with search."}
+           (archive/validate-opts {:command :search :dry-run true :file nil :query "revenue"}))))
 
   (testing "preserves an existing parse error"
     (is (= {:error "boom"}
@@ -108,6 +125,16 @@
     (is (= "report.pdf"
            (archive/original-basename "report.pdf" "abc123")))))
 
+(deftest format-search-result-test
+  (is (= "report.pdf\n  /annex/inbox/20260312-report-abc123.pdf\n  Quarterly [revenue] increased."
+         (archive/format-search-result {:basename "report.pdf"
+                                        :archive_path "/annex/inbox/20260312-report-abc123.pdf"
+                                        :snippet "Quarterly [revenue] increased."})))
+  (is (= "report.pdf\n  /annex/inbox/20260312-report-abc123.pdf"
+         (archive/format-search-result {:basename "report.pdf"
+                                        :archive_path "/annex/inbox/20260312-report-abc123.pdf"
+                                        :snippet nil}))))
+
 (deftest find-duplicate-test
   (testing "finds extensionless duplicates"
     (is (= "/tmp/inbox/20260312-README-deadbeef"
@@ -148,7 +175,7 @@
                                            (swap! indexed conj :upsert-called)))
         result (archive/run-archive! effects
                                      config
-                                     {:command :archive :dry-run true :file "/tmp/report.pdf"})]
+                                     {:command :archive :dry-run true :file "/tmp/report.pdf" :query nil})]
     (testing "returns a successful dry-run result"
       (is (= :ok (:status result)))
       (is (= 0 (:exit-code result)))
@@ -191,7 +218,7 @@
                     (assoc :run! (recording-runner calls)))
         result (archive/run-archive! effects
                                      (assoc config :remotes ["s3"])
-                                     {:command :archive :dry-run false :file "/tmp/report"})]
+                                     {:command :archive :dry-run false :file "/tmp/report" :query nil})]
     (is (= :duplicate (:status result)))
     (is (= 0 (:exit-code result)))
     (is (= "/annex/inbox/20260312-report-abc123" (:existing-path result)))
@@ -222,7 +249,7 @@
                                            (swap! indexed conj [:upsert db-path doc])))
         result (archive/run-archive! effects
                                      config
-                                     {:command :archive :dry-run false :file "/tmp/report.pdf"})]
+                                     {:command :archive :dry-run false :file "/tmp/report.pdf" :query nil})]
     (is (= :ok (:status result)))
     (is (= [{:opts {:dir "/annex"}
              :args ["git" "rev-parse" "--is-inside-work-tree"]}
@@ -268,7 +295,7 @@
                                            (throw (ex-info "db unavailable" {}))))
         result (archive/run-archive! effects
                                      config
-                                     {:command :archive :dry-run false :file "/tmp/report.pdf"})]
+                                     {:command :archive :dry-run false :file "/tmp/report.pdf" :query nil})]
     (is (= :ok (:status result)))
     (is (= ["Warning: failed to index '/annex/inbox/20260312-report-abc123.pdf': db unavailable"]
            (:warnings result)))))
@@ -286,7 +313,7 @@
                                            (throw (ex-info "should not upsert during dry-run" {}))))
         result (archive/run-reindex! effects
                                      config
-                                     {:command :reindex :dry-run true :file nil})]
+                                     {:command :reindex :dry-run true :file nil :query nil})]
     (is (= :ok (:status result)))
     (is (= ["[dry-run] Would reindex 2 archived files from '/annex/inbox' into '/tmp/archive-index.db'."
             "[dry-run] would index '/annex/inbox/20260312-README-def456' into '/tmp/archive-index.db'"
@@ -320,7 +347,7 @@
                                            (swap! indexed conj [db-path doc])))
         result (archive/run-reindex! effects
                                      config
-                                     {:command :reindex :dry-run false :file nil})]
+                                     {:command :reindex :dry-run false :file nil :query nil})]
     (is (= :ok (:status result)))
     (is (= [["/tmp/archive-index.db"
              {:sha256 "def456"
@@ -352,7 +379,7 @@
                                      (not= path "/annex/inbox")))
         result (archive/run-reindex! effects
                                      config
-                                     {:command :reindex :dry-run false :file nil})]
+                                     {:command :reindex :dry-run false :file nil :query nil})]
     (is (= :error (:status result)))
     (is (= ["Error: inbox directory '/annex/inbox' does not exist."]
            (:messages result)))))
@@ -363,17 +390,58 @@
                                     (throw (ex-info "sha failed" {}))))
         result (archive/run-reindex! effects
                                      config
-                                     {:command :reindex :dry-run false :file nil})]
+                                     {:command :reindex :dry-run false :file nil :query nil})]
     (is (= :ok (:status result)))
     (is (= ["Warning: failed to prepare indexing for '/annex/inbox/20260312-report-abc123.pdf': sha failed"]
            (:warnings result)))))
+
+(deftest run-search-test
+  (let [effects (assoc (base-effects)
+                       :search-index (fn [db-path query limit]
+                                       (is (= "/tmp/archive-index.db" db-path))
+                                       (is (= "revenue" query))
+                                       (is (= 20 limit))
+                                       [{:basename "report.pdf"
+                                         :archive_path "/annex/inbox/20260312-report-abc123.pdf"
+                                         :snippet "Quarterly [revenue] increased."}
+                                        {:basename "summary.txt"
+                                         :archive_path "/annex/inbox/20260312-summary-def456.txt"
+                                         :snippet "[Revenue] summary."}]))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :file nil :query "revenue"})]
+    (is (= :ok (:status result)))
+    (is (= ["report.pdf\n  /annex/inbox/20260312-report-abc123.pdf\n  Quarterly [revenue] increased."
+            "summary.txt\n  /annex/inbox/20260312-summary-def456.txt\n  [Revenue] summary."]
+           (:messages result)))))
+
+(deftest run-search-no-results-test
+  (let [effects (assoc (base-effects)
+                       :search-index (fn [_ _ _] []))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :file nil :query "missing"})]
+    (is (= :ok (:status result)))
+    (is (= ["No matches for 'missing'."]
+           (:messages result)))))
+
+(deftest run-search-error-test
+  (let [effects (assoc (base-effects)
+                       :search-index (fn [_ _ _]
+                                       (throw (ex-info "db unavailable" {}))))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :file nil :query "revenue"})]
+    (is (= :error (:status result)))
+    (is (= ["db unavailable"]
+           (:messages result)))))
 
 (deftest run-archive-error-test
   (let [effects (assoc (base-effects)
                        :regular-file? (constantly false))
         result (archive/run-archive! effects
                                      (assoc config :remotes ["s3"])
-                                     {:command :archive :dry-run false :file "/tmp/missing.txt"})]
+                                     {:command :archive :dry-run false :file "/tmp/missing.txt" :query nil})]
     (is (= :error (:status result)))
     (is (= 1 (:exit-code result)))
     (is (= ["Error: '/tmp/missing.txt' does not exist or is not a regular file."]
