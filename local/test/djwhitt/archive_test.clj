@@ -35,20 +35,28 @@
 
 (deftest parse-args-test
   (testing "parses archive dry-run and file"
-    (is (= {:command :archive :dry-run true :file "/tmp/file.txt" :query nil}
+    (is (= {:command :archive :dry-run true :json false :jsonl false :file "/tmp/file.txt" :query nil}
            (archive/parse-args ["--dry-run" "/tmp/file.txt"]))))
 
   (testing "parses reindex subcommand"
-    (is (= {:command :reindex :dry-run false :file nil :query nil}
+    (is (= {:command :reindex :dry-run false :json false :jsonl false :file nil :query nil}
            (archive/parse-args ["reindex"]))))
 
   (testing "parses dry-run reindex subcommand"
-    (is (= {:command :reindex :dry-run true :file nil :query nil}
+    (is (= {:command :reindex :dry-run true :json false :jsonl false :file nil :query nil}
            (archive/parse-args ["reindex" "--dry-run"]))))
 
   (testing "parses search subcommand"
-    (is (= {:command :search :dry-run false :file nil :query "revenue"}
+    (is (= {:command :search :dry-run false :json false :jsonl false :file nil :query "revenue"}
            (archive/parse-args ["search" "revenue"]))))
+
+  (testing "parses json search subcommand"
+    (is (= {:command :search :dry-run false :json true :jsonl false :file nil :query "revenue"}
+           (archive/parse-args ["search" "--json" "revenue"]))))
+
+  (testing "parses jsonl search subcommand"
+    (is (= {:command :search :dry-run false :json false :jsonl true :file nil :query "revenue"}
+           (archive/parse-args ["search" "--jsonl" "revenue"]))))
 
   (testing "rejects unknown options"
     (is (= {:error "Unknown option: --wat"}
@@ -69,19 +77,39 @@
 (deftest validate-opts-test
   (testing "adds usage error when archive file is missing"
     (is (= {:error (archive/usage-message)}
-           (archive/validate-opts {:command :archive :dry-run false :query nil}))))
+           (archive/validate-opts {:command :archive :dry-run false :json false :jsonl false :query nil}))))
 
   (testing "allows reindex with no file"
-    (is (= {:command :reindex :dry-run false :file nil :query nil}
-           (archive/validate-opts {:command :reindex :dry-run false :file nil :query nil}))))
+    (is (= {:command :reindex :dry-run false :json false :jsonl false :file nil :query nil}
+           (archive/validate-opts {:command :reindex :dry-run false :json false :jsonl false :file nil :query nil}))))
 
   (testing "allows search with a query"
-    (is (= {:command :search :dry-run false :file nil :query "revenue"}
-           (archive/validate-opts {:command :search :dry-run false :file nil :query "revenue"}))))
+    (is (= {:command :search :dry-run false :json false :jsonl false :file nil :query "revenue"}
+           (archive/validate-opts {:command :search :dry-run false :json false :jsonl false :file nil :query "revenue"}))))
+
+  (testing "allows json search with a query"
+    (is (= {:command :search :dry-run false :json true :jsonl false :file nil :query "revenue"}
+           (archive/validate-opts {:command :search :dry-run false :json true :jsonl false :file nil :query "revenue"}))))
+
+  (testing "allows jsonl search with a query"
+    (is (= {:command :search :dry-run false :json false :jsonl true :file nil :query "revenue"}
+           (archive/validate-opts {:command :search :dry-run false :json false :jsonl true :file nil :query "revenue"}))))
+
+  (testing "rejects json outside search"
+    (is (= {:error "Usage error: --json and --jsonl are only supported with search."}
+           (archive/validate-opts {:command :archive :dry-run false :json true :jsonl false :file "/tmp/file.txt" :query nil}))))
+
+  (testing "rejects jsonl outside search"
+    (is (= {:error "Usage error: --json and --jsonl are only supported with search."}
+           (archive/validate-opts {:command :archive :dry-run false :json false :jsonl true :file "/tmp/file.txt" :query nil}))))
+
+  (testing "rejects json and jsonl together"
+    (is (= {:error "Usage error: --json and --jsonl are mutually exclusive."}
+           (archive/validate-opts {:command :search :dry-run false :json true :jsonl true :file nil :query "revenue"}))))
 
   (testing "rejects dry-run with search"
     (is (= {:error "Usage error: --dry-run is not supported with search."}
-           (archive/validate-opts {:command :search :dry-run true :file nil :query "revenue"}))))
+           (archive/validate-opts {:command :search :dry-run true :json false :jsonl false :file nil :query "revenue"}))))
 
   (testing "preserves an existing parse error"
     (is (= {:error "boom"}
@@ -409,21 +437,94 @@
                                          :snippet "[Revenue] summary."}]))
         result (archive/run-search! effects
                                     config
-                                    {:command :search :dry-run false :file nil :query "revenue"})]
+                                    {:command :search :dry-run false :json false :jsonl false :file nil :query "revenue"})]
     (is (= :ok (:status result)))
     (is (= ["report.pdf\n  /annex/inbox/20260312-report-abc123.pdf\n  Quarterly [revenue] increased."
             "summary.txt\n  /annex/inbox/20260312-summary-def456.txt\n  [Revenue] summary."]
            (:messages result)))))
+
+(deftest run-search-json-test
+  (let [rows [{:basename "report.pdf"
+               :archive_path "/annex/inbox/20260312-report-abc123.pdf"
+               :snippet "Quarterly [revenue] increased."
+               :rank -1.2}]
+        effects (assoc (base-effects)
+                       :search-index (fn [_ _ _] rows))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :json true :jsonl false :file nil :query "revenue"})]
+    (is (= :ok (:status result)))
+    (is (= :json (:output-format result)))
+    (is (= rows (:output-value result)))
+    (is (empty? (:messages result)))))
+
+(deftest run-search-jsonl-test
+  (let [rows [{:basename "report.pdf"
+               :archive_path "/annex/inbox/20260312-report-abc123.pdf"
+               :rank -1.2}
+              {:basename "summary.txt"
+               :archive_path "/annex/inbox/20260312-summary-def456.txt"
+               :rank -0.8}]
+        effects (assoc (base-effects)
+                       :search-index (fn [_ _ _] rows))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :json false :jsonl true :file nil :query "revenue"})]
+    (is (= :ok (:status result)))
+    (is (= :jsonl (:output-format result)))
+    (is (= rows (:output-value result)))
+    (is (empty? (:messages result)))))
+
+(deftest emit-result-json-test
+  (let [res {:status :ok
+             :exit-code 0
+             :messages []
+             :warnings []
+             :output-format :json
+             :output-value [{:basename "report.pdf"}]}
+        stdout (with-out-str (archive/emit-result! res))]
+    (is (= "[{\"basename\":\"report.pdf\"}]\n" stdout))))
+
+(deftest emit-result-jsonl-test
+  (let [res {:status :ok
+             :exit-code 0
+             :messages []
+             :warnings []
+             :output-format :jsonl
+             :output-value [{:basename "report.pdf"}
+                            {:basename "summary.txt"}]}
+        stdout (with-out-str (archive/emit-result! res))]
+    (is (= "{\"basename\":\"report.pdf\"}\n{\"basename\":\"summary.txt\"}\n" stdout))))
 
 (deftest run-search-no-results-test
   (let [effects (assoc (base-effects)
                        :search-index (fn [_ _ _] []))
         result (archive/run-search! effects
                                     config
-                                    {:command :search :dry-run false :file nil :query "missing"})]
+                                    {:command :search :dry-run false :json false :jsonl false :file nil :query "missing"})]
     (is (= :ok (:status result)))
     (is (= ["No matches for 'missing'."]
            (:messages result)))))
+
+(deftest run-search-json-no-results-test
+  (let [effects (assoc (base-effects)
+                       :search-index (fn [_ _ _] []))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :json true :jsonl false :file nil :query "missing"})]
+    (is (= :ok (:status result)))
+    (is (= :json (:output-format result)))
+    (is (= [] (:output-value result)))))
+
+(deftest run-search-jsonl-no-results-test
+  (let [effects (assoc (base-effects)
+                       :search-index (fn [_ _ _] []))
+        result (archive/run-search! effects
+                                    config
+                                    {:command :search :dry-run false :json false :jsonl true :file nil :query "missing"})]
+    (is (= :ok (:status result)))
+    (is (= :jsonl (:output-format result)))
+    (is (= [] (:output-value result)))))
 
 (deftest run-search-error-test
   (let [effects (assoc (base-effects)
@@ -431,7 +532,7 @@
                                        (throw (ex-info "db unavailable" {}))))
         result (archive/run-search! effects
                                     config
-                                    {:command :search :dry-run false :file nil :query "revenue"})]
+                                    {:command :search :dry-run false :json false :jsonl false :file nil :query "revenue"})]
     (is (= :error (:status result)))
     (is (= ["db unavailable"]
            (:messages result)))))

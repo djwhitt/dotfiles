@@ -2,6 +2,7 @@
   ;; Test namespace: djwhitt.archive-test
   (:require [babashka.fs :as fs]
             [babashka.process :refer [shell]]
+            [cheshire.core :as json]
             [clojure.string :as str]
             [djwhitt.archive.extract :as extract]
             [djwhitt.archive.index :as index])
@@ -21,7 +22,7 @@
   (str "Usage:\n"
        "  a [--dry-run] <file>\n"
        "  a reindex [--dry-run]\n"
-       "  a search <query>"))
+       "  a search [--json|--jsonl] <query>"))
 
 (defn date-string
   ([] (date-string (Date.)))
@@ -35,12 +36,20 @@
   (loop [remaining args
          opts {:command :archive
                :dry-run false
+               :json false
+               :jsonl false
                :file nil
                :query nil}]
     (if-let [arg (first remaining)]
       (cond
         (= arg "--dry-run")
         (recur (rest remaining) (assoc opts :dry-run true))
+
+        (= arg "--json")
+        (recur (rest remaining) (assoc opts :json true))
+
+        (= arg "--jsonl")
+        (recur (rest remaining) (assoc opts :jsonl true))
 
         (and (= arg "reindex")
              (= :archive (:command opts))
@@ -72,9 +81,11 @@
         (recur (rest remaining) (assoc opts :file arg)))
       opts)))
 
-(defn validate-opts [{:keys [error command file query dry-run] :as opts}]
+(defn validate-opts [{:keys [error command file query dry-run json jsonl] :as opts}]
   (cond
     error opts
+    (and json jsonl) {:error "Usage error: --json and --jsonl are mutually exclusive."}
+    (and (or json jsonl) (not= :search command)) {:error "Usage error: --json and --jsonl are only supported with search."}
     (and (= :search command) dry-run) {:error "Usage error: --dry-run is not supported with search."}
     (= :reindex command) opts
     (= :search command) (if query opts {:error (usage-message)})
@@ -388,7 +399,7 @@
       (catch Exception e
         (error-result (.getMessage e))))))
 
-(defn run-search! [{:keys [search-index]} {:keys [index-db-path]} {:keys [query] :as opts}]
+(defn run-search! [{:keys [search-index]} {:keys [index-db-path]} {:keys [query json jsonl] :as opts}]
   (cond
     (:error opts)
     (error-result (:error opts))
@@ -403,8 +414,17 @@
             res (ok-result {:query query
                             :count count-results
                             :index-db-path index-db-path})]
-        (if (zero? count-results)
+        (cond
+          json
+          (assoc res :output-format :json :output-value results)
+
+          jsonl
+          (assoc res :output-format :jsonl :output-value results)
+
+          (zero? count-results)
           (add-message res (str "No matches for '" query "'."))
+
+          :else
           (reduce (fn [current row]
                     (add-message current (format-search-result row)))
                   res
@@ -412,12 +432,28 @@
       (catch Exception e
         (error-result (.getMessage e))))))
 
-(defn emit-result! [{:keys [messages warnings]}]
-  (binding [*out* *err*]
-    (doseq [message messages]
-      (println message))
-    (doseq [warning warnings]
-      (println warning))))
+(defn emit-result! [{:keys [messages warnings output-format output-value]}]
+  (case output-format
+    :json
+    (do
+      (println (json/generate-string output-value))
+      (binding [*out* *err*]
+        (doseq [warning warnings]
+          (println warning))))
+
+    :jsonl
+    (do
+      (doseq [row output-value]
+        (println (json/generate-string row)))
+      (binding [*out* *err*]
+        (doseq [warning warnings]
+          (println warning))))
+
+    (binding [*out* *err*]
+      (doseq [message messages]
+        (println message))
+      (doseq [warning warnings]
+        (println warning)))))
 
 (defn run! [opts]
   (case (:command opts)
