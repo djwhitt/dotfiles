@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Obsidian
+Exec=obsidian
+Terminal=false
+Type=Application
+Icon=obsidian
+StartupWMClass=obsidian
+Comment=A knowledge base that works on local Markdown files
+Categories=Office;
