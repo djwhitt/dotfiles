@@ -18,6 +18,8 @@
     :date-string (constantly "20260312")
     :sha256sum (constantly "abc123")
     :run! (fn [_ _] {:exit 0 :out "" :err ""})
+    :make-temp-file! (fn [_] "/tmp/archive-source.tar.zst")
+    :delete-file! (fn [_] nil)
     :extract-text (constantly {:status :ok
                                :mime-type "text/plain"
                                :extractor "slurp"
@@ -133,7 +135,17 @@
     (is (= {:basename "README"
             :stem "README"
             :ext ""}
-           (archive/file-parts "/tmp/README")))))
+           (archive/file-parts "/tmp/README"))))
+
+  (testing "treats compound tar extensions as a single unit"
+    (is (= {:basename "project.tar.zst"
+            :stem "project"
+            :ext ".tar.zst"}
+           (archive/file-parts "/tmp/project.tar.zst")))
+    (is (= {:basename "backup.tar.gz"
+            :stem "backup"
+            :ext ".tar.gz"}
+           (archive/file-parts "/tmp/backup.tar.gz")))))
 
 (deftest original-basename-test
   (testing "restores the original basename for files with extensions"
@@ -151,7 +163,11 @@
 
   (testing "falls back to the archive name when the format does not match"
     (is (= "report.pdf"
-           (archive/original-basename "report.pdf" "abc123")))))
+           (archive/original-basename "report.pdf" "abc123"))))
+
+  (testing "restores the original basename for compound tar extensions"
+    (is (= "project.tar.zst"
+           (archive/original-basename "20260312-project-abc123.tar.zst" "abc123")))))
 
 (deftest format-search-result-test
   (is (= "report.pdf\n  /annex/inbox/20260312-report-abc123.pdf\n  Quarterly [revenue] increased."
@@ -218,8 +234,8 @@
               "[dry-run] would run in '/annex/inbox': \"git\" \"annex\" \"add\" \"20260312-report-abc123.pdf\""
               "[dry-run] would run in '/annex': \"git\" \"commit\" \"-m\" \"archive: report.pdf\""
               "[dry-run] would index '/annex/inbox/20260312-report-abc123.pdf' into '/tmp/archive-index.db'"
-              "[dry-run] would run in '/annex': \"git\" \"annex\" \"copy\" \"20260312-report-abc123.pdf\" \"--to\" \"s3\""
-              "[dry-run] would run in '/annex': \"git\" \"annex\" \"copy\" \"20260312-report-abc123.pdf\" \"--to\" \"rsync-dot-net\""
+              "[dry-run] would run in '/annex/inbox': \"git\" \"annex\" \"copy\" \"20260312-report-abc123.pdf\" \"--to\" \"s3\""
+              "[dry-run] would run in '/annex/inbox': \"git\" \"annex\" \"copy\" \"20260312-report-abc123.pdf\" \"--to\" \"rsync-dot-net\""
               "[dry-run] would run in '/annex': \"git\" \"annex\" \"sync\""
               "[dry-run] would run in '/annex': \"git\" \"push\""
               "[dry-run] Done. File would be archived as '20260312-report-abc123.pdf'."]
@@ -293,9 +309,9 @@
              :args ["git" "annex" "add" "20260312-report-abc123.pdf"]}
             {:opts {:dir "/annex"}
              :args ["git" "commit" "-m" "archive: report.pdf"]}
-            {:opts {:dir "/annex"}
+            {:opts {:dir "/annex/inbox"}
              :args ["git" "annex" "copy" "20260312-report-abc123.pdf" "--to" "s3"]}
-            {:opts {:dir "/annex"}
+            {:opts {:dir "/annex/inbox"}
              :args ["git" "annex" "copy" "20260312-report-abc123.pdf" "--to" "rsync-dot-net"]}
             {:opts {:dir "/annex"}
              :args ["git" "annex" "sync"]}
@@ -316,6 +332,50 @@
            @indexed))
     (is (= "Indexed '20260312-report-abc123.pdf' in '/tmp/archive-index.db' (status: ok)."
            (nth (:messages result) 2)))))
+
+(deftest run-archive-directory-test
+  (let [calls (atom [])
+        deleted (atom [])
+        effects (assoc (base-effects)
+                       :regular-file? #(= "/tmp/tar-source.tar.zst" %)
+                       :directory? (fn [p] (contains? #{"/annex" "/annex/inbox" "/tmp/myproj"} p))
+                       :make-temp-file! (fn [_] "/tmp/tar-source.tar.zst")
+                       :delete-file! #(swap! deleted conj %)
+                       :run! (recording-runner calls))
+        result (archive/run-archive! effects
+                                     (assoc config :remotes ["s3"])
+                                     {:command :archive :dry-run false :file "/tmp/myproj" :query nil})]
+    (testing "archive succeeds with directory source"
+      (is (= :ok (:status result)))
+      (is (= "20260312-myproj-abc123.tar.zst" (:archive-name result))))
+
+    (testing "tars the directory, moves the tarball, then removes the source dir"
+      (is (= [{:opts {:dir "/annex"}
+               :args ["git" "rev-parse" "--is-inside-work-tree"]}
+              {:opts {:dir "/annex"}
+               :args ["git" "annex" "info"]}
+              {:opts {:dir "/annex"}
+               :args ["git" "remote" "get-url" "s3"]}
+              {:opts {}
+               :args ["tar" "--zstd" "-cf" "/tmp/tar-source.tar.zst" "-C" "/tmp" "myproj"]}
+              {:opts {}
+               :args ["mv" "/tmp/tar-source.tar.zst" "/annex/inbox/20260312-myproj-abc123.tar.zst"]}
+              {:opts {}
+               :args ["rm" "-rf" "/tmp/myproj"]}
+              {:opts {:dir "/annex/inbox"}
+               :args ["git" "annex" "add" "20260312-myproj-abc123.tar.zst"]}
+              {:opts {:dir "/annex"}
+               :args ["git" "commit" "-m" "archive: myproj.tar.zst"]}
+              {:opts {:dir "/annex/inbox"}
+               :args ["git" "annex" "copy" "20260312-myproj-abc123.tar.zst" "--to" "s3"]}
+              {:opts {:dir "/annex"}
+               :args ["git" "annex" "sync"]}
+              {:opts {:dir "/annex"}
+               :args ["git" "push"]}]
+             @calls)))
+
+    (testing "cleanup fires for the temp tarball"
+      (is (= ["/tmp/tar-source.tar.zst"] @deleted)))))
 
 (deftest run-archive-index-warning-test
   (let [effects (assoc (base-effects)
@@ -539,11 +599,12 @@
 
 (deftest run-archive-error-test
   (let [effects (assoc (base-effects)
-                       :regular-file? (constantly false))
+                       :regular-file? (constantly false)
+                       :directory? (constantly false))
         result (archive/run-archive! effects
                                      (assoc config :remotes ["s3"])
                                      {:command :archive :dry-run false :file "/tmp/missing.txt" :query nil})]
     (is (= :error (:status result)))
     (is (= 1 (:exit-code result)))
-    (is (= ["Error: '/tmp/missing.txt' does not exist or is not a regular file."]
+    (is (= ["Error: '/tmp/missing.txt' does not exist or is not a regular file or directory."]
            (:messages result)))))

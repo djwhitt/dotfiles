@@ -92,12 +92,27 @@
     file opts
     :else {:error (usage-message)}))
 
+;; Compound extensions recognized as a single unit so archived tarballs keep
+;; the trailing ".tar.zst" etc. instead of being split mid-extension.
+(def compound-extensions [".tar.gz" ".tar.bz2" ".tar.xz" ".tar.zst"])
+
+(defn- compound-extension [basename]
+  (let [lower (str/lower-case basename)]
+    (some (fn [ext] (when (str/ends-with? lower ext) ext))
+          compound-extensions)))
+
 (defn file-parts [file]
   (let [basename (str (fs/file-name file))
-        last-dot (.lastIndexOf basename ".")]
-    {:basename basename
-     :stem (if (pos? last-dot) (subs basename 0 last-dot) basename)
-     :ext (if (pos? last-dot) (subs basename last-dot) "")}))
+        compound (compound-extension basename)]
+    (if compound
+      (let [stem-end (- (count basename) (count compound))]
+        {:basename basename
+         :stem (subs basename 0 stem-end)
+         :ext (subs basename stem-end)})
+      (let [last-dot (.lastIndexOf basename ".")]
+        {:basename basename
+         :stem (if (pos? last-dot) (subs basename 0 last-dot) basename)
+         :ext (if (pos? last-dot) (subs basename last-dot) "")}))))
 
 (defn archive-entry [{:keys [file inbox-dir date sha256]}]
   (let [{:keys [basename stem ext]} (file-parts file)
@@ -219,6 +234,10 @@
    :date-string date-string
    :run! cmd!
    :sha256sum (fn [file] (sha256sum cmd! file))
+   :make-temp-file! (fn [{:keys [suffix] :or {suffix ""}}]
+                      (str (fs/create-temp-file {:suffix suffix})))
+   :delete-file! (fn [path]
+                   (when path (fs/delete-if-exists path)))
    :extract-text extract/extract-text
    :upsert-document! index/upsert-document!
    :search-index index/search})
@@ -292,16 +311,39 @@
        (when (not (str/blank? snippet))
          (str "\n  " snippet))))
 
-(defn copy-to-remotes! [effects {:keys [annex-dir remotes]} {:keys [archive-name] :as archive} {:keys [dry-run] :as res}]
+(defn copy-to-remotes! [effects {:keys [inbox-dir remotes]} {:keys [archive-name] :as archive} {:keys [dry-run] :as res}]
   (reduce
    (fn [current remote]
      (try
-       (run-mutating-command! effects current {:dir annex-dir}
+       (run-mutating-command! effects current {:dir inbox-dir}
                               ["git" "annex" "copy" archive-name "--to" remote])
-       (catch Exception _
-         (add-warning current (str "Warning: failed to copy to " remote ".")))))
+       (catch Exception e
+         (add-warning current (str "Warning: failed to copy to " remote ": " (.getMessage e))))))
    res
    remotes))
+
+(defn prepare-archive-source
+  "For a regular file, returns the file as-is. For a directory, tars and
+  zstd-compresses it into a temp file so the rest of the pipeline treats it
+  as a regular archive. Callers must cleanup :cleanup-path if non-nil."
+  [{:keys [regular-file? directory? run! make-temp-file!]} file]
+  (cond
+    (regular-file? file)
+    {:source-path file
+     :name-for (str (fs/file-name file))
+     :cleanup-path nil
+     :source-dir nil}
+
+    (directory? file)
+    (let [dirname (str (fs/file-name file))
+          tar-name (str dirname ".tar.zst")
+          parent (str (or (fs/parent file) "."))
+          tmp-path (make-temp-file! {:suffix ".tar.zst"})]
+      (run! {} ["tar" "--zstd" "-cf" tmp-path "-C" parent dirname])
+      {:source-path tmp-path
+       :name-for tar-name
+       :cleanup-path tmp-path
+       :source-dir file})))
 
 (defn run-archive! [effects {:keys [inbox-dir annex-dir] :as config} {:keys [dry-run file] :as opts}]
   (cond
@@ -311,54 +353,64 @@
     (nil? file)
     (error-result (usage-message))
 
-    (not ((:regular-file? effects) file))
-    (error-result (str "Error: '" file "' does not exist or is not a regular file."))
+    (not (or ((:regular-file? effects) file)
+             ((:directory? effects) file)))
+    (error-result (str "Error: '" file "' does not exist or is not a regular file or directory."))
 
     :else
-    (try
-      (ensure-annex-repo! effects config)
-      (let [res (ensure-inbox-dir! effects config (assoc (ok-result {:dry-run dry-run}) :dry-run dry-run))
-            sha256 ((:sha256sum effects) file)
-            archive (archive-entry {:file file
-                                    :inbox-dir inbox-dir
-                                    :date ((:date-string effects))
-                                    :sha256 sha256})
-            existing (find-duplicate (:glob effects) inbox-dir sha256)]
-        (if existing
-          (duplicate-result
-           (str "A file with hash '" sha256 "' is already archived at '" existing "'. Skipping.")
-           {:dry-run dry-run
-            :sha256 sha256
-            :existing-path existing
-            :archive-name (:archive-name archive)
-            :archive-path (:archive-path archive)})
-          (let [res (-> res
-                        (assoc :sha256 sha256
-                               :basename (:basename archive)
-                               :archive-name (:archive-name archive)
-                               :archive-path (:archive-path archive))
-                        (add-message (str (if dry-run "[dry-run] Would archive '" "Archiving '")
-                                          file
-                                          "' to '"
-                                          (:archive-path archive)
-                                          "'..."))
-                        (add-message (str "SHA256: " sha256)))
-                res (run-mutating-command! effects res {} ["mv" file (:archive-path archive)])
-                res (run-mutating-command! effects res {:dir inbox-dir}
-                                          ["git" "annex" "add" (:archive-name archive)])
-                res (run-mutating-command! effects res {:dir annex-dir}
-                                          ["git" "commit" "-m" (commit-message archive)])
-                res (index-archive! effects config archive res)
-                res (copy-to-remotes! effects config archive res)
-                res (run-mutating-command! effects res {:dir annex-dir} ["git" "annex" "sync"])
-                res (run-mutating-command! effects res {:dir annex-dir} ["git" "push"])]
-            (add-message res
-                         (str (if dry-run "[dry-run] Done. File would be archived as '"
-                                  "Done. File archived as '")
-                              (:archive-name archive)
-                              "'.")))))
-      (catch Exception e
-        (error-result (.getMessage e))))))
+    (let [source (atom nil)]
+      (try
+        (ensure-annex-repo! effects config)
+        (reset! source (prepare-archive-source effects file))
+        (let [{:keys [source-path name-for source-dir]} @source
+              res (ensure-inbox-dir! effects config (assoc (ok-result {:dry-run dry-run}) :dry-run dry-run))
+              sha256 ((:sha256sum effects) source-path)
+              archive (archive-entry {:file name-for
+                                      :inbox-dir inbox-dir
+                                      :date ((:date-string effects))
+                                      :sha256 sha256})
+              existing (find-duplicate (:glob effects) inbox-dir sha256)]
+          (if existing
+            (duplicate-result
+             (str "A file with hash '" sha256 "' is already archived at '" existing "'. Skipping.")
+             {:dry-run dry-run
+              :sha256 sha256
+              :existing-path existing
+              :archive-name (:archive-name archive)
+              :archive-path (:archive-path archive)})
+            (let [res (-> res
+                          (assoc :sha256 sha256
+                                 :basename (:basename archive)
+                                 :archive-name (:archive-name archive)
+                                 :archive-path (:archive-path archive))
+                          (add-message (str (if dry-run "[dry-run] Would archive '" "Archiving '")
+                                            file
+                                            "' to '"
+                                            (:archive-path archive)
+                                            "'..."))
+                          (add-message (str "SHA256: " sha256)))
+                  res (run-mutating-command! effects res {} ["mv" source-path (:archive-path archive)])
+                  res (if source-dir
+                        (run-mutating-command! effects res {} ["rm" "-rf" source-dir])
+                        res)
+                  res (run-mutating-command! effects res {:dir inbox-dir}
+                                            ["git" "annex" "add" (:archive-name archive)])
+                  res (run-mutating-command! effects res {:dir annex-dir}
+                                            ["git" "commit" "-m" (commit-message archive)])
+                  res (index-archive! effects config archive res)
+                  res (copy-to-remotes! effects config archive res)
+                  res (run-mutating-command! effects res {:dir annex-dir} ["git" "annex" "sync"])
+                  res (run-mutating-command! effects res {:dir annex-dir} ["git" "push"])]
+              (add-message res
+                           (str (if dry-run "[dry-run] Done. File would be archived as '"
+                                    "Done. File archived as '")
+                                (:archive-name archive)
+                                "'.")))))
+        (catch Exception e
+          (error-result (.getMessage e)))
+        (finally
+          (when-let [path (:cleanup-path @source)]
+            (try ((:delete-file! effects) path) (catch Exception _))))))))
 
 (defn run-reindex! [effects {:keys [inbox-dir index-db-path] :as config} {:keys [dry-run] :as opts}]
   (cond
