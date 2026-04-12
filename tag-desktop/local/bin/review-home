@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# Interactively triage loose files with fzf+ctpv previews.
+# Scans configured roots, skips any git/git-annex repo, lists oldest first.
+# Keys: enter/ctrl-o open, ctrl-a archive to ~/Annex/inbox, ctrl-t trash,
+#       ctrl-r reload, esc quit.
+
+set -euo pipefail
+
+ROOTS=(
+  "$HOME/Downloads"
+  "$HOME/Scratch"
+)
+TRASH="$HOME/.trash"
+
+# Directory basenames to prune entirely (build artifacts, caches, etc).
+# Tune as needed — add extracted-archive dirs that you'd rather handle as a unit.
+NOISE_DIRS=(
+  node_modules
+  __pycache__
+  .venv
+  .direnv
+  .cache
+  target
+  dist
+  build
+  .next
+)
+
+SCRIPT=$(readlink -f "$0")
+export SCRIPT
+
+list_files() {
+  local existing=()
+  local r
+  for r in "${ROOTS[@]}"; do
+    [[ -d "$r" ]] && existing+=("$r")
+  done
+  [[ ${#existing[@]} -eq 0 ]] && return 0
+
+  local noise_expr=()
+  local n
+  for n in "${NOISE_DIRS[@]}"; do
+    noise_expr+=( -o \( -type d -name "$n" \) -prune )
+  done
+
+  find "${existing[@]}" \
+    \( -type d -exec test -e {}/.git \; \) -prune \
+    "${noise_expr[@]}" \
+    -o -type f -printf '%T@\t%p\n' 2>/dev/null \
+    | sort -n | cut -f2-
+}
+
+archive_files() {
+  local f
+  for f in "$@"; do
+    [[ -f "$f" ]] || continue
+    a "$f" || echo "archive failed: $f" >&2
+  done
+}
+
+trash_files() {
+  (( $# )) || return 0
+  printf 'Trash %d file(s):\n' "$#"
+  printf '  %s\n' "$@"
+  local ans
+  read -r -p "Confirm [y/N] " ans
+  [[ "$ans" == "y" || "$ans" == "Y" ]] || { echo "Cancelled."; return 0; }
+
+  mkdir -p "$TRASH"
+  local f ts base dest i
+  for f in "$@"; do
+    [[ -f "$f" ]] || continue
+    ts=$(date -r "$f" +%Y%m%dT%H%M%S 2>/dev/null || date +%Y%m%dT%H%M%S)
+    base=$(basename -- "$f")
+    dest="$TRASH/$ts-$base"
+    i=1
+    while [[ -e "$dest" ]]; do
+      dest="$TRASH/$ts-$i-$base"
+      i=$((i + 1))
+    done
+    mv -- "$f" "$dest" || echo "trash failed: $f" >&2
+  done
+}
+
+preview_file() {
+  local file=$1
+  printf '\033[2J\033[H'
+  ctpv -c "$CTPV_ID" 2>/dev/null || true
+  # ctpv pipes its subshell's stderr back through its own stdout (see
+  # preview.c run()), so suppressing noise requires filtering stdout.
+  ctpv "$file" \
+    "$FZF_PREVIEW_COLUMNS" "$FZF_PREVIEW_LINES" \
+    "$FZF_PREVIEW_LEFT" "$FZF_PREVIEW_TOP" \
+    "$CTPV_ID" 2>/dev/null \
+    | sed -e '/printf:.*invalid number/d' \
+          -e '\|/dev/tty: No such device|d'
+}
+
+case "${1:-}" in
+  --list)    list_files; exit 0 ;;
+  --archive) shift; archive_files "$@"; exit 0 ;;
+  --trash)   shift; trash_files "$@"; exit 0 ;;
+  --preview) shift; preview_file "$@"; exit 0 ;;
+esac
+
+CTPV_ID=$$
+export CTPV_ID
+ctpv -s "$CTPV_ID" &
+trap 'ctpv -e "$CTPV_ID" 2>/dev/null || true' EXIT
+
+list_files | fzf \
+  --multi \
+  --height=100% --reverse \
+  --preview '"$SCRIPT" --preview {}' \
+  --preview-window=right:60%:wrap \
+  --header='enter/ctrl-o: open · ctrl-a: archive · ctrl-t: trash · ctrl-r: reload · esc: quit' \
+  --bind 'ctrl-a:execute("$SCRIPT" --archive {+})+reload("$SCRIPT" --list)' \
+  --bind 'ctrl-t:execute("$SCRIPT" --trash {+})+reload("$SCRIPT" --list)' \
+  --bind 'ctrl-o:execute-silent(xdg-open {} >/dev/null 2>&1 &)' \
+  --bind 'enter:execute-silent(xdg-open {} >/dev/null 2>&1 &)' \
+  --bind 'ctrl-r:reload("$SCRIPT" --list)' \
+  >/dev/null || true
