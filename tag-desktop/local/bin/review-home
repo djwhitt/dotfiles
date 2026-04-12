@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Interactively triage loose files with fzf+ctpv previews.
+# Interactively triage loose files with fzf previews.
 # Scans configured roots, skips any git/git-annex repo, lists oldest first.
 # Keys: enter/ctrl-o open, ctrl-a archive to ~/Annex/inbox, ctrl-t trash,
 #       ctrl-r reload, esc quit.
@@ -82,18 +82,70 @@ trash_files() {
   done
 }
 
+render_image() {
+  # Render an image via kitty's Unicode Placeholder Protocol — actual pixels,
+  # anchored to placeholder characters that fzf can redraw over. Falls back
+  # to chafa symbol mode if kitten icat fails.
+  local img=$1 w=$2 h=$3
+  kitten icat --unicode-placeholder --stdin no --transfer-mode file \
+    --place "${w}x${h}@0x0" -- "$img" 2>/dev/null \
+    || chafa -f symbols -s "${w}x${h}" -- "$img" 2>/dev/null
+}
+
 preview_file() {
   local file=$1
-  printf '\033[2J\033[H'
-  ctpv -c "$CTPV_ID" 2>/dev/null || true
-  # ctpv pipes its subshell's stderr back through its own stdout (see
-  # preview.c run()), so suppressing noise requires filtering stdout.
-  ctpv "$file" \
-    "$FZF_PREVIEW_COLUMNS" "$FZF_PREVIEW_LINES" \
-    "$FZF_PREVIEW_LEFT" "$FZF_PREVIEW_TOP" \
-    "$CTPV_ID" 2>/dev/null \
-    | sed -e '/printf:.*invalid number/d' \
-          -e '\|/dev/tty: No such device|d'
+  [[ -r "$file" ]] || { echo "unreadable: $file"; return 0; }
+
+  local w=${FZF_PREVIEW_COLUMNS:-80}
+  local h=${FZF_PREVIEW_LINES:-40}
+  local mime
+  mime=$(file -bL --mime-type -- "$file" 2>/dev/null || echo unknown)
+
+  case "$mime" in
+    image/*)
+      render_image "$file" "$w" "$h"
+      ;;
+    application/pdf)
+      local tmp
+      tmp=$(mktemp --suffix=.png)
+      pdftoppm -f 1 -l 1 -r 150 -png -- "$file" "${tmp%.png}" 2>/dev/null
+      render_image "$tmp" "$w" "$h"
+      rm -f "$tmp"
+      ;;
+    video/*)
+      local tmp
+      tmp=$(mktemp --suffix=.png)
+      ffmpegthumbnailer -i "$file" -o "$tmp" -s 0 -q 8 2>/dev/null
+      render_image "$tmp" "$w" "$h"
+      rm -f "$tmp"
+      ;;
+    audio/*)
+      exiftool -- "$file"
+      ;;
+    text/markdown)
+      glow -s dark -w "$w" -- "$file"
+      ;;
+    text/html|application/xhtml+xml)
+      w3m -dump -cols "$w" -T text/html "$file"
+      ;;
+    application/json)
+      jq -C . -- "$file" 2>/dev/null || bat --color=always --style=plain -- "$file"
+      ;;
+    application/zip|application/x-tar|application/gzip|application/x-bzip2|application/x-xz|application/x-7z-compressed|application/vnd.rar)
+      atool -l -- "$file"
+      ;;
+    application/vnd.openxmlformats-officedocument.*|application/vnd.oasis.opendocument.*|application/msword|application/vnd.ms-*)
+      echo "(office doc — open with ctrl-o for full view)"
+      echo
+      exiftool -- "$file"
+      ;;
+    text/*|application/javascript|application/x-shellscript|application/xml)
+      bat --color=always --style=plain --paging=never --terminal-width="$w" -- "$file"
+      ;;
+    *)
+      exiftool -- "$file"
+      ;;
+  esac
 }
 
 case "${1:-}" in
@@ -103,13 +155,9 @@ case "${1:-}" in
   --preview) shift; preview_file "$@"; exit 0 ;;
 esac
 
-CTPV_ID=$$
-export CTPV_ID
-ctpv -s "$CTPV_ID" &
-trap 'ctpv -e "$CTPV_ID" 2>/dev/null || true' EXIT
-
 list_files | fzf \
   --multi \
+  --no-sort \
   --height=100% --reverse \
   --preview '"$SCRIPT" --preview {}' \
   --preview-window=right:60%:wrap \
