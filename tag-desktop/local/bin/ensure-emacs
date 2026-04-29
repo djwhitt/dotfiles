@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+window_class="emacs"
+
+if hyprctl clients -j | jq -e '.[] | select(.class == "'"$window_class"'")' > /dev/null 2>&1; then
+  hyprctl dispatch focuswindow "class:$window_class"
+else
+  setsid -f emacs >/dev/null 2>&1
+fi
