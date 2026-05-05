@@ -9,7 +9,7 @@ This is a dotfiles repository managed with **RCM** (rcm/lsrc). Dotfiles are syml
 ### RCM Configuration
 
 The rcrc file (`host-framework13/rcrc`) controls deployment:
-- `TAGS="desktop"` - Enables `tag-desktop/` configs
+- `TAGS="linux"` - Enables `tag-linux/` configs
 - `DOTFILES_DIRS` - Main repo + private repo at `~/.dotfiles-private`
 - `EXCLUDES="Makefile"` - Not symlinked
 
@@ -20,7 +20,7 @@ The rcrc file (`host-framework13/rcrc`) controls deployment:
 rcup -v              # Install/update symlinks
 lsrc                 # List what will be linked
 
-# Just tasks (user.justfile in tag-desktop/)
+# Just tasks (user.justfile in tag-linux/)
 just weekly-newsletter-to-kindle
 ```
 
@@ -35,8 +35,8 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 ## Directory Structure
 
 - `config/` - Universal configs (fish, nvim, git, atuin)
-- `tag-desktop/` - Desktop-specific configs (kitty, lf, neomutt, taskwarrior)
-- `tag-desktop/local/bin/` - Desktop utility scripts
+- `tag-linux/` - Linux desktop configs (kitty, lf, neomutt, taskwarrior, hypr, niri, waybar, etc.)
+- `tag-linux/local/bin/` - Linux desktop utility scripts
 - `local/bin/` - Cross-platform utility scripts
 - `host-framework13/` - Host-specific overrides
 
@@ -46,13 +46,13 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 |-----|-----------------|-------|
 | Fish shell | `config/fish/` | Primary shell, modular conf.d/ setup |
 | Neovim | `config/nvim/lua/` | Lua-based config |
-| Kitty | `tag-desktop/config/kitty/` | Terminal with hyprctl window management |
-| LF | `tag-desktop/config/lf/` | File manager with custom scripts |
+| Kitty | `tag-linux/config/kitty/` | Terminal with hyprctl window management |
+| LF | `tag-linux/config/lf/` | File manager with custom scripts |
 | Atuin | `config/atuin/` | Shell history manager |
 
 ## Notable Scripts
 
-### Kitty Window Management (`tag-desktop/local/bin/`)
+### Kitty Window Management (`tag-linux/local/bin/`)
 - `ensure-kitty-nvim` - Opens Neovim in dedicated Kitty window on workspace 2
 - `ensure-kitty-lf` - Opens LF file manager in dedicated Kitty window
 
