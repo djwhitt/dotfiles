@@ -1,6 +1,11 @@
 alias tl="tmuxp load"
-alias ls="ls --hyperlink=auto --color=auto"
 alias j="just"
+
+if command ls --version 2>/dev/null | string match -q "*GNU*"
+    alias ls "ls --hyperlink=auto --color=auto"
+else
+    alias ls "ls -G"
+end
 
 # Quick editing shortcuts
 alias ef="e ~/.config/fish/config.fish"
@@ -9,5 +14,7 @@ alias et="e ~/.local/src/clj/djwhitt/tasks.clj"
 alias ev="e ~/.config/nvim/lua/plugins/astrocore.lua"
 
 if status is-interactive
-  atuin init fish | source
+    if type -q atuin
+        atuin init fish | source
+    end
 end
