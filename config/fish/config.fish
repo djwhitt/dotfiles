@@ -1,3 +1,5 @@
+set -g fish_greeting ""
+
 alias tl="tmuxp load"
 alias j="just"
 
@@ -6,12 +8,6 @@ if command ls --version 2>/dev/null | string match -q "*GNU*"
 else
     alias ls "ls -G"
 end
-
-# Quick editing shortcuts
-alias ef="e ~/.config/fish/config.fish"
-alias em="e ~/.map.edn"
-alias et="e ~/.local/src/clj/djwhitt/tasks.clj"
-alias ev="e ~/.config/nvim/lua/plugins/astrocore.lua"
 
 if status is-interactive
     if type -q atuin
