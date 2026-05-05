@@ -1,1 +1,1 @@
-set -x FZF_DEFAULT_OPTS "--layout=reverse"
+set -gx FZF_DEFAULT_OPTS "--layout=reverse"
