@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -eu
+
+usage() {
+    cat <<EOF
+Usage: transcribe FILE [-m MODEL]
+  Converts FILE to 16kHz mono WAV via ffmpeg, then runs whisper-cli.
+  MODEL: name of ~/.local/share/whisper/ggml-MODEL.bin (default: small.en).
+EOF
+}
+
+model_name="small.en"
+input=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+        -m|--model) model_name="$2"; shift 2 ;;
+        -*) echo "transcribe: unknown option: $1" >&2; usage >&2; exit 2 ;;
+        *) if [[ -n "$input" ]]; then
+               echo "transcribe: unexpected extra argument: $1" >&2; exit 2
+           fi
+           input="$1"; shift ;;
+    esac
+done
+
+if [[ -z "$input" ]]; then
+    usage >&2
+    exit 2
+fi
+
+model_path="$HOME/.local/share/whisper/ggml-$model_name.bin"
+
+if [[ ! -f "$input" ]]; then
+    echo "transcribe: input not found: $input" >&2
+    exit 1
+fi
+if [[ ! -f "$model_path" ]]; then
+    echo "transcribe: model not found: $model_path" >&2
+    echo "  Download: whisper-cpp-download-ggml-model $model_name ~/.local/share/whisper" >&2
+    exit 1
+fi
+
+tmpdir=$(mktemp -d -t transcribe)
+trap 'rm -rf "$tmpdir"' EXIT
+tmpwav="$tmpdir/audio.wav"
+
+ffmpeg -loglevel error -y -i "$input" -ar 16000 -ac 1 -c:a pcm_s16le "$tmpwav"
+whisper-cli -m "$model_path" -f "$tmpwav" -nt
