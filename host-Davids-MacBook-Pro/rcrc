@@ -1,0 +1,4 @@
+HOSTNAME="Davids-MacBook-Pro"
+TAGS="darwin"
+DOTFILES_DIRS="/Users/djwhitt/.dotfiles /Users/djwhitt/.dotfiles-private"
+EXCLUDES="Makefile CLAUDE.md README.org PLAN.org"
