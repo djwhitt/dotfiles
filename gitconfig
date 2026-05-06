@@ -23,13 +23,18 @@
 	process = git-lfs filter-process
 	required = true
 
-[diff]
-	external = difft
+#[diff]
+#	external = difft
 [safe]
 	directory = /etc/nixos
+	directory = /srv/git/djw-study.git
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !gh auth git-credential
+[core]
+	excludesfile = /home/djwhitt/.gitignore_global
+[init]
+	defaultBranch = main

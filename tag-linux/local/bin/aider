@@ -2,10 +2,12 @@
 
 #docker pull paulgauthier/aider-full
 
-docker run -it \
-  --user "$(id -u):$(id -g)" \
-  --volume "$HOME/.gitconfig:/home/djwhitt/.gitconfig" \
-  --volume "$(pwd):/app" \
-  paulgauthier/aider-full \
+#docker run -it \
+#  --user "$(id -u):$(id -g)" \
+#  --volume "$HOME/.gitconfig:/home/djwhitt/.gitconfig" \
+#  --volume "$(pwd):/app" \
+#  paulgauthier/aider-full \
+
+exec /etc/profiles/per-user/djwhitt/bin/aider \
   --openai-api-key "$(openai-api-key)" \
   --anthropic-api-key "$(anthropic-api-key)" "$@"

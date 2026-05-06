@@ -14,3 +14,6 @@ if status is-interactive
         atuin init fish | source
     end
 end
+
+# opencode
+fish_add_path /home/djwhitt/.opencode/bin

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 export EDITOR=nvim
-export VISUAL=e
+export VISUAL=nvim
+#export VISUAL=e
 
 export NPM_PACKAGES="$HOME/.npm-packages"
 

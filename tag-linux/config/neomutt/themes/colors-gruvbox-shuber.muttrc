@@ -57,6 +57,24 @@ color index color167 color234 ~=
 color index color234 color223 ~T
 color index color234 color167 ~D
 
+# Notmuch tag-based index colors (Gmail labels via lieer).
+# Order matters: later rules override earlier ones, so put the most-important
+# states (e.g. unread) last if you want them to win over label coloring.
+color index color214 color234 "~(tag:starred)"
+color index color208 color234 "~(tag:important)"
+color index color175 color234 "~(tag:scans)"
+color index color243 color234 "~(tag:trash)"
+color index color243 color234 "~(tag:spam)"
+
+# Inline tag display (the tag column in the index).
+color index_tag color214 color234 "starred"
+color index_tag color208 color234 "important"
+color index_tag color142 color234 "inbox"
+color index_tag color175 color234 "scans"
+color index_tag color109 color234 "sent"
+color index_tag color167 color234 "trash"
+color index_tag color167 color234 "spam"
+
 color header color214 color234 "^(To:|From:)"
 color header color142 color234 "^Subject:"
 color header color108 color234 "^X-Spam-Status:"
@@ -67,7 +85,7 @@ color body color142 color234 "[a-z]{3,255}://[-a-zA-Z0-9@:%._\\+~#=/?&,]+"
 color body color142 color234 "[a-zA-Z]([-a-zA-Z0-9_]+\\.){2,255}[-a-zA-Z0-9_]{2,255}"
 color body color208 color234 "[-a-z_0-9.%$]+@[-a-z_0-9.]+\\.[-a-z][-a-z]+"
 color body color208 color234 "mailto:[-a-z_0-9.]+@[-a-z_0-9.]+"
-color body color234 color214 "[;:]-*[)>(<lt;|]"
+color body color234 color214 "[;:]-*[)>(<|]"
 color body color229 color234 "\\*[- A-Za-z]+\\*"
 
 color body color214 color234 "^-.*PGP.*-*"
