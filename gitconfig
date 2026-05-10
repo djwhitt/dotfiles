@@ -8,6 +8,7 @@
 	br = branch
 	co = checkout
 	df = diff
+	dft = -c diff.external=difft diff
 	lg = log -p
 
 [push]
@@ -23,8 +24,6 @@
 	process = git-lfs filter-process
 	required = true
 
-#[diff]
-#	external = difft
 [safe]
 	directory = /etc/nixos
 	directory = /srv/git/djw-study.git
