@@ -1,11 +1,23 @@
 {
-    "global": {
-        "show_in_menu_bar": false
-    },
+    "global": { "show_in_menu_bar": false },
     "profiles": [
         {
             "complex_modifications": {
                 "rules": [
+                    {
+                        "description": "Caps Lock -> Left Control (hold) / Escape (tap)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "caps_lock",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "left_control" }],
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
                     {
                         "description": "Disable Command+Tab (app switching handled by AltTab on Option+Tab)",
                         "manipulators": [
@@ -17,11 +29,7 @@
                                         "optional": ["any"]
                                     }
                                 },
-                                "to": [
-                                    {
-                                        "key_code": "vk_none"
-                                    }
-                                ],
+                                "to": [{ "key_code": "vk_none" }],
                                 "type": "basic"
                             }
                         ]
@@ -30,21 +38,8 @@
             },
             "name": "Default profile",
             "selected": true,
-            "simple_modifications": [
-                {
-                    "from": {
-                        "key_code": "caps_lock"
-                    },
-                    "to": [
-                        {
-                            "key_code": "left_control"
-                        }
-                    ]
-                }
-            ],
-            "virtual_hid_keyboard": {
-                "keyboard_type_v2": "ansi"
-            }
+            "simple_modifications": [],
+            "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
         }
     ]
 }
