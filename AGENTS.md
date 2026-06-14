@@ -54,6 +54,7 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 | LF | `tag-linux/config/lf/` | File manager with custom scripts |
 | Atuin | `config/atuin/` | Shell history manager |
 | Karabiner | `tag-darwin/config/karabiner/` | macOS key remapping (Caps Lock → Left Control) |
+| SwiftBar | `tag-darwin/Library/Application Support/SwiftBar/plugins/` | Menu bar plugins, symlinked into SwiftBar's default dir via `UNDOTTED="Library"` in the darwin rcrc |
 
 ## Notable Scripts
 

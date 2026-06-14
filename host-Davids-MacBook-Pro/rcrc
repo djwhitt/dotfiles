@@ -1,4 +1,5 @@
 HOSTNAME="Davids-MacBook-Pro"
 TAGS="darwin"
+UNDOTTED="Library"
 DOTFILES_DIRS="/Users/djwhitt/.dotfiles /Users/djwhitt/.dotfiles-private"
 EXCLUDES="Makefile CLAUDE.md AGENTS.md README.org PLAN.org"
