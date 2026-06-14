@@ -6,6 +6,3 @@
 .clj-kondo
 .lsp
 .nrepl-port
-
-# Live Display
-.live-display*

@@ -60,7 +60,7 @@ Companion RCM repo for sensitive configs, merged via `DOTFILES_DIRS` in rcrc. Se
 ### Kitty Window Management (`tag-linux/local/bin/`)
 - `ensure-kitty-nvim` - Opens Neovim in dedicated Kitty window on workspace 2
 - `ensure-kitty-lf` - Opens LF file manager in dedicated Kitty window
-- `ensure-kitty-mr-moo`, `ensure-kitty-render` - Other dedicated-window launchers
+- `ensure-kitty-render` - Other dedicated-window launchers
 
 ### Media & Archival
 - `record-call` (`tag-linux/local/bin/`) - Toggle call recording (mic + system audio) with transcription
