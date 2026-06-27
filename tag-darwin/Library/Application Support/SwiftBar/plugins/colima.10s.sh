@@ -25,7 +25,12 @@ status=$("$COLIMA" status 2>&1)
 
 if [[ $status =~ "colima is running" ]]; then
   running=1
-  echo "🐳"
+  if [[ -n $DOCKER ]]; then
+    running_count=$("$DOCKER" ps -q 2>/dev/null | wc -l | tr -d ' ')
+    echo "🐳 $running_count"
+  else
+    echo "🐳"
+  fi
 else
   running=0
   echo "🐳⏸"
@@ -35,7 +40,27 @@ echo "---"
 
 if (( running )); then
   echo "Colima is running | color=green"
-  [[ -n $DOCKER ]] && echo "$("$DOCKER" ps -q 2>/dev/null | wc -l | tr -d ' ') containers running"
+
+  if [[ -n $DOCKER ]]; then
+    echo "$running_count containers running"
+
+    # List every container (running + stopped) with per-container actions.
+    # Format: state<TAB>name  (state is "running", "exited", etc.)
+    while IFS=$'\t' read -r state name; do
+      [[ -z $name ]] && continue
+      if [[ $state == running ]]; then
+        echo "--🟢 $name | color=green"
+        echo "----Stop | shell=\"$DOCKER\" param1=stop param2=\"$name\" terminal=false refresh=true"
+        echo "----Restart | shell=\"$DOCKER\" param1=restart param2=\"$name\" terminal=false refresh=true"
+        echo "----Logs | shell=\"$DOCKER\" param1=logs param2=--tail param3=100 param4=\"$name\" terminal=true"
+      else
+        echo "--⚪ $name | color=gray"
+        echo "----Start | shell=\"$DOCKER\" param1=start param2=\"$name\" terminal=false refresh=true"
+        echo "----Remove | shell=\"$DOCKER\" param1=rm param2=\"$name\" terminal=false refresh=true"
+      fi
+    done < <("$DOCKER" ps -a --format '{{.State}}'$'\t''{{.Names}}' 2>/dev/null)
+  fi
+
   echo "---"
   echo "Stop Colima | shell=\"$COLIMA\" param1=stop terminal=false refresh=true"
   echo "Restart Colima | shell=\"$COLIMA\" param1=restart terminal=false refresh=true"
