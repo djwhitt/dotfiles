@@ -2,6 +2,7 @@ set -g fish_greeting ""
 
 alias j="just"
 alias contagent="$HOME/Work/misc/contagent/contagent"
+alias cpi="$HOME/Work/misc/contagent/contagent pi"
 
 if command ls --version 2>/dev/null | string match -q "*GNU*"
     alias ls "ls --hyperlink=auto --color=auto"
