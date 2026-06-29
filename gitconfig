@@ -33,7 +33,5 @@
 [credential "https://gist.github.com"]
 	helper =
 	helper = !gh auth git-credential
-[core]
-	excludesfile = /home/djwhitt/.gitignore_global
 [init]
 	defaultBranch = main
